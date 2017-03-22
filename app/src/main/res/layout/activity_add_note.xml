@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:context="com.prodigus.com.prodigus.AddNote">
+
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbarCon"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:popupTheme="@style/AppTheme.PopupOverlay" />
+
+    </android.support.design.widget.AppBarLayout>
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+        android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        tools:context="com.prodigus.com.prodigus.AddNote">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:id="@+id/personID"
+            android:visibility="invisible" />
+
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/NoteText"
+            android:hint="Zadajte text"
+            android:inputType="textMultiLine"
+            android:minLines="10"
+            android:gravity="top"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_below="@+id/edMeetingDate" />
+
+        <Button
+            android:id="@+id/btnAddN"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Pridať poznámku"
+            android:textSize="20dp"
+            android:layout_below="@+id/personID"
+            android:layout_alignLeft="@+id/tbMeetingDate"
+            android:layout_alignStart="@+id/tbMeetingDate"
+            android:layout_marginTop="28dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
+
+        <TextView
+            android:id="@+id/tbMeetingDate"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="left"
+            android:text="Dátum stretnutia"
+            android:textSize="20dp"
+            android:layout_marginTop="8dp"
+            android:layout_below="@+id/btnAddN"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
+
+        <EditText
+            android:id="@+id/edMeetingDate"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="left"
+            android:height="15dp"
+            android:layout_marginTop="10dp"
+            android:layout_below="@+id/tbMeetingDate"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+
+    </RelativeLayout>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/fab_margin"
+        app:srcCompat="@android:drawable/ic_dialog_email" />
+
+</android.support.design.widget.CoordinatorLayout>
+
+

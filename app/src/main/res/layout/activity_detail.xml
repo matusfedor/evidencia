@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    tools:context=".activity.MainActivity"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+
+
+
+        <TextView
+            android:id="@+id/tbTitle"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="left"
+            android:text="Titul"
+            android:textSize="20dp"
+
+            />
+
+        <TextView
+            android:id="@+id/edTitle"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="left"
+            android:singleLine="true"
+            android:height="20dp"
+            android:layout_below="@+id/tbTitle"
+            />
+
+        <TextView
+            android:id="@+id/tbName"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="left"
+            android:text="Meno"
+            android:textSize="20dp"
+            android:layout_below="@+id/edTitle"/>
+
+        <TextView
+            android:id="@+id/edName"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="left"
+            android:singleLine="true"
+            android:height="20dp"
+            android:layout_below="@+id/tbName"/>
+
+        <TextView
+            android:id="@+id/tbSurname"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="left"
+            android:text="Priezvisko"
+            android:textSize="20dp"
+            android:layout_below="@+id/edName"/>
+
+        <TextView
+            android:id="@+id/edSurname"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:gravity="left"
+            android:singleLine="true"
+            android:height="20dp"
+            android:layout_below="@+id/tbSurname"/>
+
+        <TextView
+            android:id="@+id/tbBornDate"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="left"
+            android:text="Dátum narodenia"
+            android:textSize="20dp"
+            android:layout_below="@+id/edSurname"/>
+
+        <TextView
+            android:id="@+id/edBornDate"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:gravity="left"
+            android:singleLine="true"
+            android:height="20dp"
+            android:layout_below="@+id/tbBornDate"/>
+        <TextView
+            android:id="@+id/tbEmail"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="left"
+            android:text="Email"
+            android:textSize="20dp"
+            android:layout_below="@+id/edBornDate"/>
+
+        <TextView
+            android:id="@+id/edEmail"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="left"
+            android:singleLine="true"
+            android:height="20dp"
+            android:layout_below="@+id/tbEmail"/>
+
+        <TextView
+            android:id="@+id/tbPhone"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="left"
+            android:text="Telefón"
+            android:textSize="20dp"
+            android:layout_below="@+id/edEmail"/>
+
+        <TextView
+            android:id="@+id/edPhone"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="left"
+            android:singleLine="true"
+            android:height="20dp"
+            android:layout_below="@+id/tbPhone"/>
+
+        <TextView
+            android:id="@+id/tbGender"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="left"
+            android:text="Pohlavie"
+            android:textSize="20dp"
+            android:layout_below="@+id/edPhone"/>
+
+        <TextView
+            android:id="@+id/Gender_spinner"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tbGender"/>
+
+        <TextView
+            android:id="@+id/tbCity"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="left"
+            android:text="Mesto"
+            android:textSize="20dp"
+            android:layout_below="@+id/Gender_spinner"/>
+
+        <TextView
+            android:id="@+id/edCity"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="left"
+            android:singleLine="true"
+            android:height="20dp"
+            android:layout_below="@+id/tbCity"/>
+
+        <TextView
+            android:id="@+id/tbStreet"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="left"
+            android:text="Ulica"
+            android:textSize="20dp"
+            android:layout_below="@+id/edCity"/>
+
+        <TextView
+            android:id="@+id/edStreet"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="left"
+            android:singleLine="true"
+            android:height="20dp"
+            android:layout_below="@+id/tbStreet"/>
+
+        <TextView
+            android:id="@+id/tbNumber"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="left"
+            android:text="Popisné číslo"
+            android:textSize="20dp"
+            android:layout_below="@+id/edStreet"/>
+
+        <TextView
+            android:id="@+id/edNumber"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="left"
+            android:singleLine="true"
+            android:height="20dp"
+            android:layout_below="@+id/tbNumber"/>
+
+
+    </RelativeLayout>
+</ScrollView>

@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:layout_marginTop="62dp"
+    tools:context=".activity.MainActivity"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/tbTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Titul"
+            android:textSize="20dp" />
+
+        <EditText
+            android:id="@+id/edTitle"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tbTitle"
+            android:gravity="left"
+            android:singleLine="true"
+            android:height="20dp"/>
+
+        <TextView
+            android:id="@+id/tbName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_below="@+id/edTitle"
+            android:text="Meno"
+            android:textSize="20dp" />
+
+        <EditText
+            android:id="@+id/edName"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tbName"
+            android:gravity="left"
+            android:singleLine="true"
+            android:height="20dp"/>
+
+        <TextView
+            android:id="@+id/tbSurname"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_below="@+id/edName"
+            android:gravity="left"
+            android:text="Priezvisko"
+            android:textSize="20dp" />
+
+        <EditText
+            android:id="@+id/edSurname"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:gravity="left"
+            android:layout_below="@+id/tbSurname"
+            android:singleLine="true"
+            android:height="20dp"/>
+
+        <TextView
+            android:id="@+id/tbBornDate"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="left"
+            android:layout_below="@+id/edSurname"
+            android:text="Dátum narodenia"
+            android:textSize="20dp" />
+
+        <EditText
+            android:id="@+id/edBornDate"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:gravity="left"
+            android:layout_below="@+id/tbBornDate"
+            android:singleLine="true"
+            android:height="20dp"/>
+        <TextView
+            android:id="@+id/tbEmail"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_below="@+id/edBornDate"
+            android:gravity="left"
+            android:text="Email"
+            android:textSize="20dp"/>
+
+        <EditText
+            android:id="@+id/edEmail"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="left"
+            android:layout_below="@+id/tbEmail"
+            android:singleLine="true"
+            android:height="20dp"/>
+
+        <TextView
+            android:id="@+id/tbPhone"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="left"
+            android:layout_below="@+id/edEmail"
+            android:text="Telefón"
+            android:textSize="20dp" />
+
+        <EditText
+            android:id="@+id/edPhone"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="left"
+            android:layout_below="@+id/tbPhone"
+            android:singleLine="true"
+            android:height="20dp"/>
+
+        <TextView
+            android:id="@+id/tbGender"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="left"
+            android:layout_below="@+id/edPhone"
+            android:text="Pohlavie"
+            android:textSize="20dp" />
+
+        <Spinner
+            android:id="@+id/Gender_spinner"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tbGender"/>
+
+        <TextView
+            android:id="@+id/tbCity"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="left"
+            android:text="Mesto"
+            android:layout_below="@+id/Gender_spinner"
+            android:textSize="20dp" />
+
+        <EditText
+            android:id="@+id/edCity"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="left"
+            android:layout_below="@+id/tbCity"
+            android:singleLine="true"
+            android:height="20dp"/>
+
+        <TextView
+            android:id="@+id/tbStreet"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="left"
+            android:text="Ulica"
+            android:layout_below="@+id/edCity"
+            android:textSize="20dp" />
+
+        <EditText
+            android:id="@+id/edStreet"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="left"
+            android:layout_below="@+id/tbStreet"
+            android:singleLine="true"
+            android:height="20dp"/>
+
+        <TextView
+            android:id="@+id/tbNumber"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="left"
+            android:layout_below="@+id/edStreet"
+            android:text="Popisné číslo"
+            android:textSize="20dp" />
+
+        <EditText
+            android:id="@+id/edNumber"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="left"
+            android:layout_below="@+id/tbNumber"
+            android:singleLine="true"
+            android:height="20dp"/>
+
+        <Button
+            android:id="@+id/btnAdd"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center"
+            android:text="Pridať kontakt"
+            android:layout_below="@+id/edNumber"
+            android:textSize="20dp"
+            android:layout_marginTop="10dp"/>
+
+    </RelativeLayout>
+</ScrollView>

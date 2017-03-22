@@ -1,0 +1,5 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" tools:context="com.prodigus.com.prodigus.AddNote">
+    <item android:id="@+id/menuAdd_Note" android:title="@string/action_show"
+        android:orderInCategory="110" />
+</menu>
