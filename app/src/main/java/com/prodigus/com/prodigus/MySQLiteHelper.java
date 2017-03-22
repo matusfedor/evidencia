@@ -17,6 +17,7 @@ import java.util.List;
 
 public class MySQLiteHelper extends SQLiteOpenHelper {
 
+    //region Contact
     public static final String TABLE_COMMENTS = "clients";
     public static final String COLUMN_ID = "_id";
     public static final String COLUMN_TITLE = "title";
@@ -30,23 +31,58 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     public static final String COLUMN_EMAIL = "email";
     public static final String COLUMN_PHONE = "phone";
     public static final String COLUMN_ATT = "attribute";
+    //endregion
 
+    //region Access
     public static final String TABLE_ACCESS = "settAccess";
     public static final String COLUMN_LOG_ID = "_id";
     public static final String COLUMN_LOGNAME = "logname";
     public static final String COLUMN_PIN = "pin";
+    //endregion
 
+    //region Note
     public static final String TABLE_NOTES = "notes";
     public static final String TABLE_ATTRIBUTE = "cl_attribute";
     public static final String COLUMN_NOTE_ID = "_id";
     public static final String COLUMN_NOTE_TEXT = "notetext";
     public static final String COLUMN_NOTE_DATEC = "datec";
     public static final String COLUMN_NOTE_PERSON = "person";
+    public static final String COLUMN_NOTE_ATTRIBUTE = "attribute";
+    //endregion
 
     private static final String DATABASE_NAME = "contact.db";
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
 
-    // Database creation sql statement
+    public MySQLiteHelper(Context context) {
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+    }
+
+    //region Basic
+    @Override
+    public void onCreate(SQLiteDatabase database) {
+        database.execSQL(DATABASE_CREATE); database.execSQL(TABLE_SETACCESS); database.execSQL(TABLE_NOTESS); database.execSQL(TABLE_ATTRIBUTES);
+        database.execSQL("Insert into cl_attribute values (1,'AFA','Finan. analyza','C')");
+        database.execSQL("Insert into cl_attribute values (2,'TEL','Telef. kontakt','N')");
+        database.execSQL("Insert into cl_attribute values (3,'OSO','Osobné stretnutie','N')");
+        database.execSQL("Insert into cl_attribute values (4,'SKO','Školenie','N')");
+
+    }
+
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        Log.w(MySQLiteHelper.class.getName(),
+                "Upgrading database from version " + oldVersion + " to "
+                        + newVersion + ", which will destroy all old data");
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_COMMENTS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_ACCESS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NOTES);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_ATTRIBUTE);
+        onCreate(db);
+    }
+    //endregion
+
+    //region Table creation
+    // Database creation sql statements
     private static final String DATABASE_CREATE = "create table "
             + TABLE_COMMENTS + "(" + COLUMN_ID + " integer primary key autoincrement, "
             + COLUMN_TITLE + " text,"
@@ -70,150 +106,17 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
             + TABLE_NOTES + "(" + COLUMN_NOTE_ID + " integer primary key autoincrement, "
             + COLUMN_NOTE_TEXT + " text not null,"
             + COLUMN_NOTE_DATEC + " text not null,"
-            + COLUMN_NOTE_PERSON + " text not null) ";
+            + COLUMN_NOTE_PERSON + " text not null, "
+            + COLUMN_NOTE_ATTRIBUTE + " text not null) ";
 
     private static final String TABLE_ATTRIBUTES =  "create table "
             + "cl_attribute" + "( _id integer primary key autoincrement, "
             + "att_sc" + " text not null,"
-            + "att_full" + " text not null) ";
+            + "att_full" + " text not null,"
+            + "att_type" + " text not null)";
+    //endregion
 
-    public MySQLiteHelper(Context context) {
-        super(context, DATABASE_NAME, null, DATABASE_VERSION);
-    }
-
-    @Override
-    public void onCreate(SQLiteDatabase database) {
-        database.execSQL(DATABASE_CREATE); database.execSQL(TABLE_SETACCESS); database.execSQL(TABLE_NOTESS); database.execSQL(TABLE_ATTRIBUTES);
-        database.execSQL("Insert into cl_attribute values (1,'AFA','Finan. analyza')");
-
-    }
-
-    @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        Log.w(MySQLiteHelper.class.getName(),
-                "Upgrading database from version " + oldVersion + " to "
-                        + newVersion + ", which will destroy all old data");
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_COMMENTS);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_ACCESS);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NOTES);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_ATTRIBUTE);
-        onCreate(db);
-    }
-
-    //insert comment
-    public long createToDo(String title, String name, String surname, Date borndate, String city, String street, String number, String email, String phone, String gender, String attribute) {
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        ContentValues values = new ContentValues();
-        values.put(FeedEntry.COLUMN_TITLE, title);
-        values.put(FeedEntry.COLUMN_NAME,name);
-        values.put(FeedEntry.COLUMN_SURNAME,surname);
-        values.put(FeedEntry.COLUMN_BORNDATE,borndate.toString());
-        values.put(FeedEntry.COLUMN_CITY,city);
-        values.put(FeedEntry.COLUMN_STREET,street);
-        values.put(FeedEntry.COLUMN_NUMBER,number);
-        values.put(FeedEntry.COLUMN_EMAIL,email);
-        values.put(FeedEntry.COLUMN_PHONE,phone);
-        values.put(FeedEntry.COLUMN_GENDER,gender);
-        values.put(FeedEntry.COLUMN_ATTRIBUTE, attribute);
-        // insert row
-
-        long todo_id = db.insert(FeedEntry.TABLE_NAME, null, values);
-
-        return todo_id;
-    }
-
-    public long updateToDo(int personId, String title, String name, String surname, Date borndate, String city, String street, String number, String email, String phone, String gender, String attribute) {
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        ContentValues values = new ContentValues();
-        values.put(FeedEntry.COLUMN_TITLE, title);
-        values.put(FeedEntry.COLUMN_NAME,name);
-        values.put(FeedEntry.COLUMN_SURNAME,surname);
-        values.put(FeedEntry.COLUMN_BORNDATE,borndate.toString());
-        values.put(FeedEntry.COLUMN_CITY,city);
-        values.put(FeedEntry.COLUMN_STREET,street);
-        values.put(FeedEntry.COLUMN_NUMBER,number);
-        values.put(FeedEntry.COLUMN_EMAIL,email);
-        values.put(FeedEntry.COLUMN_PHONE,phone);
-        values.put(FeedEntry.COLUMN_GENDER,gender);
-        values.put(FeedEntry.COLUMN_ATTRIBUTE, attribute);
-        // insert row
-
-        long todo_id = db.update(FeedEntry.TABLE_NAME, values, "_id=" + personId, null);
-
-        return todo_id;
-    }
-
-    public long createNote(String text, String person)
-    {
-        /*
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy hh:mm:ss");
-
-        Date now = new Date();
-        now.getDate();
-
-        SimpleDateFormat format =
-                new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
-
-        //Date parsed = format.parse(now.toString());*/
-/*
-        Date dt = new Date();
-        int hours = dt.getDay();
-        int minutes = dt.getMonth();
-        int seconds = dt.getYear();
-        String curTime = hours + ":" + minutes + ":" + seconds;*/
-
-        Calendar calendar = Calendar.getInstance();
-        int hours = calendar.get(Calendar.DAY_OF_MONTH);
-        int minutes = calendar.get(Calendar.MONTH)+1;
-        int seconds = calendar.get(Calendar.YEAR);
-        String curTime = hours + "." + minutes + "." + seconds;
-
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(FeedReaderContract.Notes.COLUMN_NOTE_TEXT , text);
-        values.put(FeedReaderContract.Notes.COLUMN_NOTE_DATEC, curTime);
-        values.put(FeedReaderContract.Notes.COLUMN_NOTE_PERSON, person);
-
-        long todo_id = db.insert(FeedReaderContract.Notes.TABLE_NAME, null, values);
-
-        return todo_id;
-    }
-
-    public long setAccess(String logName, String pin) {
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        ContentValues values = new ContentValues();
-        values.put(AccessEntry.COLUMN_LOGNAME, logName);
-        values.put(AccessEntry.COLUMN_PIN, pin);
-         // insert row
-
-        long todo_id = db.insert(AccessEntry.TABLE_NAME, null, values);
-
-        return todo_id;
-    }
-
-    public void updAccess(String logName, String pin) {
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        ContentValues values = new ContentValues();
-        values.put(AccessEntry.COLUMN_LOGNAME, logName);
-        values.put(AccessEntry.COLUMN_PIN, pin);
-        // insert row
-
-        String strSQL = "UPDATE settAccess SET logName = " + logName + ", pin = " + pin;
-        db.execSQL(strSQL);
-    }
-
-    public boolean updateAccess(String logName, String pin) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues args = new ContentValues();
-        args.put(COLUMN_LOGNAME, logName);
-        args.put(COLUMN_PIN, pin);
-        return db.update(TABLE_ACCESS, args, null, null) > 0;
-    }
-
+    //region Select SQL
     public Cursor getAuth()
     {
         String selectQuery = "SELECT logname, pin FROM " + TABLE_ACCESS;
@@ -258,9 +161,25 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         return cursor;
     }
 
+    public Cursor getNotesByAttribute(String attribute)
+    {
+        String selectQuery = "SELECT _id, datec, notetext FROM " + TABLE_NOTES + " WHERE attribute like '%" + attribute + "%'";
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        return cursor;
+    }
+
     public Cursor getAllMarks()
     {
         String selectQuery = "SELECT distinct cl_attribute._id, att_sc, att_full FROM " + TABLE_ATTRIBUTE + " INNER JOIN " + TABLE_COMMENTS + " ON cl_attribute._id = clients.attribute";
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        return cursor;
+    }
+
+    public Cursor getAllNoteMarks()
+    {
+        String selectQuery = "SELECT distinct cl_attribute._id, att_sc, att_full FROM " + TABLE_ATTRIBUTE + " INNER JOIN " + TABLE_NOTES + " ON cl_attribute._id = notes.attribute";
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
         return cursor;
@@ -274,19 +193,178 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         return cursor;
     }
 
-    public void deleteAll()
-    {
-        SQLiteDatabase db = this.getWritableDatabase();
-        db.delete(FeedReaderContract.Notes.TABLE_NAME, null, null);
-        db.delete(FeedEntry.TABLE_NAME, null, null);
-    }
-
     public Cursor getAllNotes(String personid)
     {
         String selectQuery = "SELECT _id, substr(notetext,0,10) || '...' notetext, datec, person FROM " + TABLE_NOTES + " WHERE person = " + personid;
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
         return cursor;
+    }
+
+    public Cursor getRow(String id)
+    {
+        String selectQuery = "SELECT _id,title,name,surname,borndate,city,street,number,gender,email,phone FROM " + TABLE_COMMENTS + " WHERE _id = " + id;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        return cursor;
+    }
+
+    public List<Genders> getAllNoteTypes() {
+        List<Genders> noteTypesList = new ArrayList<Genders>();
+        String selectQuery = "SELECT _id, att_full FROM " + TABLE_ATTRIBUTE;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        // looping through all rows and adding to list
+        if (cursor.moveToFirst()) {
+            do {
+                Genders contact = new Genders(Integer.parseInt(cursor.getString(0)),cursor.getString(1));
+                noteTypesList.add(contact);
+            } while (cursor.moveToNext());
+        }
+
+        // return contact list
+        return noteTypesList;
+    }
+
+    //endregion
+
+    //region Insert SQL
+    public long createToDo(String title, String name, String surname, Date borndate, String city, String street, String number, String email, String phone, String gender, String attribute) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(FeedEntry.COLUMN_TITLE, title);
+        values.put(FeedEntry.COLUMN_NAME,name);
+        values.put(FeedEntry.COLUMN_SURNAME,surname);
+        values.put(FeedEntry.COLUMN_BORNDATE,borndate.toString());
+        values.put(FeedEntry.COLUMN_CITY,city);
+        values.put(FeedEntry.COLUMN_STREET,street);
+        values.put(FeedEntry.COLUMN_NUMBER,number);
+        values.put(FeedEntry.COLUMN_EMAIL,email);
+        values.put(FeedEntry.COLUMN_PHONE,phone);
+        values.put(FeedEntry.COLUMN_GENDER,gender);
+        values.put(FeedEntry.COLUMN_ATTRIBUTE, attribute);
+        // insert row
+
+        long todo_id = db.insert(FeedEntry.TABLE_NAME, null, values);
+
+        return todo_id;
+    }
+
+    public long createNote(String text, String person, long attribute)
+    {
+        /*
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy hh:mm:ss");
+
+        Date now = new Date();
+        now.getDate();
+
+        SimpleDateFormat format =
+                new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
+
+        //Date parsed = format.parse(now.toString());*/
+/*
+        Date dt = new Date();
+        int hours = dt.getDay();
+        int minutes = dt.getMonth();
+        int seconds = dt.getYear();
+        String curTime = hours + ":" + minutes + ":" + seconds;*/
+
+        Calendar calendar = Calendar.getInstance();
+        int hours = calendar.get(Calendar.DAY_OF_MONTH);
+        int minutes = calendar.get(Calendar.MONTH)+1;
+        int seconds = calendar.get(Calendar.YEAR);
+        String curTime = hours + "." + minutes + "." + seconds;
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(FeedReaderContract.Notes.COLUMN_NOTE_TEXT , text);
+        values.put(FeedReaderContract.Notes.COLUMN_NOTE_DATEC, curTime);
+        values.put(FeedReaderContract.Notes.COLUMN_NOTE_PERSON, person);
+        values.put(FeedReaderContract.Notes.COLUMN_NOTE_ATTRIBUTE, attribute);
+
+        long todo_id = db.insert(FeedReaderContract.Notes.TABLE_NAME, null, values);
+
+        return todo_id;
+    }
+
+    public long setAccess(String logName, String pin) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(AccessEntry.COLUMN_LOGNAME, logName);
+        values.put(AccessEntry.COLUMN_PIN, pin);
+        // insert row
+
+        long todo_id = db.insert(AccessEntry.TABLE_NAME, null, values);
+
+        return todo_id;
+    }
+    //endregion
+
+    //region Update SQL
+    public long updateToDo(int personId, String title, String name, String surname, Date borndate, String city, String street, String number, String email, String phone, String gender, String attribute) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(FeedEntry.COLUMN_TITLE, title);
+        values.put(FeedEntry.COLUMN_NAME,name);
+        values.put(FeedEntry.COLUMN_SURNAME,surname);
+        values.put(FeedEntry.COLUMN_BORNDATE,borndate.toString());
+        values.put(FeedEntry.COLUMN_CITY,city);
+        values.put(FeedEntry.COLUMN_STREET,street);
+        values.put(FeedEntry.COLUMN_NUMBER,number);
+        values.put(FeedEntry.COLUMN_EMAIL,email);
+        values.put(FeedEntry.COLUMN_PHONE,phone);
+        values.put(FeedEntry.COLUMN_GENDER,gender);
+        values.put(FeedEntry.COLUMN_ATTRIBUTE, attribute);
+        // insert row
+
+        long todo_id = db.update(FeedEntry.TABLE_NAME, values, "_id=" + personId, null);
+
+        return todo_id;
+    }
+
+    public void updAccess(String logName, String pin) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(AccessEntry.COLUMN_LOGNAME, logName);
+        values.put(AccessEntry.COLUMN_PIN, pin);
+        // insert row
+
+        String strSQL = "UPDATE settAccess SET logName = " + logName + ", pin = " + pin;
+        db.execSQL(strSQL);
+    }
+
+    public boolean updateAccess(String logName, String pin) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues args = new ContentValues();
+        args.put(COLUMN_LOGNAME, logName);
+        args.put(COLUMN_PIN, pin);
+        return db.update(TABLE_ACCESS, args, null, null) > 0;
+    }
+
+    //endregion
+
+    //region Delete SQL
+    public int deleteContact(int personId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(FeedEntry.COLUMN_TITLE, personId);
+
+        int todo_id = db.delete(FeedEntry.TABLE_NAME, "_id=" + personId, null);
+
+        return todo_id;
+    }
+
+    public void deleteAll()
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(FeedReaderContract.Notes.TABLE_NAME, null, null);
+        db.delete(FeedEntry.TABLE_NAME, null, null);
     }
 
     public void delNote(String noteid)
@@ -298,11 +376,5 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         Log.d("DELNOTE", "noteB: " + todo_id );
     }
 
-    public Cursor getRow(String id)
-    {
-        String selectQuery = "SELECT _id,title,name,surname,borndate,city,street,number,gender,email,phone FROM " + TABLE_COMMENTS + " WHERE _id = " + id;
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery(selectQuery, null);
-        return cursor;
-    }
+    //endregion
 }

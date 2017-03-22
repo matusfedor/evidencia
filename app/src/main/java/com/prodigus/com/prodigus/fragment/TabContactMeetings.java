@@ -21,6 +21,7 @@ package com.prodigus.com.prodigus.fragment;
 
 import android.app.DatePickerDialog;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.InputType;
@@ -41,8 +42,10 @@ import android.widget.Toast;
 import com.prodigus.com.prodigus.AddNote;
 import com.prodigus.com.prodigus.ChildItems;
 import com.prodigus.com.prodigus.ExpandableListAdapter;
+import com.prodigus.com.prodigus.MySQLiteHelper;
 import com.prodigus.com.prodigus.R;
 import com.prodigus.com.prodigus.SecondActivity;
+import com.prodigus.com.prodigus.ThirdActivity;
 import com.prodigus.com.prodigus.activity.TabContactMain;
 
 import java.text.SimpleDateFormat;
@@ -59,15 +62,17 @@ public class TabContactMeetings extends Fragment {
     ExpandableListView expListView;
     List<String> listDataHeader;
     HashMap<String, List<ChildItems>> listDataChild;
+    MySQLiteHelper db;
+    String personId;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         if (container == null) {
             return null;
         }
-
+        db = new MySQLiteHelper(getActivity());
         myFragmentView = (RelativeLayout)inflater.inflate(R.layout.activity_tab_contact_meetings, container, false);
-
+        personId = getActivity().getIntent().getStringExtra("personId");
         setHasOptionsMenu(true);
 
         expListView = (ExpandableListView) myFragmentView.findViewById(R.id.expLvMeeting);
@@ -93,7 +98,9 @@ public class TabContactMeetings extends Fragment {
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.add_meeting:
-                startActivity(new Intent(getActivity(), AddNote.class));
+                Intent nextScreen = new Intent(getActivity(), AddNote.class);
+                nextScreen.putExtra("personId",personId);
+                startActivity(nextScreen);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -134,8 +141,23 @@ public class TabContactMeetings extends Fragment {
         listDataHeader = new ArrayList<String>();
         listDataChild = new HashMap<String, List<ChildItems>>();
 
+        Cursor c = db.getAllNoteMarks();
+        int i = 0;
+
+        while (c.moveToNext())
+        {
+            try
+            {
+                listDataHeader.add(c.getString(c.getColumnIndex("att_full")));
+                listDataChild.put(listDataHeader.get(0), getNotesList(c.getString(c.getColumnIndex("_id"))));
+            }
+            catch (Exception e) {
+                Log.e("LogMarks", "Error " + e.toString());
+            }
+        }
+
         // Adding child data
-        listDataHeader.add("Telefonický kontakt");
+        /*listDataHeader.add("Telefonický kontakt");
         listDataHeader.add("Osobné stretnutie");
         listDataHeader.add("Školenie");
 
@@ -151,6 +173,24 @@ public class TabContactMeetings extends Fragment {
 
         listDataChild.put(listDataHeader.get(0), top250);
         listDataChild.put(listDataHeader.get(1), nowShowing);
-        listDataChild.put(listDataHeader.get(2), comingSoon);
+        listDataChild.put(listDataHeader.get(2), comingSoon);*/
+    }
+
+    private List getNotesList(String attribute)
+    {
+        List<ChildItems> notes = new ArrayList<ChildItems>();
+        Cursor c = db.getNotesByAttribute(attribute);
+        while (c.moveToNext())
+        {
+            try
+            {
+                notes.add(new ChildItems(c.getInt(c.getColumnIndex("_id")), c.getString(c.getColumnIndex("datec")) + " " + c.getString(c.getColumnIndex("notetext"))));
+            }
+            catch (Exception e) {
+                Log.e("LogMarks", "Error " + e.toString());
+            }
+
+        }
+        return notes;
     }
 }

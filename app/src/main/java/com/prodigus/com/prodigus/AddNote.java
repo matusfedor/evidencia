@@ -12,9 +12,12 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,7 +25,9 @@ import com.prodigus.com.prodigus.R;
 import com.prodigus.com.prodigus.activity.TabContactMain;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 public class AddNote extends AppCompatActivity implements View.OnClickListener {
     String personID;
@@ -31,12 +36,14 @@ public class AddNote extends AppCompatActivity implements View.OnClickListener {
     private DatePickerDialog bornDatePickerDialog;
     private SimpleDateFormat dateFormatter;
     private Toolbar toolbar;
+    protected List<Genders> meetingTypes = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_note);
 
+        db = new MySQLiteHelper(getApplicationContext());
         toolbar = (Toolbar) findViewById(R.id.toolbarCon);
         setSupportActionBar(toolbar);
 
@@ -44,13 +51,21 @@ public class AddNote extends AppCompatActivity implements View.OnClickListener {
 
         dateFormatter = new SimpleDateFormat("dd.MM.yyyy");
         setDateTimeField();
-        //getActionBar().setDisplayHomeAsUpEnabled(true);
 
         Intent intent = getIntent();
-        String itemText = intent.getStringExtra("item");
+        String itemText = intent.getStringExtra("personId");
 
         //EditText title = (EditText) findViewById(R.id.NoteText);
         //title.setText(itemText);
+
+        Spinner spinner = (Spinner) findViewById(R.id.meetingType);
+
+        meetingTypes = db.getAllNoteTypes();
+
+        ArrayAdapter<Genders> adapter = new ArrayAdapter<Genders>(this, android.R.layout.simple_spinner_item,meetingTypes);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+
         personID = itemText;
         db = new MySQLiteHelper(getApplicationContext());
 
@@ -61,8 +76,11 @@ public class AddNote extends AppCompatActivity implements View.OnClickListener {
             public void onClick(View arg0) {
 
                 String note = ((EditText) findViewById(R.id.NoteText)).getText().toString();
+                Spinner meetingType = (Spinner) findViewById(R.id.meetingType);
+                //long meetingTypeString = meetingType.getSelectedItem();
+                long meetingTypeString = ((Genders) meetingType.getSelectedItem()).getId();
 
-                long noteId = db.createNote(note,personID);
+                long noteId = db.createNote(note,personID,meetingTypeString);
                 Log.i("Note id: ", Long.toString(noteId));
 
                 ((EditText) findViewById(R.id.NoteText)).setText("");

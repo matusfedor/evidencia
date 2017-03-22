@@ -34,5 +34,6 @@ public final class FeedReaderContract {
         public static final String COLUMN_NOTE_TEXT = "notetext";
         public static final String COLUMN_NOTE_DATEC = "datec";
         public static final String COLUMN_NOTE_PERSON = "person";
+        public static final String COLUMN_NOTE_ATTRIBUTE = "attribute";
     }
 }

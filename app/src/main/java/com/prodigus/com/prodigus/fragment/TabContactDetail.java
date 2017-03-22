@@ -14,10 +14,12 @@ public class TabContactDetail extends AppCompatActivity {
 
 package com.prodigus.com.prodigus.fragment;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -30,6 +32,7 @@ import android.widget.TextView;
 
 import com.prodigus.com.prodigus.MySQLiteHelper;
 import com.prodigus.com.prodigus.R;
+import com.prodigus.com.prodigus.SecondActivity;
 import com.prodigus.com.prodigus.ThirdActivity;
 
 public class TabContactDetail extends Fragment {
@@ -99,9 +102,28 @@ public class TabContactDetail extends Fragment {
                 Intent nextScreen = new Intent(getActivity(), ThirdActivity.class);
                 nextScreen.putExtra("personId",personId);
                 startActivity(nextScreen);
-
                 return true;
+            case R.id.delete_contact:
+                AlertDialog.Builder ab = new AlertDialog.Builder(getActivity());
+                ab.setMessage("Are you sure to delete?").setPositiveButton("Yes", dialogClickListener)
+                        .setNegativeButton("No", dialogClickListener).show();
         }
         return super.onOptionsItemSelected(item);
     }
+
+    DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            switch (which){
+                case DialogInterface.BUTTON_POSITIVE:
+                    db.deleteContact(Integer.parseInt(personId));
+                    startActivity(new Intent(getActivity(), SecondActivity.class));
+                    break;
+
+                case DialogInterface.BUTTON_NEGATIVE:
+
+                    break;
+            }
+        }
+    };
 }
