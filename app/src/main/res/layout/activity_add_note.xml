@@ -44,6 +44,13 @@
             android:id="@+id/personID"
             android:visibility="invisible" />
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:id="@+id/noteID"
+            android:visibility="invisible" />
+
         <EditText
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

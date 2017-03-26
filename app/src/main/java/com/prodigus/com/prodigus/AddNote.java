@@ -3,6 +3,7 @@ package com.prodigus.com.prodigus;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
@@ -29,6 +30,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import static java.lang.Integer.parseInt;
+
 public class AddNote extends AppCompatActivity implements View.OnClickListener {
     String personID;
     MySQLiteHelper db;
@@ -54,6 +57,7 @@ public class AddNote extends AppCompatActivity implements View.OnClickListener {
 
         Intent intent = getIntent();
         String itemText = intent.getStringExtra("personId");
+        String noteId = intent.getStringExtra("noteId");
 
         //EditText title = (EditText) findViewById(R.id.NoteText);
         //title.setText(itemText);
@@ -67,7 +71,29 @@ public class AddNote extends AppCompatActivity implements View.OnClickListener {
         spinner.setAdapter(adapter);
 
         personID = itemText;
+
         db = new MySQLiteHelper(getApplicationContext());
+
+        if(noteId != null && noteId != ""){
+            db = new MySQLiteHelper(getApplicationContext());
+            Cursor cursor = db.getNote(parseInt(noteId));
+            cursor.moveToFirst();
+
+            TextView personId = ((TextView) findViewById(R.id.personID));
+            personId.setText(cursor.getString(cursor.getColumnIndex("person")));
+
+            TextView noteIdd = ((TextView) findViewById(R.id.noteID));
+            noteIdd.setText(cursor.getString(cursor.getColumnIndex("_id")));
+
+            EditText noteText = ((EditText) findViewById(R.id.NoteText));
+            noteText.setText(cursor.getString(cursor.getColumnIndex("notetext")));
+
+            EditText meetingDate = ((EditText) findViewById(R.id.edMeetingDate));
+            meetingDate.setText(cursor.getString(cursor.getColumnIndex("datec")));
+
+            Spinner attribute = (Spinner) findViewById(R.id.meetingType);
+            attribute.setSelection(getIndex(attribute,cursor.getString(cursor.getColumnIndex("attribute"))));
+        }
 
         /*ulozenie poznamky*/
         Button btnAdd = (Button) findViewById(R.id.btnAddN);
@@ -89,6 +115,18 @@ public class AddNote extends AppCompatActivity implements View.OnClickListener {
         });
     }
 
+    private int getIndex(Spinner spinner, String myString)
+    {
+        int index = 0;
+
+        for (int i=0;i<spinner.getCount();i++){
+            if (((Genders)spinner.getItemAtPosition(i)).getId() == parseInt(myString)){
+                index = i;
+                break;
+            }
+        }
+        return index;
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -113,7 +151,7 @@ public class AddNote extends AppCompatActivity implements View.OnClickListener {
 
         if (id == android.R.id.home) {
             Intent nextScreen = new Intent(getApplicationContext(), TabContactMain.class);
-            nextScreen.putExtra("item",personID);
+            nextScreen.putExtra("personId",personID);
             startActivity(nextScreen);
             return true;
         }

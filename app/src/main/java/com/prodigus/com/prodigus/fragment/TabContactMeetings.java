@@ -54,6 +54,8 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 
+import static java.lang.Integer.parseInt;
+
 public class TabContactMeetings extends Fragment {
 
     private View myFragmentView;
@@ -64,6 +66,7 @@ public class TabContactMeetings extends Fragment {
     HashMap<String, List<ChildItems>> listDataChild;
     MySQLiteHelper db;
     String personId;
+    String noteId;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -100,6 +103,7 @@ public class TabContactMeetings extends Fragment {
             case R.id.add_meeting:
                 Intent nextScreen = new Intent(getActivity(), AddNote.class);
                 nextScreen.putExtra("personId",personId);
+                nextScreen.putExtra("noteId",noteId);
                 startActivity(nextScreen);
                 return true;
             default:
@@ -122,11 +126,19 @@ public class TabContactMeetings extends Fragment {
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         ExpandableListView.ExpandableListContextMenuInfo info = (ExpandableListView.ExpandableListContextMenuInfo)item.getMenuInfo();
+        int groupPos = ExpandableListView.getPackedPositionGroup(info.packedPosition);
+        int childPos = ExpandableListView.getPackedPositionChild(info.packedPosition);
+
+        noteId = String.valueOf(listDataChild.get(listDataHeader.get(groupPos)).get(childPos).getId());
 
         switch(item.getItemId())
         {
             case 1:
-                Toast.makeText(getActivity(), "Clicked edit", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getActivity(), "Clicked edit", Toast.LENGTH_SHORT).show();
+                Intent nextScreen = new Intent(getActivity(), AddNote.class);
+                nextScreen.putExtra("personId",personId);
+                nextScreen.putExtra("noteId",noteId);
+                startActivity(nextScreen);
                 break;
             case 2:
                 Toast.makeText(getActivity(), "Clicked delete", Toast.LENGTH_SHORT).show();
@@ -141,7 +153,7 @@ public class TabContactMeetings extends Fragment {
         listDataHeader = new ArrayList<String>();
         listDataChild = new HashMap<String, List<ChildItems>>();
 
-        Cursor c = db.getAllNoteMarks();
+        Cursor c = db.getAllNoteMarks(parseInt(personId));
         int i = 0;
 
         while (c.moveToNext())
@@ -149,7 +161,8 @@ public class TabContactMeetings extends Fragment {
             try
             {
                 listDataHeader.add(c.getString(c.getColumnIndex("att_full")));
-                listDataChild.put(listDataHeader.get(0), getNotesList(c.getString(c.getColumnIndex("_id"))));
+                listDataChild.put(listDataHeader.get(i), getNotesList(c.getString(c.getColumnIndex("_id"))));
+                i++;
             }
             catch (Exception e) {
                 Log.e("LogMarks", "Error " + e.toString());
@@ -179,7 +192,7 @@ public class TabContactMeetings extends Fragment {
     private List getNotesList(String attribute)
     {
         List<ChildItems> notes = new ArrayList<ChildItems>();
-        Cursor c = db.getNotesByAttribute(attribute);
+        Cursor c = db.getNotesByAttribute(attribute, parseInt(personId));
         while (c.moveToNext())
         {
             try

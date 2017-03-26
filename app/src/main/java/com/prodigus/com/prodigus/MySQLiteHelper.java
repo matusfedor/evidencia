@@ -161,9 +161,9 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         return cursor;
     }
 
-    public Cursor getNotesByAttribute(String attribute)
+    public Cursor getNotesByAttribute(String attribute, int personId)
     {
-        String selectQuery = "SELECT _id, datec, notetext FROM " + TABLE_NOTES + " WHERE attribute like '%" + attribute + "%'";
+        String selectQuery = "SELECT _id, datec, notetext FROM " + TABLE_NOTES + " WHERE attribute like '%" + attribute + "%' and person = " + personId;
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
         return cursor;
@@ -177,9 +177,9 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         return cursor;
     }
 
-    public Cursor getAllNoteMarks()
+    public Cursor getAllNoteMarks(int personID)
     {
-        String selectQuery = "SELECT distinct cl_attribute._id, att_sc, att_full FROM " + TABLE_ATTRIBUTE + " INNER JOIN " + TABLE_NOTES + " ON cl_attribute._id = notes.attribute";
+        String selectQuery = "SELECT distinct cl_attribute._id, att_sc, att_full FROM " + TABLE_ATTRIBUTE + " INNER JOIN " + TABLE_NOTES + " ON cl_attribute._id = notes.attribute" + " WHERE notes.person = " + personID;
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
         return cursor;
@@ -204,6 +204,14 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     public Cursor getRow(String id)
     {
         String selectQuery = "SELECT _id,title,name,surname,borndate,city,street,number,gender,email,phone FROM " + TABLE_COMMENTS + " WHERE _id = " + id;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        return cursor;
+    }
+
+    public Cursor getNote(int id)
+    {
+        String selectQuery = "SELECT _id, notetext, datec, person, attribute FROM " + TABLE_NOTES + " WHERE _id = " + id;
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
         return cursor;

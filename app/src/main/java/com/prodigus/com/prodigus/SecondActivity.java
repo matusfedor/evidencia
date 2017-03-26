@@ -79,28 +79,28 @@ public class SecondActivity extends AppCompatActivity
 
             expListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
 
-                @Override
-                public boolean onChildClick(ExpandableListView parent, View v,
-                                            int groupPosition, int childPosition, long id) {
-                    personID = String.valueOf(listDataChild.get(listDataHeader.get(groupPosition)).get(childPosition).getId());
-                    Intent nextScreen = new Intent(getApplicationContext(), TabContactMain.class);
-                    nextScreen.putExtra("personId",personID);
-                    startActivity(nextScreen);
+            @Override
+            public boolean onChildClick(ExpandableListView parent, View v,
+                                        int groupPosition, int childPosition, long id) {
+                personID = String.valueOf(listDataChild.get(listDataHeader.get(groupPosition)).get(childPosition).getId());
+                Intent nextScreen = new Intent(getApplicationContext(), TabContactMain.class);
+                nextScreen.putExtra("personId",personID);
+                startActivity(nextScreen);
 
-                    Log.i("QQQidd",personID);
-                    //startActivity(new Intent(SecondActivity.this, TabContactMain.class));
+                Log.i("QQQidd",personID);
+                //startActivity(new Intent(SecondActivity.this, TabContactMain.class));
 
-                    /*Toast.makeText(
-                            getApplicationContext(),
-                            listDataHeader.get(groupPosition)
-                                    + " : "
-                                    + listDataChild.get(
-                                    listDataHeader.get(groupPosition)).get(
-                                    childPosition), Toast.LENGTH_SHORT)
-                            .show();*/
-                    return false;
-                }
-            });
+                /*Toast.makeText(
+                        getApplicationContext(),
+                        listDataHeader.get(groupPosition)
+                                + " : "
+                                + listDataChild.get(
+                                listDataHeader.get(groupPosition)).get(
+                                childPosition), Toast.LENGTH_SHORT)
+                        .show();*/
+                return false;
+            }
+        });
         }
 
         Button btnNextScreen = (Button) findViewById(R.id.button);
@@ -222,7 +222,8 @@ public class SecondActivity extends AppCompatActivity
             try
             {
                 listDataHeader.add(c.getString(c.getColumnIndex("att_full")));
-                listDataChild.put(listDataHeader.get(0), getContactList(c.getString(c.getColumnIndex("_id"))));
+                listDataChild.put(listDataHeader.get(i), getContactList(c.getString(c.getColumnIndex("_id"))));
+                i++;
             }
             catch (Exception e) {
                 Log.e("LogMarks", "Error " + e.toString());
