@@ -380,8 +380,6 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         String deleteQuery = "_id = " + noteid;
         SQLiteDatabase db = this.getWritableDatabase();
         long todo_id = db.delete(FeedReaderContract.Notes.TABLE_NAME, deleteQuery, null);
-        Log.d("DELNOTE", "noteA: " + noteid );
-        Log.d("DELNOTE", "noteB: " + todo_id );
     }
 
     //endregion

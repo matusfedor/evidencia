@@ -20,10 +20,12 @@ public class TabContactMeetings extends AppCompatActivity {
 package com.prodigus.com.prodigus.fragment;
 
 import android.app.DatePickerDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.text.InputType;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -141,13 +143,34 @@ public class TabContactMeetings extends Fragment {
                 startActivity(nextScreen);
                 break;
             case 2:
-                Toast.makeText(getActivity(), "Clicked delete", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getActivity(), "Clicked delete", Toast.LENGTH_SHORT).show();
+                AlertDialog.Builder ab = new AlertDialog.Builder(getActivity());
+                ab.setMessage("Are you sure to delete?").setPositiveButton("Yes", dialogClickListener)
+                        .setNegativeButton("No", dialogClickListener).show();
                 break;
             default: break;
         }
 
         return super.onContextItemSelected(item);
     }
+
+    DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            switch (which){
+                case DialogInterface.BUTTON_POSITIVE:
+                    db.delNote(noteId);
+
+                    getActivity().recreate();
+                    break;
+
+                case DialogInterface.BUTTON_NEGATIVE:
+
+                    break;
+            }
+        }
+    };
+
 
     private void prepareListData() {
         listDataHeader = new ArrayList<String>();
