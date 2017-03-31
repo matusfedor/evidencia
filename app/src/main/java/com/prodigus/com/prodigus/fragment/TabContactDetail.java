@@ -52,25 +52,26 @@ public class TabContactDetail extends Fragment {
 
         setHasOptionsMenu(true);
 
-        View v = (RelativeLayout)inflater.inflate(R.layout.activity_tab_contact_detail, container, false);
+        View v = (RelativeLayout) inflater.inflate(R.layout.activity_tab_contact_detail, container, false);
 
-        TextView title = (TextView) v.findViewById(R.id.degree);
-        setVisibility(title, cursor.getString( cursor.getColumnIndex("title")), true);
-        TextView name = (TextView) v.findViewById(R.id.name);
-        setVisibility(name, cursor.getString( cursor.getColumnIndex("name")), true);
-        TextView surname = (TextView) v.findViewById(R.id.surname);
-        setVisibility(surname, cursor.getString( cursor.getColumnIndex("surname")), true);
-        TextView email = (TextView) v.findViewById(R.id.email);
-        email.setText(cursor.getString( cursor.getColumnIndex("email")));
-        TextView phone = (TextView) v.findViewById(R.id.phone);
-        phone.setText(cursor.getString( cursor.getColumnIndex("phone")));
-        //TextView borndate = (TextView) v.findViewById(R.id.dateBirth);
-        //borndate.setText(cursor.getString( cursor.getColumnIndex("borndate")));
-        TextView city = (TextView) v.findViewById(R.id.city);
-        setVisibility(city, cursor.getString( cursor.getColumnIndex("city")), false);
-        TextView street = (TextView) v.findViewById(R.id.street);
-        setVisibility(street, cursor.getString( cursor.getColumnIndex("street")), false);
-
+        if(personId != null) {
+            TextView title = (TextView) v.findViewById(R.id.degree);
+            setVisibility(title, cursor.getString(cursor.getColumnIndex("title")), true);
+            TextView name = (TextView) v.findViewById(R.id.name);
+            setVisibility(name, cursor.getString(cursor.getColumnIndex("name")), true);
+            TextView surname = (TextView) v.findViewById(R.id.surname);
+            setVisibility(surname, cursor.getString(cursor.getColumnIndex("surname")), true);
+            TextView email = (TextView) v.findViewById(R.id.email);
+            email.setText(cursor.getString(cursor.getColumnIndex("email")));
+            TextView phone = (TextView) v.findViewById(R.id.phone);
+            phone.setText(cursor.getString(cursor.getColumnIndex("phone")));
+            //TextView borndate = (TextView) v.findViewById(R.id.dateBirth);
+            //borndate.setText(cursor.getString( cursor.getColumnIndex("borndate")));
+            TextView city = (TextView) v.findViewById(R.id.city);
+            setVisibility(city, cursor.getString(cursor.getColumnIndex("city")), false);
+            TextView street = (TextView) v.findViewById(R.id.street);
+            setVisibility(street, cursor.getString(cursor.getColumnIndex("street")), false);
+        }
         return v;
 
         //return (RelativeLayout)inflater.inflate(R.layout.activity_tab_contact_detail, container, false);

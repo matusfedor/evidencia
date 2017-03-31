@@ -159,6 +159,10 @@ public class ThirdActivity extends AppCompatActivity implements OnClickListener 
 
                 if(personId == null || personId == ""){
                     long todo1_id = db.createToDo(title, name, surname, borndate, city, street, number, email, phone, genderS, "1");
+
+                    if(todo1_id > 0){
+                        db.createContactHistory(todo1_id, 1);
+                    }
                 }
                 else
                 {

@@ -48,10 +48,17 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     public static final String COLUMN_NOTE_DATEC = "datec";
     public static final String COLUMN_NOTE_PERSON = "person";
     public static final String COLUMN_NOTE_ATTRIBUTE = "attribute";
+
+    //region Contact State History
+    public static final String TABLE_conStateHistory = "contactStateHistory";
+    public static final String COLUMN_HIS_ID = "_id";
+    public static final String COLUMN_CON_ID = "con_id";
+    public static final String COLUMN_CON_STATE = "con_state";
+    public static final String COLUMN_CHANGE_DATE = "change_date";
     //endregion
 
     private static final String DATABASE_NAME = "contact.db";
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 9;
 
     public MySQLiteHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -60,7 +67,11 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     //region Basic
     @Override
     public void onCreate(SQLiteDatabase database) {
-        database.execSQL(DATABASE_CREATE); database.execSQL(TABLE_SETACCESS); database.execSQL(TABLE_NOTESS); database.execSQL(TABLE_ATTRIBUTES);
+        database.execSQL(TABLE_CONTACTS);
+        database.execSQL(TABLE_SETACCESS);
+        database.execSQL(TABLE_NOTESS);
+        database.execSQL(TABLE_ATTRIBUTES);
+        database.execSQL(TABLE_ContactStateHistory);
         database.execSQL("Insert into cl_attribute values (1,'AFA','Finan. analyza','C')");
         database.execSQL("Insert into cl_attribute values (2,'TEL','Telef. kontakt','N')");
         database.execSQL("Insert into cl_attribute values (3,'OSO','Osobné stretnutie','N')");
@@ -77,13 +88,14 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_ACCESS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_NOTES);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_ATTRIBUTE);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_conStateHistory);
         onCreate(db);
     }
     //endregion
 
     //region Table creation
     // Database creation sql statements
-    private static final String DATABASE_CREATE = "create table "
+    private static final String TABLE_CONTACTS = "create table "
             + TABLE_COMMENTS + "(" + COLUMN_ID + " integer primary key autoincrement, "
             + COLUMN_TITLE + " text,"
             + COLUMN_NAME + " text not null,"
@@ -96,6 +108,12 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
             + COLUMN_EMAIL + " text, "
             + COLUMN_PHONE + " text, "
             + COLUMN_ATT + " text)";
+
+    private static final String TABLE_ContactStateHistory = "create table " + TABLE_conStateHistory
+            + "(" + COLUMN_HIS_ID + " integer primary key autoincrement, "
+            + COLUMN_CON_ID + " integer, "
+            + COLUMN_CON_STATE + " integer, "
+            + COLUMN_CHANGE_DATE +  " numeric)";
 
     private static final String TABLE_SETACCESS =  "create table "
             + TABLE_ACCESS + "(" + COLUMN_LOG_ID + " integer primary key autoincrement, "
@@ -219,7 +237,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 
     public List<Genders> getAllNoteTypes() {
         List<Genders> noteTypesList = new ArrayList<Genders>();
-        String selectQuery = "SELECT _id, att_full FROM " + TABLE_ATTRIBUTE;
+        String selectQuery = "SELECT _id, att_full FROM " + TABLE_ATTRIBUTE + " WHERE att_type = 'N'";
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
 
@@ -256,6 +274,24 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         // insert row
 
         long todo_id = db.insert(FeedEntry.TABLE_NAME, null, values);
+
+        return todo_id;
+    }
+
+    public long createContactHistory(long conID, int state) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:MM:SS");
+        String cDate = sdf.format(new Date());
+
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_CON_ID, conID);
+        values.put(COLUMN_CON_STATE, state);
+        values.put(COLUMN_CHANGE_DATE, cDate);
+
+        // insert row
+
+        long todo_id = db.insert(TABLE_conStateHistory, null, values);
 
         return todo_id;
     }
