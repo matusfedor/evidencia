@@ -158,7 +158,7 @@ public class ThirdActivity extends AppCompatActivity implements OnClickListener 
                 String phone = ((EditText) findViewById(R.id.edPhone)).getText().toString();
 
                 if(personId == null || personId == ""){
-                    long todo1_id = db.createToDo(title, name, surname, borndate, city, street, number, email, phone, genderS, "1");
+                    long todo1_id = db.createToDo(title, name, surname, borndate, city, street, number, email, phone, genderS, "1", 0);
 
                     if(todo1_id > 0){
                         db.createContactHistory(todo1_id, 1);

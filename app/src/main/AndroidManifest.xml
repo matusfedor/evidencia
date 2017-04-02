@@ -13,7 +13,6 @@
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.READ_PROFILE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
-
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -92,7 +91,8 @@
         <activity
             android:name=".activity.TabStatistics"
             android:label="@string/title_activity_tab_statistics"
-            android:theme="@style/MyMaterialTheme"></activity>
+            android:theme="@style/MyMaterialTheme" />
+        <activity android:name=".activity.Synchronize"></activity>
     </application>
 
 </manifest>

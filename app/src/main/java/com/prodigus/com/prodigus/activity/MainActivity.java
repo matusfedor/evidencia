@@ -93,7 +93,7 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_statistics) {
             startActivity(new Intent(MainActivity.this, TabStatistics.class));
         } else if (id == R.id.nav_sync) {
-
+            startActivity(new Intent(MainActivity.this, Synchronize.class));
         } else if (id == R.id.nav_share) {
 
         } else if (id == R.id.nav_send) {

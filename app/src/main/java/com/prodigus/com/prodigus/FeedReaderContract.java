@@ -21,6 +21,7 @@ public final class FeedReaderContract {
         public static final String COLUMN_EMAIL = "email";
         public static final String COLUMN_PHONE = "phone";
         public static final String COLUMN_ATTRIBUTE = "attribute";
+        public static final String COLUMN_CLIENT_ID = "clientId";
     }
 
     public static abstract class AccessEntry implements BaseColumns {

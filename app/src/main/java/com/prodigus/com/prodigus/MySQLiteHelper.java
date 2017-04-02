@@ -31,6 +31,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     public static final String COLUMN_EMAIL = "email";
     public static final String COLUMN_PHONE = "phone";
     public static final String COLUMN_ATT = "attribute";
+    public static final String COLUMN_CLIENT_ID = "clientId";
     //endregion
 
     //region Access
@@ -48,6 +49,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     public static final String COLUMN_NOTE_DATEC = "datec";
     public static final String COLUMN_NOTE_PERSON = "person";
     public static final String COLUMN_NOTE_ATTRIBUTE = "attribute";
+    //endregion
 
     //region Contact State History
     public static final String TABLE_conStateHistory = "contactStateHistory";
@@ -58,7 +60,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     //endregion
 
     private static final String DATABASE_NAME = "contact.db";
-    private static final int DATABASE_VERSION = 9;
+    private static final int DATABASE_VERSION = 13;
 
     public MySQLiteHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -72,10 +74,12 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         database.execSQL(TABLE_NOTESS);
         database.execSQL(TABLE_ATTRIBUTES);
         database.execSQL(TABLE_ContactStateHistory);
-        database.execSQL("Insert into cl_attribute values (1,'AFA','Finan. analyza','C')");
-        database.execSQL("Insert into cl_attribute values (2,'TEL','Telef. kontakt','N')");
-        database.execSQL("Insert into cl_attribute values (3,'OSO','Osobné stretnutie','N')");
-        database.execSQL("Insert into cl_attribute values (4,'SKO','Školenie','N')");
+        database.execSQL("Insert into cl_attribute values (1,'AFA','Finan. analyza','C',1)");
+        database.execSQL("Insert into cl_attribute values (2,'TEL','Telef. kontakt','N',2)");
+        database.execSQL("Insert into cl_attribute values (3,'OSO','Osobné stretnutie','N',3)");
+        database.execSQL("Insert into cl_attribute values (4,'SKO','Školenie','N',4)");
+
+        database.execSQL("Insert into settAccess values (1,'Ditte','9595')");
 
     }
 
@@ -107,7 +111,8 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
             + COLUMN_GENDER + " text, "
             + COLUMN_EMAIL + " text, "
             + COLUMN_PHONE + " text, "
-            + COLUMN_ATT + " text)";
+            + COLUMN_ATT + " text,"
+            + COLUMN_CLIENT_ID + " integer)";
 
     private static final String TABLE_ContactStateHistory = "create table " + TABLE_conStateHistory
             + "(" + COLUMN_HIS_ID + " integer primary key autoincrement, "
@@ -128,10 +133,11 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
             + COLUMN_NOTE_ATTRIBUTE + " text not null) ";
 
     private static final String TABLE_ATTRIBUTES =  "create table "
-            + "cl_attribute" + "( _id integer primary key autoincrement, "
+            + "cl_attribute" + "( _id integer primary key, "
             + "att_sc" + " text not null,"
             + "att_full" + " text not null,"
-            + "att_type" + " text not null)";
+            + "att_type" + " text not null,"
+            + "att_status_order" + " integer)";
     //endregion
 
     //region Select SQL
@@ -141,6 +147,45 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
         return cursor;
+    }
+
+    public int getPersonsStatuses(Integer personID) {
+        List<Integer> statusList = new ArrayList<Integer>();
+        // Select All Query
+        String selectQuery = "SELECT MAX(con_state) FROM " + TABLE_conStateHistory + " WHERE con_id = " + personID;
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        cursor.moveToFirst();
+
+        if(cursor.getCount() != 0)
+        {
+            return cursor.getInt(0);
+        }
+        return 0;
+
+        // looping through all rows and adding to list
+        /*if (cursor.moveToFirst()) {
+            do {
+                statusList.add(cursor.getInt(0));
+            } while (cursor.moveToNext());
+        }*/
+
+        // return contact list
+    }
+
+    public int GetAttributeOrder(int statusId) {
+        String selectQuery = "SELECT att_status_order FROM " + TABLE_ATTRIBUTE + " WHERE _id = " + statusId;
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        cursor.moveToFirst();
+
+        if(cursor.getCount() != 0)
+        {
+            return cursor.getInt(0);
+        }
+        return 0;
     }
 
     public List<Clients> getAllContacts() {
@@ -256,7 +301,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     //endregion
 
     //region Insert SQL
-    public long createToDo(String title, String name, String surname, Date borndate, String city, String street, String number, String email, String phone, String gender, String attribute) {
+    public long createToDo(String title, String name, String surname, Date borndate, String city, String street, String number, String email, String phone, String gender, String attribute, int clientId) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -271,6 +316,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         values.put(FeedEntry.COLUMN_PHONE,phone);
         values.put(FeedEntry.COLUMN_GENDER,gender);
         values.put(FeedEntry.COLUMN_ATTRIBUTE, attribute);
+        values.put(FeedEntry.COLUMN_CLIENT_ID, clientId);
         // insert row
 
         long todo_id = db.insert(FeedEntry.TABLE_NAME, null, values);
@@ -292,6 +338,22 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         // insert row
 
         long todo_id = db.insert(TABLE_conStateHistory, null, values);
+
+        return todo_id;
+    }
+
+    //region Insert SQL
+    public long createAttribute(int id, String att_sc, String att_full, int att_con_order, String att_type) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put("_id", id);
+        values.put("att_sc",att_sc);
+        values.put("att_full",att_full);
+        values.put("att_type",att_type);
+        values.put("att_status_order",att_con_order);
+
+        long todo_id = db.insert("cl_attribute", null, values);
 
         return todo_id;
     }
@@ -370,6 +432,16 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         return todo_id;
     }
 
+    public long updateStatus(int personId, int attribute) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(FeedEntry.COLUMN_ATTRIBUTE, attribute);
+        long todo_id = db.update(FeedEntry.TABLE_NAME, values, "_id=" + personId, null);
+
+        return todo_id;
+    }
+
     public void updAccess(String logName, String pin) {
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -409,6 +481,12 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(FeedReaderContract.Notes.TABLE_NAME, null, null);
         db.delete(FeedEntry.TABLE_NAME, null, null);
+    }
+
+    public void deleteAllAttributes()
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete("cl_attribute", null, null);
     }
 
     public void delNote(String noteid)

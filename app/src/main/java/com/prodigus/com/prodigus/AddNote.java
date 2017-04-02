@@ -104,13 +104,23 @@ public class AddNote extends AppCompatActivity implements View.OnClickListener {
                 String note = ((EditText) findViewById(R.id.NoteText)).getText().toString();
                 Spinner meetingType = (Spinner) findViewById(R.id.meetingType);
                 //long meetingTypeString = meetingType.getSelectedItem();
-                long meetingTypeString = ((Genders) meetingType.getSelectedItem()).getId();
+                int meetingTypeInt = ((Genders) meetingType.getSelectedItem()).getId();
 
-                long noteId = db.createNote(note,personID,meetingTypeString);
+                long noteId = db.createNote(note,personID,meetingTypeInt);
                 Log.i("Note id: ", Long.toString(noteId));
 
                 ((EditText) findViewById(R.id.NoteText)).setText("");
                 Toast.makeText(getApplicationContext(), "Poznámka bola uložená", Toast.LENGTH_LONG).show();
+
+                //List<Integer> statusList = new ArrayList<Integer>();
+                int statusList = db.getPersonsStatuses(parseInt(personID));
+                int newNoteStatus = db.GetAttributeOrder(meetingTypeInt);
+                int numberOfGreater = 0;
+
+                if(newNoteStatus > statusList) {
+                    db.updateStatus(parseInt(personID), meetingTypeInt);
+                    Toast.makeText(getApplicationContext(), "Status bol zmeneny", Toast.LENGTH_LONG).show();
+                }
             }
         });
     }
