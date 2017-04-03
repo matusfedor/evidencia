@@ -46,12 +46,6 @@ import com.prodigus.com.prodigus.R;
 
 public class Synchronize extends AppCompatActivity {
 
-   /* @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_synchronize);
-    }*/
-
     private final String NAMESPACE = "http://microsoft.com/webservices/";
     private final String URL = "http://evidencia.prodigus.sk/EvidenceService.asmx";
     private final String SOAP_ACTION = "http://microsoft.com/webservices/GetPerson";
@@ -60,9 +54,6 @@ public class Synchronize extends AppCompatActivity {
     private final String METHOD_NAME_Attribute = "GetAttributes";
 
     private String TAG = "PGGURU";
-    private static String celcius = "";
-    private static String fahren;
-
     private StringReader xmlReader;
 
     MySQLiteHelper db;
@@ -75,7 +66,6 @@ public class Synchronize extends AppCompatActivity {
         setContentView(R.layout.activity_synchronize);
 
         db = new MySQLiteHelper(getApplicationContext());
-
 
         final Button btnAkt = (Button) findViewById(R.id.btnAkt);
         btnAkt.setOnClickListener(new View.OnClickListener() {
@@ -307,6 +297,16 @@ public class Synchronize extends AppCompatActivity {
         //Create request
         SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME_Attribute);
         //Property which holds input parameters
+        PropertyInfo celsiusPI = new PropertyInfo();
+        //Set Name
+        celsiusPI.setName("username");
+        //Set Value
+        celsiusPI.setValue(logname);
+        //Set dataType
+        //celsiusPI.setType(double.class);
+        celsiusPI.setType(String.class);
+        //Add the property to request object
+        request.addProperty(celsiusPI);
 
         //Create envelope
         SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
@@ -328,6 +328,7 @@ public class Synchronize extends AppCompatActivity {
         //Create HTTP call object
         HttpTransportSE androidHttpTransport = new HttpTransportSE(URL);
 
+        Log.i("bodyoutAttribute", "" + envelope.bodyOut.toString());
         try {
             androidHttpTransport.call(SOAP_ACTION_Attribute, envelope);
 
@@ -335,6 +336,7 @@ public class Synchronize extends AppCompatActivity {
             //SoapPrimitive response = (SoapPrimitive) envelope.getResponse();
             SoapObject result = (SoapObject)envelope.getResponse();
 
+            Log.i("bodyoutAttributeCount", "" + result.getPropertyCount());
             for (int i = 0; i < result.getPropertyCount(); i++)
             {
                 SoapObject s_deals = (SoapObject) result.getProperty(i);
