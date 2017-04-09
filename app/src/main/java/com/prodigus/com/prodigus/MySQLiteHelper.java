@@ -350,7 +350,6 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         return todo_id;
     }
 
-    //region Insert SQL
     public long createAttribute(int id, String att_sc, String att_full, int att_con_order, String att_type) {
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -434,6 +433,18 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         values.put(FeedEntry.COLUMN_GENDER,gender);
         values.put(FeedEntry.COLUMN_ATTRIBUTE, attribute);
         // insert row
+
+        long todo_id = db.update(FeedEntry.TABLE_NAME, values, "_id=" + personId, null);
+
+        return todo_id;
+    }
+
+    //region Update SQL
+    public long updateContactClientId(int personId, int clientId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(FeedEntry.COLUMN_CLIENT_ID, clientId);
 
         long todo_id = db.update(FeedEntry.TABLE_NAME, values, "_id=" + personId, null);
 

@@ -25,6 +25,7 @@ import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
 import org.kxml2.kdom.Element;
 import org.kxml2.kdom.Node;
+import org.w3c.dom.Text;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -37,6 +38,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -52,6 +54,8 @@ import com.prodigus.com.prodigus.MySQLiteHelper;
 import com.prodigus.com.prodigus.R;
 import com.prodigus.com.prodigus.SecondActivity;
 
+import static com.prodigus.com.prodigus.R.id.progressBar;
+
 public class Synchronize extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private final String NAMESPACE = "http://microsoft.com/webservices/";
@@ -63,6 +67,11 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
 
     private String TAG = "PGGURU";
     private StringReader xmlReader;
+
+    private ProgressBar progressBar;
+    private TextView tvResult;
+
+    Integer progressBarCount = 1;
 
     MySQLiteHelper db;
     Button b;
@@ -84,17 +93,25 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view_synchro);
         navigationView.setNavigationItemSelectedListener(this);
 
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        progressBar.setMax(10);
+
+        tvResult = (TextView) findViewById(R.id.tvResult);
+
         db = new MySQLiteHelper(getApplicationContext());
 
         final Button btnAkt = (Button) findViewById(R.id.btnAkt);
         btnAkt.setOnClickListener(new View.OnClickListener() {
 
             public void onClick(View arg0) {
-              /*AsyncCallWS_send task_new = new AsyncCallWS_send();
-              task_new.execute();*/
-                Log.i("WS","1");
+
+                progressBarCount = 1;
+                progressBar.setVisibility(View.VISIBLE);
+                progressBar.setProgress(0);
+
                 AsyncCallWS task = new AsyncCallWS();
-                task.execute();
+                task.execute(10);
+
             }
         });
 /*
@@ -747,60 +764,36 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
             // Object  response=  (SoapObject)envelope.getResponse();
             SoapPrimitive results = (SoapPrimitive)envelope.getResponse();
 
-            Integer ert = Integer.parseInt(results.toString());
-            //update contact client id
-                //db.delPZP(PZPID.toString());
+            Integer returnValue = Integer.parseInt(results.toString());
 
+            if(returnValue != null || returnValue > 0)
+            {
+                db.updateContactClientId(id, returnValue);
+            }
         }
         catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private class AsyncCallWS extends AsyncTask<String, Void, Void> {
+    private class AsyncCallWS extends AsyncTask<Integer, Integer, String> {
         @Override
-        protected Void doInBackground(String... params) {
-            Log.i(TAG, "doInBackground");
-
+        protected String doInBackground(Integer... params) {
             sendAllContacts();
+            publishProgress(2);
             loadAttributes();
+            publishProgress(6);
             loadContacts();
+            publishProgress(10);
 
-            /*
-            String title = "";
-            String name = "";
-            String surname = "";
-            String borndate = "";
-            String city = "";
-            String street = "";
-            String number = "";
-            String gender = "";
-            String email = "";
-            String phone = "";
-
-            Cursor cursor = db.getAllRows("");
-            while (cursor.moveToNext()) {
-                title = cursor.getString(cursor.getColumnIndexOrThrow("title"));
-                name = cursor.getString(cursor.getColumnIndexOrThrow("name"));
-                surname = cursor.getString(cursor.getColumnIndexOrThrow("surname"));
-                borndate = cursor.getString(cursor.getColumnIndexOrThrow("borndate"));
-                city = cursor.getString(cursor.getColumnIndexOrThrow("city"));
-                street = cursor.getString(cursor.getColumnIndexOrThrow("street"));
-                number = cursor.getString(cursor.getColumnIndexOrThrow("number"));
-                gender = cursor.getString(cursor.getColumnIndexOrThrow("gender"));
-                email = cursor.getString(cursor.getColumnIndexOrThrow("email"));
-                phone = cursor.getString(cursor.getColumnIndexOrThrow("phone"));
-
-                //sendData(title, name, surname, borndate, city, street, number, gender, email, phone);
-            }*/
-
-
-            return null;
+            return "Task Completed.";
         }
 
         @Override
-        protected void onPostExecute(Void result) {
+        protected void onPostExecute(String result) {
             Log.i(TAG, "onPostExecute");
+            tvResult.setText(result);
+            //progressBar.setVisibility(View.GONE);
             //Button btnAkt = (Button) findViewById(R.id.btnAkt);
             //btnAkt.setText("AktualizĂˇcia Ăşdajov");
             //btnAkt.setBackgroundColor(Color.LTGRAY);
@@ -817,8 +810,9 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
         }
 
         @Override
-        protected void onProgressUpdate(Void... values) {
+        protected void onProgressUpdate(Integer... values) {
             Log.i(TAG, "onProgressUpdate");
+            progressBar.setProgress(values[0]);
         }
 
     }

@@ -51,16 +51,38 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Synchronize.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="Synchronize.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/com/prodigus/com/prodigus/activity/Synchronize.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="65">
-              <caret line="857" column="34" selection-start-line="857" selection-start-column="34" selection-end-line="857" selection-end-column="34" />
+            <state relative-caret-position="1785">
+              <caret line="790" column="0" selection-start-line="790" selection-start-column="0" selection-end-line="790" selection-end-column="0" />
               <folding>
+                <element signature="method#loadContacts#0;class#Synchronize#0" expanded="false" />
+                <element signature="method#sendAllContacts#0;class#Synchronize#0" expanded="false" />
+                <element signature="method#loadAttributes#0;class#Synchronize#0" expanded="false" />
                 <element signature="docComment;method#sendData#0;class#Synchronize#0" expanded="false" />
                 <element signature="method#sendData#0;class#Synchronize#0" expanded="false" />
-                <element signature="method#onPostExecute#0;class#AsyncCallWS#0;class#Synchronize#0" expanded="false" />
+                <element signature="method#sendContacts#0;class#Synchronize#0" expanded="false" />
                 <element signature="method#onPreExecute#0;class#AsyncCallWS#0;class#Synchronize#0" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="MySQLiteHelper.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/prodigus/com/prodigus/MySQLiteHelper.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-317">
+              <caret line="442" column="67" selection-start-line="442" selection-start-column="67" selection-end-line="442" selection-end-column="67" />
+              <folding>
+                <element signature="e#1413#1428#0" expanded="false" />
+                <element signature="e#1674#1687#0" expanded="false" />
+                <element signature="e#2135#2165#0" expanded="false" />
+                <element signature="e#2736#2750#0" expanded="false" />
+                <element signature="e#4150#4173#0" expanded="false" />
+                <element signature="e#6131#6150#0" expanded="false" />
+                <element signature="e#12513#12532#0" expanded="false" />
+                <element signature="e#19046#19065#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -68,25 +90,25 @@
       </file>
       <file leaf-file-name="activity_synchronize.xml" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/activity_synchronize.xml">
-          <provider editor-type-id="android-designer2">
+          <provider selected="true" editor-type-id="android-designer2">
             <state />
           </provider>
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="70">
-              <caret line="8" column="36" selection-start-line="8" selection-start-column="36" selection-end-line="8" selection-end-column="36" />
+          <provider editor-type-id="text-editor">
+            <state relative-caret-position="153">
+              <caret line="9" column="29" selection-start-line="9" selection-start-column="29" selection-end-line="9" selection-end-column="29" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="activity_main_drawer.xml" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/app/src/main/res/menu/activity_main_drawer.xml">
+      <file leaf-file-name="content_synchro.xml" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/content_synchro.xml">
           <provider editor-type-id="android-designer2">
             <state />
           </provider>
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="92">
-              <caret line="10" column="54" selection-start-line="10" selection-start-column="54" selection-end-line="10" selection-end-column="54" />
+            <state relative-caret-position="449">
+              <caret line="36" column="33" selection-start-line="36" selection-start-column="25" selection-end-line="36" selection-end-column="33" />
               <folding />
             </state>
           </provider>
@@ -1858,18 +1880,18 @@
         <option value="$PROJECT_DIR$/app/src/main/java/com/prodigus/com/prodigus/AddNote.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/prodigus/com/prodigus/FeedReaderContract.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/prodigus/com/prodigus/ThirdActivity.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/prodigus/com/prodigus/MySQLiteHelper.java" />
         <option value="$PROJECT_DIR$/app/src/main/res/layout/activity_third.xml" />
-        <option value="$PROJECT_DIR$/app/src/main/res/layout/content_synchro.xml" />
         <option value="$PROJECT_DIR$/app/src/main/res/layout/activity_main.xml" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/prodigus/com/prodigus/activity/MainActivity.java" />
         <option value="$PROJECT_DIR$/app/src/main/res/layout/app_bar_synchro.xml" />
         <option value="$PROJECT_DIR$/app/src/main/res/layout/activity_synchronize.xml" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/prodigus/com/prodigus/activity/Synchronize.java" />
         <option value="$PROJECT_DIR$/app/src/main/res/values/strings.xml" />
         <option value="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/prodigus/com/prodigus/SecondActivity.java" />
         <option value="$PROJECT_DIR$/app/src/main/res/menu/activity_main_drawer.xml" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/prodigus/com/prodigus/MySQLiteHelper.java" />
+        <option value="$PROJECT_DIR$/app/src/main/res/layout/content_synchro.xml" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/prodigus/com/prodigus/activity/Synchronize.java" />
       </list>
     </option>
   </component>
@@ -2004,28 +2026,6 @@
               <option name="myItemType" value="com.android.tools.idea.navigator.nodes.AndroidModuleNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
-              <option name="myItemType" value="com.android.tools.idea.navigator.nodes.AndroidSourceTypeNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="prodigus" />
-              <option name="myItemType" value="com.android.tools.idea.navigator.nodes.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="activity" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Evidencia" />
-              <option name="myItemType" value="com.android.tools.idea.navigator.nodes.AndroidViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="app" />
-              <option name="myItemType" value="com.android.tools.idea.navigator.nodes.AndroidModuleNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
               <option name="myItemId" value="manifests" />
               <option name="myItemType" value="com.android.tools.idea.navigator.nodes.AndroidManifestsGroupNode" />
             </PATH_ELEMENT>
@@ -2059,6 +2059,7 @@
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="device.picker.selection" value="5.1_Prodigus" />
     <property name="UI_DESIGNER_EDITOR_MODE.NlPaletteManager-NlPreviewForm.SHOW" value="false" />
+    <property name="UI_DESIGNER_EDITOR_MODE.NlPropertiesWindowManager-NlEditorPanel.SHOW" value="false" />
   </component>
   <component name="RecentsManager">
     <key name="android.template.packageName">
@@ -2435,7 +2436,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1616" height="876" extended-state="6" />
-    <editor active="false" />
+    <editor active="true" />
     <layout>
       <window_info id="Nl-Palette" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Build Variants" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.50486785" order="3" side_tool="true" content_ui="tabs" />
@@ -2452,8 +2453,8 @@
       <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Image Layers" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32969153" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.31432545" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32969153" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.31432545" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32962447" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32962447" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Captures" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -2554,7 +2555,7 @@
             <element signature="e#2736#2750#0" expanded="false" />
             <element signature="e#4150#4173#0" expanded="false" />
             <element signature="e#11883#11892#0" expanded="false" />
-            <element signature="e#16525#16544#0" expanded="false" />
+            <element signature="e#16501#16520#0" expanded="false" />
             <element signature="method#updateToDo#0;class#MySQLiteHelper#0" expanded="false" />
           </folding>
         </state>
@@ -2752,37 +2753,12 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/prodigus/com/prodigus/FeedReaderContract.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="357">
-          <caret line="23" column="51" selection-start-line="23" selection-start-column="35" selection-end-line="23" selection-end-column="51" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/prodigus/com/prodigus/fragment/TabContactMeetings.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="534">
           <caret line="170" column="9" selection-start-line="170" selection-start-column="9" selection-end-line="170" selection-end-column="9" />
           <folding>
             <element signature="e#5832#6263#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/prodigus/com/prodigus/MySQLiteHelper.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1921">
-          <caret line="215" column="22" selection-start-line="215" selection-start-column="22" selection-end-line="215" selection-end-column="22" />
-          <folding>
-            <element signature="imports" expanded="false" />
-            <element signature="e#1413#1428#0" expanded="false" />
-            <element signature="e#1674#1687#0" expanded="false" />
-            <element signature="e#2135#2165#0" expanded="false" />
-            <element signature="e#2736#2750#0" expanded="false" />
-            <element signature="e#4150#4173#0" expanded="false" />
-            <element signature="e#11883#11892#0" expanded="false" />
-            <element signature="e#16525#16544#0" expanded="false" />
-            <element signature="method#updateToDo#0;class#MySQLiteHelper#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -2813,25 +2789,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="306">
           <caret line="18" column="0" selection-start-line="18" selection-start-column="0" selection-end-line="18" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/content_synchro.xml">
-      <provider editor-type-id="android-designer2">
-        <state />
-      </provider>
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="272">
-          <caret line="16" column="17" selection-start-line="16" selection-start-column="17" selection-end-line="16" selection-end-column="17" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/prodigus/com/prodigus/ThirdActivity.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2805">
-          <caret line="199" column="5" selection-start-line="199" selection-start-column="5" selection-end-line="199" selection-end-column="5" />
           <folding />
         </state>
       </provider>
@@ -2888,19 +2845,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/prodigus/com/prodigus/activity/Synchronize.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="65">
-          <caret line="857" column="34" selection-start-line="857" selection-start-column="34" selection-end-line="857" selection-end-column="34" />
-          <folding>
-            <element signature="docComment;method#sendData#0;class#Synchronize#0" expanded="false" />
-            <element signature="method#sendData#0;class#Synchronize#0" expanded="false" />
-            <element signature="method#onPostExecute#0;class#AsyncCallWS#0;class#Synchronize#0" expanded="false" />
-            <element signature="method#onPreExecute#0;class#AsyncCallWS#0;class#Synchronize#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/nav_header_main.xml">
       <provider editor-type-id="android-designer2">
         <state />
@@ -2953,17 +2897,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/activity_synchronize.xml">
-      <provider editor-type-id="android-designer2">
-        <state />
-      </provider>
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="70">
-          <caret line="8" column="36" selection-start-line="8" selection-start-column="36" selection-end-line="8" selection-end-column="36" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/res/menu/activity_main_drawer.xml">
       <provider editor-type-id="android-designer2">
         <state />
@@ -2972,6 +2905,77 @@
         <state relative-caret-position="92">
           <caret line="10" column="54" selection-start-line="10" selection-start-column="54" selection-end-line="10" selection-end-column="54" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/prodigus/com/prodigus/ThirdActivity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-508">
+          <caret line="147" column="48" selection-start-line="147" selection-start-column="48" selection-end-line="147" selection-end-column="48" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/prodigus/com/prodigus/FeedReaderContract.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="357">
+          <caret line="23" column="35" selection-start-line="23" selection-start-column="35" selection-end-line="23" selection-end-column="35" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/prodigus/com/prodigus/MySQLiteHelper.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-317">
+          <caret line="442" column="67" selection-start-line="442" selection-start-column="67" selection-end-line="442" selection-end-column="67" />
+          <folding>
+            <element signature="e#1413#1428#0" expanded="false" />
+            <element signature="e#1674#1687#0" expanded="false" />
+            <element signature="e#2135#2165#0" expanded="false" />
+            <element signature="e#2736#2750#0" expanded="false" />
+            <element signature="e#4150#4173#0" expanded="false" />
+            <element signature="e#6131#6150#0" expanded="false" />
+            <element signature="e#12513#12532#0" expanded="false" />
+            <element signature="e#19046#19065#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/activity_synchronize.xml">
+      <provider selected="true" editor-type-id="android-designer2">
+        <state />
+      </provider>
+      <provider editor-type-id="text-editor">
+        <state relative-caret-position="153">
+          <caret line="9" column="29" selection-start-line="9" selection-start-column="29" selection-end-line="9" selection-end-column="29" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/content_synchro.xml">
+      <provider editor-type-id="android-designer2">
+        <state />
+      </provider>
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="449">
+          <caret line="36" column="33" selection-start-line="36" selection-start-column="25" selection-end-line="36" selection-end-column="33" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/prodigus/com/prodigus/activity/Synchronize.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1785">
+          <caret line="790" column="0" selection-start-line="790" selection-start-column="0" selection-end-line="790" selection-end-column="0" />
+          <folding>
+            <element signature="method#loadContacts#0;class#Synchronize#0" expanded="false" />
+            <element signature="method#sendAllContacts#0;class#Synchronize#0" expanded="false" />
+            <element signature="method#loadAttributes#0;class#Synchronize#0" expanded="false" />
+            <element signature="docComment;method#sendData#0;class#Synchronize#0" expanded="false" />
+            <element signature="method#sendData#0;class#Synchronize#0" expanded="false" />
+            <element signature="method#sendContacts#0;class#Synchronize#0" expanded="false" />
+            <element signature="method#onPreExecute#0;class#AsyncCallWS#0;class#Synchronize#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
