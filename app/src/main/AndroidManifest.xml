@@ -92,7 +92,13 @@
             android:name=".activity.TabStatistics"
             android:label="@string/title_activity_tab_statistics"
             android:theme="@style/MyMaterialTheme" />
-        <activity android:name=".activity.Synchronize"></activity>
+        <activity
+            android:name=".activity.Synchronize"
+            android:label="@string/title_activity_synchro">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.prodigus.com.prodigus.activity.MainActivity" />
+        </activity>
     </application>
 
 </manifest>

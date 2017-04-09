@@ -216,6 +216,14 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         return cursor;
     }
 
+    public Cursor selectAllContacts()
+    {
+        String selectQuery = "SELECT _id, title, name, surname, borndate, city, street, number, gender, email, phone, attribute, clientId FROM " + TABLE_COMMENTS;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        return cursor;
+    }
+
     public Cursor getContacts(String attribute)
     {
         String selectQuery = "SELECT _id, name, surname, title, city FROM " + TABLE_COMMENTS + " WHERE attribute like '%" + attribute + "%'";

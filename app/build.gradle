@@ -30,4 +30,5 @@ dependencies {
     compile 'com.android.support:support-v4:24.2.1'
     testCompile 'junit:junit:4.12'
     compile files('libs/mpandroidchartlibrary-2-0-1.jar')
+    compile files('libs/ksoap2-android-assembly-2.6.0-jar-with-dependencies.jar')
 }

@@ -1,5 +1,10 @@
 package com.prodigus.com.prodigus.activity;
 
+import android.support.design.widget.NavigationView;
+import android.support.v4.app.NavUtils;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.database.Cursor;
@@ -24,8 +29,10 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
 import android.content.Intent;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.util.Xml;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -43,8 +50,9 @@ import java.util.Iterator;
 
 import com.prodigus.com.prodigus.MySQLiteHelper;
 import com.prodigus.com.prodigus.R;
+import com.prodigus.com.prodigus.SecondActivity;
 
-public class Synchronize extends AppCompatActivity {
+public class Synchronize extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private final String NAMESPACE = "http://microsoft.com/webservices/";
     private final String URL = "http://evidencia.prodigus.sk/EvidenceService.asmx";
@@ -64,6 +72,17 @@ public class Synchronize extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_synchronize);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.synchroToolbar);
+        setSupportActionBar(toolbar);
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.layout_synchronize);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view_synchro);
+        navigationView.setNavigationItemSelectedListener(this);
 
         db = new MySQLiteHelper(getApplicationContext());
 
@@ -197,30 +216,20 @@ public class Synchronize extends AppCompatActivity {
         }
     }
 
-    /***
-    public void sendAll()
+    public void sendAllContacts()
     {
-        String druhVozidla = "";
-        String ucelVozidla = "";
-        String znacka = "";
-        String model = "";
-        String zdvihObjem = "";
-        String vykon = "";
-        String hmotnost = "";
-        String rokVyroby = "";
-        String druhPaliva = "";
-        String typDrzitela = "";
-        String psc = "";
-        String bydlisko = "";
-        String bdate = "";
-        String skodovost = "";
-        String poistovna = "";
-        String opravnenie = "";
-        String meno = "";
-        String priezvisko = "";
+        int clientId = 0;
+        String title = "";
+        String name = "";
+        String surname = "";
+        String city = "";
+        String street = "";
+        String number = "";
+        String gender = "";
         String email = "";
-        String telefon = "";
-        Integer PZPID;
+        String phone = "";
+        int attribute = 0;
+        int clientInternalId = 0;
 
         Date brndate = null;
 
@@ -230,30 +239,20 @@ public class Synchronize extends AppCompatActivity {
         String myTimestamp="2014/02/17 20:49";
         SimpleDateFormat form = new SimpleDateFormat("MM/dd/yyyy");
 
-        Cursor cursor = db.getAllPZP();
+        Cursor cursor = db.selectAllContacts();
         while (cursor.moveToNext()) {
-            PZPID = cursor.getInt(cursor.getColumnIndexOrThrow("_id"));
-            druhVozidla = cursor.getString(cursor.getColumnIndexOrThrow("druhVozidla"));
-            ucelVozidla = cursor.getString(cursor.getColumnIndexOrThrow("ucelVozidla"));
-            znacka = cursor.getString(cursor.getColumnIndexOrThrow("znacka"));
-            model = cursor.getString(cursor.getColumnIndexOrThrow("model"));
-            zdvihObjem = cursor.getString(cursor.getColumnIndexOrThrow("zdvihObjem"));
-            vykon = cursor.getString(cursor.getColumnIndexOrThrow("vykon"));
-            hmotnost = cursor.getString(cursor.getColumnIndexOrThrow("hmotnost"));
-            rokVyroby = cursor.getString(cursor.getColumnIndexOrThrow("rokVyroby"));
-            druhPaliva = cursor.getString(cursor.getColumnIndexOrThrow("druhPaliva"));
-            typDrzitela = cursor.getString(cursor.getColumnIndexOrThrow("typDrzitela"));
-            psc = cursor.getString(cursor.getColumnIndexOrThrow("psc"));
-            bydlisko = cursor.getString(cursor.getColumnIndexOrThrow("bydlisko"));
-            bdate = cursor.getString(cursor.getColumnIndexOrThrow("bdate"));
-            skodovost = cursor.getString(cursor.getColumnIndexOrThrow("skodovost"));
-            poistovna = cursor.getString(cursor.getColumnIndexOrThrow("poistovna"));
-            opravnenie = cursor.getString(cursor.getColumnIndexOrThrow("opravnenie"));
-            meno = cursor.getString(cursor.getColumnIndexOrThrow("meno"));
-            priezvisko = cursor.getString(cursor.getColumnIndexOrThrow("priezvisko"));
+            clientId = cursor.getInt(cursor.getColumnIndexOrThrow("_id"));
+            title = cursor.getString(cursor.getColumnIndexOrThrow("title"));
+            name = cursor.getString(cursor.getColumnIndexOrThrow("name"));
+            surname = cursor.getString(cursor.getColumnIndexOrThrow("surname"));
+            city = cursor.getString(cursor.getColumnIndexOrThrow("city"));
+            street = cursor.getString(cursor.getColumnIndexOrThrow("street"));
+            number = cursor.getString(cursor.getColumnIndexOrThrow("number"));
+            gender = cursor.getString(cursor.getColumnIndexOrThrow("gender"));
             email = cursor.getString(cursor.getColumnIndexOrThrow("email"));
-            telefon = cursor.getString(cursor.getColumnIndexOrThrow("telefon"));
-
+            phone = cursor.getString(cursor.getColumnIndexOrThrow("phone"));
+            attribute = cursor.getInt(cursor.getColumnIndexOrThrow("attribute"));
+            clientInternalId = cursor.getInt(cursor.getColumnIndexOrThrow("clientId"));
 
             //borndate = cursor.getString(cursor.getColumnIndexOrThrow("borndate")));
             //borndate = "";
@@ -264,10 +263,10 @@ public class Synchronize extends AppCompatActivity {
                 System.out.println("ERROR: Cannot parse");
             }*/
 
-            /*sendData(PZPID, druhVozidla,ucelVozidla,znacka,model,zdvihObjem,vykon,hmotnost,rokVyroby,druhPaliva,typDrzitela,psc,bydlisko,bdate,skodovost,poistovna,opravnenie, meno, priezvisko, email, telefon);
+            sendContacts(clientId, clientInternalId, surname, name, city, street, number, email, phone, "M", null, title, "", attribute);
         }
         cursor.close();
-    }*/
+    }
 
     public void loadAttributes() {
         //vyber ulozene nastavenie pre autentifikaciu
@@ -619,11 +618,151 @@ public class Synchronize extends AppCompatActivity {
         }
     }
 
+    public void sendContacts(int id, int clientId, String surname, String name, String city, String street, String pc, String email, String phone, String sex, String bornDate, String degree_bef, String degree_aft, int attribute) {
+
+        //vyber ulozeneho nastavenia pre autentifikaciu
+        String logname = "";
+        String pin = "";
+
+        Cursor c = db.getAuth();
+
+        if(Integer.valueOf(c.getCount()) > 0) {
+
+            if (c.moveToFirst()) {
+                logname = c.getString(c.getColumnIndex("logname"));
+                pin = c.getString(c.getColumnIndex("pin"));
+            }
+            c.close();
+        }
+        else {
+            return;
+        }
+
+        //Create request
+        SoapObject request = new SoapObject(NAMESPACE, "InsertUpdatePerson");
+
+        PropertyInfo personInfo = new PropertyInfo();
+        personInfo.setName("clientId");
+        personInfo.setValue(clientId);
+        personInfo.setType(int.class);
+
+        PropertyInfo personInfo2 = new PropertyInfo();
+        personInfo2.setName("surname");
+        personInfo2.setValue(surname);
+        personInfo2.setType(String.class);
+
+        PropertyInfo personInfo3 = new PropertyInfo();
+        personInfo3.setName("name");
+        personInfo3.setValue(name);
+        personInfo3.setType(String.class);
+
+        PropertyInfo personInfo4 = new PropertyInfo();
+        personInfo4.setName("city");
+        personInfo4.setValue(city);
+        personInfo4.setType(String.class);
+
+        PropertyInfo personInfo5 = new PropertyInfo();
+        personInfo5.setName("street");
+        personInfo5.setValue(street);
+        personInfo5.setType(String.class);
+
+        PropertyInfo personInfo6 = new PropertyInfo();
+        personInfo6.setName("pc");
+        personInfo6.setValue(pc);
+        personInfo6.setType(String.class);
+
+        PropertyInfo personInfo8 = new PropertyInfo();
+        personInfo8.setName("email");
+        personInfo8.setValue(email);
+        personInfo8.setType(String.class);
+
+        PropertyInfo personInfo9 = new PropertyInfo();
+        personInfo9.setName("phone");
+        personInfo9.setValue(phone);
+        personInfo9.setType(String.class);
+
+        PropertyInfo personInfo10 = new PropertyInfo();
+        personInfo10.setName("sex");
+        personInfo10.setValue(sex);
+        personInfo10.setType(String.class);
+
+        PropertyInfo personInfo11 = new PropertyInfo();
+        personInfo11.setName("bornDate");
+        personInfo11.setValue(bornDate);
+        personInfo11.setType(String.class);
+
+        PropertyInfo personInfo12 = new PropertyInfo();
+        personInfo12.setName("degree_bef");
+        personInfo12.setValue(degree_bef);
+        personInfo12.setType(String.class);
+
+        PropertyInfo personInfo13 = new PropertyInfo();
+        personInfo13.setName("degree_aft");
+        personInfo13.setValue(degree_aft);
+        personInfo13.setType(String.class);
+
+        PropertyInfo personInfo14 = new PropertyInfo();
+        personInfo14.setName("attribute");
+        personInfo14.setValue(attribute);
+        personInfo14.setType(String.class);
+
+        //Add the property to request object
+        request.addProperty(personInfo);
+        request.addProperty(personInfo2);
+        request.addProperty(personInfo3);
+        request.addProperty(personInfo4);
+        request.addProperty(personInfo5);
+        request.addProperty(personInfo6);
+        request.addProperty(personInfo8);
+        request.addProperty(personInfo9);
+        request.addProperty(personInfo10);
+        request.addProperty(personInfo11);
+        request.addProperty(personInfo12);
+        request.addProperty(personInfo13);
+        request.addProperty(personInfo14);
+
+        //Create envelope
+        SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
+                SoapEnvelope.VER11);
+
+        /*header*/
+        Element h = new Element().createElement(NAMESPACE, "UserCredentials");
+        Element Username = new Element().createElement(NAMESPACE, "userName");
+        Username.addChild(Node.TEXT, logname);
+        h.addChild(Node.ELEMENT, Username);
+        Element wssePassword = new Element().createElement(NAMESPACE, "password");
+        wssePassword.addChild(Node.TEXT, pin);
+        h.addChild(Node.ELEMENT, wssePassword);
+
+        envelope.headerOut = new Element[]{h};
+        envelope.dotNet = true;
+        //Set output SOAP object
+        envelope.setOutputSoapObject(request);
+        //Create HTTP call object
+        HttpTransportSE androidHttpTransport = new HttpTransportSE(URL);
+        Log.i("--Insert", "" + envelope.bodyOut.toString());
+        try {
+            androidHttpTransport.call("http://microsoft.com/webservices/InsertUpdatePerson", envelope);
+            //SoapObject result = (SoapObject)envelope.getResponse();
+            // Object  response=  (SoapObject)envelope.getResponse();
+            SoapPrimitive results = (SoapPrimitive)envelope.getResponse();
+
+            Integer ert = Integer.parseInt(results.toString());
+            //update contact client id
+                //db.delPZP(PZPID.toString());
+
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     private class AsyncCallWS extends AsyncTask<String, Void, Void> {
         @Override
         protected Void doInBackground(String... params) {
             Log.i(TAG, "doInBackground");
 
+            sendAllContacts();
             loadAttributes();
             loadContacts();
 
@@ -690,5 +829,50 @@ public class Synchronize extends AppCompatActivity {
         if ( db!= null) {
             db.close();
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            // Respond to the action bar's Up/Home button
+            case android.R.id.home:
+                NavUtils.navigateUpFromSameTask(this);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.layout_synchronize);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    @SuppressWarnings("StatementWithEmptyBody")
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+
+        if (id == R.id.nav_contacts) {
+            startActivity(new Intent(Synchronize.this, SecondActivity.class));
+        } else if (id == R.id.nav_pzp) {
+            startActivity(new Intent(Synchronize.this, TabContactMain.class));
+        } else if (id == R.id.nav_statistics) {
+            startActivity(new Intent(Synchronize.this, TabStatistics.class));
+        } else if (id == R.id.nav_sync) {
+            startActivity(new Intent(Synchronize.this, Synchronize.class));
+        } else if (id == R.id.nav_share) {
+
+        } else if (id == R.id.nav_send) {
+
+        }
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.layout_synchronize);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
     }
 }

@@ -20,6 +20,7 @@ import android.widget.SimpleCursorAdapter;
 import android.view.MenuItem;
 
 import com.prodigus.com.prodigus.FeedReaderContract.FeedEntry;
+import com.prodigus.com.prodigus.activity.Synchronize;
 import com.prodigus.com.prodigus.activity.TabContactMain;
 import com.prodigus.com.prodigus.activity.TabStatistics;
 
@@ -196,7 +197,7 @@ public class SecondActivity extends AppCompatActivity
         } else if (id == R.id.nav_statistics) {
             startActivity(new Intent(SecondActivity.this, TabStatistics.class));
         } else if (id == R.id.nav_sync) {
-
+            startActivity(new Intent(SecondActivity.this, Synchronize.class));
         } else if (id == R.id.nav_share) {
 
         } else if (id == R.id.nav_send) {

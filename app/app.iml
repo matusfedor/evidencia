@@ -129,6 +129,7 @@
     <orderEntry type="library" exported="" name="support-compat-24.2.1" level="project" />
     <orderEntry type="library" exported="" name="animated-vector-drawable-24.2.1" level="project" />
     <orderEntry type="library" exported="" name="support-fragment-24.2.1" level="project" />
+    <orderEntry type="library" exported="" name="ksoap2-android-assembly-2.6.0-jar-with-dependencies" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="runner-0.5" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="espresso-idling-resource-2.2.2" level="project" />
     <orderEntry type="library" exported="" name="mpandroidchartlibrary-2-0-1" level="project" />

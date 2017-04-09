@@ -15,6 +15,7 @@
     <string name="title_activity_add_note">Add meeting</string>
     <string name="title_activity_show_notes">ShowNotes</string>
     <string name="title_activity_login">Login</string>
+    <string name="title_activity_synchro">Synchronizácia</string>
 
     <string name="menu_contact_edit">Upraviť kontakt</string>
     <string name="menu_contact_delete">Zmazať kontakt</string>

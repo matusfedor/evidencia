@@ -5,11 +5,11 @@
         <item
             android:id="@+id/nav_contacts"
             android:icon="@drawable/ic_menu_camera"
-            android:title="Contacts" />
+            android:title="Kontakty" />
         <item
             android:id="@+id/nav_statistics"
             android:icon="@drawable/ic_menu_slideshow"
-            android:title="Statistics" />
+            android:title="Štatistiky" />
         <item
             android:id="@+id/nav_pzp"
             android:icon="@drawable/ic_menu_gallery"
@@ -17,19 +17,19 @@
         <item
             android:id="@+id/nav_sync"
             android:icon="@drawable/ic_menu_manage"
-            android:title="Synchronizovať" />
+            android:title="Synchronizácia" />
     </group>
 
-    <item android:title="Communicate">
+    <item android:title="Administrácia">
         <menu>
             <item
                 android:id="@+id/nav_share"
                 android:icon="@drawable/ic_menu_share"
-                android:title="Share" />
+                android:title="Nastavenia" />
             <item
                 android:id="@+id/nav_send"
                 android:icon="@drawable/ic_menu_send"
-                android:title="Send" />
+                android:title="Hlásenia" />
         </menu>
     </item>
 
