@@ -35,6 +35,14 @@ import java.util.List;
 import com.prodigus.com.prodigus.MySQLiteHelper;
 import com.prodigus.com.prodigus.R;
 
+import org.ksoap2.SoapEnvelope;
+import org.ksoap2.serialization.PropertyInfo;
+import org.ksoap2.serialization.SoapObject;
+import org.ksoap2.serialization.SoapSerializationEnvelope;
+import org.ksoap2.transport.HttpTransportSE;
+import org.kxml2.kdom.Element;
+import org.kxml2.kdom.Node;
+
 import static android.Manifest.permission.READ_CONTACTS;
 
 /**
@@ -59,12 +67,17 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      */
     private UserLoginTask mAuthTask = null;
 
+    private AsyncCallWS loginTask = null;
+
     // UI references.
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
     MySQLiteHelper db;
+
+    private String pin;
+    private String name;
 
     /*web service authentication*/
     private final String NAMESPACE = "http://microsoft.com/webservices/";
@@ -77,6 +90,14 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         // Set up the login form.
+        db = new MySQLiteHelper(getApplicationContext());
+        Cursor c = db.getAuth();
+        if (c.moveToFirst()) {
+            name = c.getString(c.getColumnIndex("logname"));
+            pin = c.getString(c.getColumnIndex("pin"));
+        }
+        c.close();
+
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
         populateAutoComplete();
 
@@ -195,8 +216,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            mAuthTask = new UserLoginTask(email, password);
-            mAuthTask.execute((Void) null);
+            //mAuthTask = new UserLoginTask(email, password);
+            //mAuthTask.execute((Void) null);
+
+            loginTask = new AsyncCallWS(email, password);
+            loginTask.execute((Void) null);
         }
     }
 
@@ -358,29 +382,75 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
     }
 
-    private class AsyncCallWS extends AsyncTask<Integer, Integer, String> {
-        @Override
-        protected String doInBackground(Integer... params) {
+    private class AsyncCallWS extends AsyncTask<Void, Void, Boolean> {
 
-            return "Task Completed.";
+        private final String mEmail;
+        private final String mPassword;
+
+        AsyncCallWS(String email, String password) {
+            mEmail = email;
+            mPassword = password;
         }
 
         @Override
-        protected void onPostExecute(String result) {
+        protected Boolean doInBackground(Void... params) {
+            SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
 
+            PropertyInfo personInfo = new PropertyInfo();
+            personInfo.setName("nick");
+            personInfo.setValue(mEmail);
+            personInfo.setType(String.class);
+
+            PropertyInfo personInfo2 = new PropertyInfo();
+            personInfo2.setName("pin");
+            personInfo2.setValue(mPassword);
+            personInfo2.setType(String.class);
+
+            request.addProperty(personInfo);
+            request.addProperty(personInfo2);
+
+            SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
+                    SoapEnvelope.VER11);
+
+             /*header*/
+            //Element h = new Element().createElement(NAMESPACE, "UserCredentials");
+            //envelope.headerOut = new Element[]{h};
+
+            //Set output SOAP object
+            envelope.setOutputSoapObject(request);
+            //Create HTTP call object
+            HttpTransportSE androidHttpTransport = new HttpTransportSE(URL);
+
+            Log.i("bodyout", "" + envelope.bodyOut.toString());
+
+            try {
+                androidHttpTransport.call(SOAP_ACTION, envelope);
+
+                //Get the response
+                //SoapPrimitive response = (SoapPrimitive) envelope.getResponse();
+                SoapObject result = (SoapObject)envelope.getResponse();
+                if(result.toString() == "true") return true;
+            } catch (Exception e) {
+            e.printStackTrace();
+            }
+
+            return false;
+        }
+
+        @Override
+        protected void onPostExecute(final Boolean success) {
+            if (success) {
+                finish();
+            } else {
+                mPasswordView.setError(getString(R.string.error_incorrect_password));
+                mPasswordView.requestFocus();
+            }
         }
 
         @Override
         protected void onPreExecute() {
 
         }
-
-
-        @Override
-        protected void onProgressUpdate(Integer... values) {
-            
-        }
-
     }
 
 }

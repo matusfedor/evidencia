@@ -168,32 +168,32 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
         request.addProperty(celsiusPI);
         //Create envelope
         SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
-                SoapEnvelope.VER11);
+                    SoapEnvelope.VER11);
 
         /*header*/
-        Element h = new Element().createElement(NAMESPACE, "UserCredentials");
-        Element Username = new Element().createElement(NAMESPACE, "userName");
-        Username.addChild(Node.TEXT, logname);
-        h.addChild(Node.ELEMENT, Username);
-        Element wssePassword = new Element().createElement(NAMESPACE, "password");
-        wssePassword.addChild(Node.TEXT, pin);
-        h.addChild(Node.ELEMENT, wssePassword);
+            Element h = new Element().createElement(NAMESPACE, "UserCredentials");
+            Element Username = new Element().createElement(NAMESPACE, "userName");
+            Username.addChild(Node.TEXT, logname);
+            h.addChild(Node.ELEMENT, Username);
+            Element wssePassword = new Element().createElement(NAMESPACE, "password");
+            wssePassword.addChild(Node.TEXT, pin);
+            h.addChild(Node.ELEMENT, wssePassword);
 
-        envelope.headerOut = new Element[]{h};
+            envelope.headerOut = new Element[]{h};
 
-        //Set output SOAP object
-        envelope.setOutputSoapObject(request);
-        //Create HTTP call object
-        HttpTransportSE androidHttpTransport = new HttpTransportSE(URL);
+            //Set output SOAP object
+            envelope.setOutputSoapObject(request);
+            //Create HTTP call object
+            HttpTransportSE androidHttpTransport = new HttpTransportSE(URL);
 
-        Log.i("bodyout", "" + envelope.bodyOut.toString());
+            Log.i("bodyout", "" + envelope.bodyOut.toString());
 
-        try {
-            androidHttpTransport.call(SOAP_ACTION, envelope);
+            try {
+                androidHttpTransport.call(SOAP_ACTION, envelope);
 
-            //Get the response
-            //SoapPrimitive response = (SoapPrimitive) envelope.getResponse();
-            SoapObject result = (SoapObject)envelope.getResponse();
+                //Get the response
+                //SoapPrimitive response = (SoapPrimitive) envelope.getResponse();
+                SoapObject result = (SoapObject)envelope.getResponse();
 
             //SoapPrimitive result = (SoapPrimitive) envelope.getResponse();
             Log.i(TAG, String.valueOf(result.getPropertyCount()));
