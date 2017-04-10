@@ -18,6 +18,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -31,6 +32,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.prodigus.com.prodigus.MySQLiteHelper;
 import com.prodigus.com.prodigus.R;
 
 import static android.Manifest.permission.READ_CONTACTS;
@@ -62,6 +64,13 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
+    MySQLiteHelper db;
+
+    /*web service authentication*/
+    private final String NAMESPACE = "http://microsoft.com/webservices/";
+    private final String URL = "http://evidencia.prodigus.sk/EvidenceService.asmx";
+    private final String SOAP_ACTION = "http://microsoft.com/webservices/Authenticate";
+    private final String METHOD_NAME = "Authenticate";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -308,7 +317,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         @Override
         protected Boolean doInBackground(Void... params) {
             // TODO: attempt authentication against a network service.
-
+            String logname;
+            String pin;
             try {
                 // Simulate network access.
                 Thread.sleep(2000);
@@ -347,5 +357,31 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             showProgress(false);
         }
     }
+
+    private class AsyncCallWS extends AsyncTask<Integer, Integer, String> {
+        @Override
+        protected String doInBackground(Integer... params) {
+
+            return "Task Completed.";
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+
+        }
+
+        @Override
+        protected void onPreExecute() {
+
+        }
+
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            
+        }
+
+    }
+
 }
 
