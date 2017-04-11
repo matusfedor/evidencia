@@ -469,7 +469,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         values.put(AccessEntry.COLUMN_PIN, pin);
         // insert row
 
-        String strSQL = "UPDATE settAccess SET logName = " + logName + ", pin = " + pin;
+        String strSQL = "UPDATE settAccess SET logName = '" + logName + "', pin = '" + pin + "'";
         db.execSQL(strSQL);
     }
 

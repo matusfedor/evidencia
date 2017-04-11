@@ -22,8 +22,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.prodigus.com.prodigus.Genders;
 import com.prodigus.com.prodigus.R;
 import com.prodigus.com.prodigus.SecondActivity;
 import com.prodigus.com.prodigus.ViewPagerAdapter;
@@ -33,6 +36,9 @@ import com.prodigus.com.prodigus.fragment.TabStatMonth;
 import com.prodigus.com.prodigus.fragment.TabStatQrt;
 import com.prodigus.com.prodigus.fragment.TabStatWeek;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class TabStatistics extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private SectionsPagerAdapter mSectionsPagerAdapter;
@@ -40,6 +46,8 @@ public class TabStatistics extends AppCompatActivity implements NavigationView.O
     private ViewPager mViewPager;
     private Toolbar toolbar;
     private TabLayout tabLayout;
+
+    protected List<Genders> gens = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +85,15 @@ public class TabStatistics extends AppCompatActivity implements NavigationView.O
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        gens = new ArrayList<Genders>();
+        gens.add(new Genders(1,"Stanislav Ditte"));
+        gens.add(new Genders(2,"Žaneta Verešpejová"));
+
+        Spinner spinner = (Spinner) findViewById(R.id.userSpinner);
+        ArrayAdapter<Genders> adapter = new ArrayAdapter<Genders>(this, R.layout.text_spinner, gens);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
 
     }
 

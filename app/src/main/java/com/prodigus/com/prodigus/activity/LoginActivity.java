@@ -29,6 +29,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,6 +39,7 @@ import com.prodigus.com.prodigus.R;
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.PropertyInfo;
 import org.ksoap2.serialization.SoapObject;
+import org.ksoap2.serialization.SoapPrimitive;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
 import org.kxml2.kdom.Element;
@@ -62,6 +64,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private static final String[] DUMMY_CREDENTIALS = new String[]{
             "Ditte:1234", "bar@example.com:world"
     };
+
+
+
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
@@ -394,46 +399,61 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
 
-            PropertyInfo personInfo = new PropertyInfo();
-            personInfo.setName("nick");
-            personInfo.setValue(mEmail);
-            personInfo.setType(String.class);
-
-            PropertyInfo personInfo2 = new PropertyInfo();
-            personInfo2.setName("pin");
-            personInfo2.setValue(mPassword);
-            personInfo2.setType(String.class);
-
-            request.addProperty(personInfo);
-            request.addProperty(personInfo2);
-
-            SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
-                    SoapEnvelope.VER11);
-
-             /*header*/
-            //Element h = new Element().createElement(NAMESPACE, "UserCredentials");
-            //envelope.headerOut = new Element[]{h};
-
-            //Set output SOAP object
-            envelope.setOutputSoapObject(request);
-            //Create HTTP call object
-            HttpTransportSE androidHttpTransport = new HttpTransportSE(URL);
-
-            Log.i("bodyout", "" + envelope.bodyOut.toString());
-
-            try {
-                androidHttpTransport.call(SOAP_ACTION, envelope);
-
-                //Get the response
-                //SoapPrimitive response = (SoapPrimitive) envelope.getResponse();
-                SoapObject result = (SoapObject)envelope.getResponse();
-                if(result.toString() == "true") return true;
-            } catch (Exception e) {
-            e.printStackTrace();
+            Boolean isConnected;
+            try{
+                isConnected = isConnected();
             }
+            catch(InterruptedException ex) { isConnected = false;}
+            catch(IOException ex) { isConnected = false;}
 
+            if(isConnected) {
+                SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
+
+                PropertyInfo personInfo = new PropertyInfo();
+                personInfo.setName("nick");
+                personInfo.setValue(mEmail);
+                personInfo.setType(String.class);
+
+                PropertyInfo personInfo2 = new PropertyInfo();
+                personInfo2.setName("pin");
+                personInfo2.setValue(mPassword);
+                personInfo2.setType(String.class);
+
+                request.addProperty(personInfo);
+                request.addProperty(personInfo2);
+
+                SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
+                        SoapEnvelope.VER11);
+
+                //Set output SOAP object
+                envelope.dotNet = true;
+                envelope.setOutputSoapObject(request);
+                //Create HTTP call object
+                HttpTransportSE androidHttpTransport = new HttpTransportSE(URL);
+
+                Log.i("Login", "" + envelope.bodyOut.toString());
+
+                try {
+                    androidHttpTransport.call(SOAP_ACTION, envelope);
+                    SoapPrimitive result = (SoapPrimitive) envelope.getResponse();
+                    if ((Boolean.parseBoolean(result.toString())))
+                    {
+                        db.updAccess(mEmail, mPassword);
+                        return true;}
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            else {
+                Cursor c = db.getAuth();
+                if (c.moveToFirst()) {
+                        name = c.getString(c.getColumnIndex("logname"));
+                        pin = c.getString(c.getColumnIndex("pin"));
+                }
+                c.close();
+                if(name.equals(mEmail) && pin.equals(mPassword)) {return true;}
+            }
             return false;
         }
 
@@ -444,6 +464,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             } else {
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
                 mPasswordView.requestFocus();
+                showProgress(false);
             }
         }
 
@@ -451,6 +472,17 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         protected void onPreExecute() {
 
         }
+    }
+
+    public boolean isConnected() throws InterruptedException, IOException
+    {
+        String command = "ping -c 1 google.com";
+        return (Runtime.getRuntime().exec (command).waitFor() == 0);
+    }
+
+    @Override
+    public void onBackPressed() {
+        // your code.
     }
 
 }
