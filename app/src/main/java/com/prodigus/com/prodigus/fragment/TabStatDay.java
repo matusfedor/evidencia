@@ -1,6 +1,7 @@
 package com.prodigus.com.prodigus.fragment;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -12,6 +13,7 @@ import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
+import com.prodigus.com.prodigus.MySQLiteHelper;
 import com.prodigus.com.prodigus.R;
 
 import java.util.ArrayList;
@@ -26,6 +28,7 @@ public class TabStatDay extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+    MySQLiteHelper db;
 
     private OnFragmentInteractionListener mListener;
 
@@ -57,6 +60,7 @@ public class TabStatDay extends Fragment {
                              Bundle savedInstanceState) {
 
         myFragmentView = inflater.inflate(R.layout.fragment_tab_stat_day, container, false);
+        db = new MySQLiteHelper(getActivity());
 
         ArrayList<BarEntry> entries = new ArrayList<>();
         entries.add(new BarEntry(4f, 0));
@@ -67,10 +71,22 @@ public class TabStatDay extends Fragment {
         BarDataSet dataset = new BarDataSet(entries, "# of Calls");
 
         ArrayList<String> labels = new ArrayList<String>();
-        labels.add("AFA");
+        Cursor c = db.getAllStatMarks();
+        while (c.moveToNext())
+        {
+            try
+            {
+                labels.add(c.getString(c.getColumnIndex("att_sc")));
+            }
+            catch (Exception e) {
+            }
+
+        }
+
+        /*labels.add("AFA");
         labels.add("REZ");
         labels.add("KON");
-        labels.add("OBCH");
+        labels.add("OBCH");*/
 
         //BarChart chart = new BarChart(getActivity());
 

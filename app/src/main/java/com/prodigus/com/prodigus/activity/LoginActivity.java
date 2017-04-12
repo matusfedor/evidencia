@@ -472,6 +472,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         protected void onPreExecute() {
 
         }
+
     }
 
     public boolean isConnected() throws InterruptedException, IOException

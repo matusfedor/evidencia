@@ -214,7 +214,7 @@ public class TabStatistics extends AppCompatActivity implements NavigationView.O
         } else if (id == R.id.nav_statistics) {
             startActivity(new Intent(TabStatistics.this, TabStatistics.class));
         } else if (id == R.id.nav_sync) {
-
+            startActivity(new Intent(TabStatistics.this, Synchronize.class));
         } else if (id == R.id.nav_share) {
 
         } else if (id == R.id.nav_send) {

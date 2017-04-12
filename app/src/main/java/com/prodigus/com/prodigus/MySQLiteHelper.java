@@ -256,6 +256,23 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         return cursor;
     }
 
+    public Cursor getAllStatMarks()
+    {
+        String selectQuery = "SELECT _id, att_sc, att_full FROM " + TABLE_ATTRIBUTE + " WHERE att_type = 'N' and att_status_order != 0 order by att_status_order";
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        return cursor;
+    }
+
+    public Cursor getStatCounts(int days)
+    {
+        String selectQuery = "SELECT count(contactStateHistory.con_state), cl_attribute._id FROM cl_attribute LEFT JOIN contactStateHistory ON cl_attribute._id = contactStateHistory.con_state and contactStateHistory.change_date > date( julianday(date('now'))- " + days + " )" +
+                " WHERE att_type = 'N' and att_status_order != 0 GROUP BY cl_attribute._id";
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        return cursor;
+    }
+
     public Cursor getAllPersons()
     {
         String selectQuery = "SELECT  title, name,  surname,  borndate,  city,  street,  number,  gender,  email,  phone FROM " + TABLE_COMMENTS ;
@@ -439,7 +456,6 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         return todo_id;
     }
 
-    //region Update SQL
     public long updateContactClientId(int personId, int clientId) {
         SQLiteDatabase db = this.getWritableDatabase();
 
