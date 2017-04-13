@@ -8,13 +8,18 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.EditText;
+import android.widget.Spinner;
 
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
+import com.prodigus.com.prodigus.Genders;
 import com.prodigus.com.prodigus.MySQLiteHelper;
 import com.prodigus.com.prodigus.R;
+import com.prodigus.com.prodigus.activity.TabStatistics;
 
 import java.util.ArrayList;
 
@@ -28,6 +33,7 @@ public class TabStatDay extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+    private float testfl = 0f;
     MySQLiteHelper db;
 
     private OnFragmentInteractionListener mListener;
@@ -62,14 +68,48 @@ public class TabStatDay extends Fragment {
         myFragmentView = inflater.inflate(R.layout.fragment_tab_stat_day, container, false);
         db = new MySQLiteHelper(getActivity());
 
+        ((TabStatistics)getActivity()).setFragmentRefreshListener(new TabStatistics.FragmentRefreshListener() {
+            @Override
+            public void onRefresh() {
+                testfl += 1;
+
+                ArrayList<BarEntry> entries = new ArrayList<>();
+                entries.add(new BarEntry(testfl, 0));
+                entries.add(new BarEntry(8f, 1));
+                entries.add(new BarEntry(6f, 2));
+                entries.add(new BarEntry(12f, 3));
+
+                ArrayList<String> labels = new ArrayList<String>();
+                labels.add("AFA");
+                labels.add("REZ");
+                labels.add("KON");
+                labels.add("OBCH");
+
+                BarDataSet dataset = new BarDataSet(entries, "# of Calls");
+                BarChart myChart = (BarChart) myFragmentView.findViewById(R.id.chart);
+                BarData data = new BarData(labels, dataset);
+                myChart.setData(data);
+                myChart.setDescription("# of times Alice called Bob");
+
+                myChart.invalidate();
+            }
+        });
+
         ArrayList<BarEntry> entries = new ArrayList<>();
-        entries.add(new BarEntry(4f, 0));
-        entries.add(new BarEntry(8f, 1));
-        entries.add(new BarEntry(6f, 2));
-        entries.add(new BarEntry(12f, 3));
+        Cursor cValue = db.getStatCounts(0);
+        int dayStat = 0;
+        while (cValue.moveToNext())
+        {
+            try
+            {
+                entries.add(new BarEntry(cValue.getColumnIndex("pocet"), dayStat));
+                dayStat++;
+            }
+            catch (Exception e) {
+            }
+        }
 
         BarDataSet dataset = new BarDataSet(entries, "# of Calls");
-
         ArrayList<String> labels = new ArrayList<String>();
         Cursor c = db.getAllStatMarks();
         while (c.moveToNext())
@@ -80,24 +120,11 @@ public class TabStatDay extends Fragment {
             }
             catch (Exception e) {
             }
-
         }
 
-        /*labels.add("AFA");
-        labels.add("REZ");
-        labels.add("KON");
-        labels.add("OBCH");*/
-
-        //BarChart chart = new BarChart(getActivity());
-
         BarChart myChart = (BarChart) myFragmentView.findViewById(R.id.chart);
-
-        //chart.addView(myChart);
-        //setContentView(chart);
-
         BarData data = new BarData(labels, dataset);
         myChart.setData(data);
-
         myChart.setDescription("# of times Alice called Bob");
 
         return myFragmentView;
