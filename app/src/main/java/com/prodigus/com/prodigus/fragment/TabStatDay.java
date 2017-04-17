@@ -21,6 +21,7 @@ import com.prodigus.com.prodigus.MySQLiteHelper;
 import com.prodigus.com.prodigus.R;
 import com.prodigus.com.prodigus.activity.TabStatistics;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class TabStatDay extends Fragment {
@@ -71,30 +72,29 @@ public class TabStatDay extends Fragment {
         ((TabStatistics)getActivity()).setFragmentRefreshListener(new TabStatistics.FragmentRefreshListener() {
             @Override
             public void onRefresh() {
-                testfl += 1;
+                Boolean isConnected;
+                try{
+                    isConnected = isConnected();
+                }
+                catch(InterruptedException ex) { isConnected = false;}
+                catch(IOException ex) { isConnected = false;}
 
-                ArrayList<BarEntry> entries = new ArrayList<>();
-                entries.add(new BarEntry(testfl, 0));
-                entries.add(new BarEntry(8f, 1));
-                entries.add(new BarEntry(6f, 2));
-                entries.add(new BarEntry(12f, 3));
 
-                ArrayList<String> labels = new ArrayList<String>();
-                labels.add("AFA");
-                labels.add("REZ");
-                labels.add("KON");
-                labels.add("OBCH");
-
-                BarDataSet dataset = new BarDataSet(entries, "# of Calls");
-                BarChart myChart = (BarChart) myFragmentView.findViewById(R.id.chart);
-                BarData data = new BarData(labels, dataset);
-                myChart.setData(data);
-                myChart.setDescription("# of times Alice called Bob");
-
-                myChart.invalidate();
+                prepareStatData();
             }
         });
 
+        return myFragmentView;
+    }
+
+    // TODO: Rename method, update argument and hook method into UI event
+    public void onButtonPressed(Uri uri) {
+        if (mListener != null) {
+            mListener.onFragmentInteraction(uri);
+        }
+    }
+
+    public void prepareStatData() {
         ArrayList<BarEntry> entries = new ArrayList<>();
         Cursor cValue = db.getStatCounts(0);
         int dayStat = 0;
@@ -127,14 +127,7 @@ public class TabStatDay extends Fragment {
         myChart.setData(data);
         myChart.setDescription("# of times Alice called Bob");
 
-        return myFragmentView;
-    }
-
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
+        myChart.invalidate();
     }
 
     /*@Override
@@ -157,5 +150,11 @@ public class TabStatDay extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
+    }
+
+    public boolean isConnected() throws InterruptedException, IOException
+    {
+        String command = "ping -c 1 google.com";
+        return (Runtime.getRuntime().exec (command).waitFor() == 0);
     }
 }

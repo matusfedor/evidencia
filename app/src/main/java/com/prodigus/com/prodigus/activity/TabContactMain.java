@@ -18,6 +18,7 @@ import java.util.List;
 
 import com.prodigus.com.prodigus.AddNote;
 import com.prodigus.com.prodigus.R;
+import com.prodigus.com.prodigus.SecondActivity;
 import com.prodigus.com.prodigus.ViewPagerAdapter;
 import com.prodigus.com.prodigus.fragment.TabContactDetail;
 import com.prodigus.com.prodigus.fragment.TabContactMeetings;
@@ -56,8 +57,19 @@ public class TabContactMain extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        super.onOptionsItemSelected(item);
-        return false;
+        //super.onOptionsItemSelected(item);
+        //return false;
+
+        int id = item.getItemId();
+
+        if (id == android.R.id.home) {
+            Intent nextScreen = new Intent(getApplicationContext(), SecondActivity.class);
+            //nextScreen.putExtra("personId",personID);
+            startActivity(nextScreen);
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 }
 

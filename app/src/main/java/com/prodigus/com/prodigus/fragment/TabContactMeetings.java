@@ -67,7 +67,7 @@ public class TabContactMeetings extends Fragment {
     List<String> listDataHeader;
     HashMap<String, List<ChildItems>> listDataChild;
     MySQLiteHelper db;
-    String personId;
+    String personId = "";
     String noteId;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -81,10 +81,13 @@ public class TabContactMeetings extends Fragment {
         setHasOptionsMenu(true);
 
         expListView = (ExpandableListView) myFragmentView.findViewById(R.id.expLvMeeting);
-        prepareListData();
-        listAdapter = new ExpandableListAdapter(getActivity(), listDataHeader, listDataChild);
-        expListView.setAdapter(listAdapter);
 
+        if(personId != null) {
+            prepareListData();
+
+            listAdapter = new ExpandableListAdapter(getActivity(), listDataHeader, listDataChild);
+            expListView.setAdapter(listAdapter);
+        }
         registerForContextMenu(expListView);
 
         return myFragmentView;

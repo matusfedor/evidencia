@@ -234,7 +234,10 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 
     public Cursor getNotesByAttribute(String attribute, int personId)
     {
-        String selectQuery = "SELECT _id, datec, notetext FROM " + TABLE_NOTES + " WHERE attribute like '%" + attribute + "%' and person = " + personId;
+        //String selectQuery = "SELECT _id, datec, notetext FROM " + TABLE_NOTES + " WHERE attribute like '%" + attribute + "%' and person = " + personId;
+        String selectQuery = "SELECT _id, datec, notetext FROM notes WHERE attribute = " + attribute + " and person = " + personId +
+        " UNION SELECT _id, datec, notetext FROM notes WHERE attribute = " + attribute + " and person = (SELECT clientId FROM clients WHERE _id = " + personId + ")";
+
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
         return cursor;
@@ -250,7 +253,8 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 
     public Cursor getAllNoteMarks(int personID)
     {
-        String selectQuery = "SELECT distinct cl_attribute._id, att_sc, att_full FROM " + TABLE_ATTRIBUTE + " INNER JOIN " + TABLE_NOTES + " ON cl_attribute._id = notes.attribute" + " WHERE notes.person = " + personID;
+        String selectQuery = "SELECT distinct cl_attribute._id _id, att_sc, att_full FROM " + TABLE_ATTRIBUTE + " INNER JOIN " + TABLE_NOTES + " ON cl_attribute._id = notes.attribute" + " WHERE notes.person = " + personID +
+                " UNION SELECT distinct cl_attribute._id _id, att_sc, att_full FROM cl_attribute INNER JOIN notes ON cl_attribute._id = notes.attribute WHERE notes.person = (SELECT clientId from clients where _id = " + personID + ")";
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
         return cursor;
@@ -259,6 +263,14 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     public Cursor getAllStatMarks()
     {
         String selectQuery = "SELECT _id, att_sc, att_full FROM " + TABLE_ATTRIBUTE + " WHERE att_type = 'N' and att_status_order != 0 order by att_status_order";
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        return cursor;
+    }
+
+    public Cursor getAllContactAttHistory()
+    {
+        String selectQuery = "SELECT con_id, con_state, change_date FROM contactStateHistory";
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
         return cursor;
@@ -284,6 +296,14 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     public Cursor getAllNotes(String personid)
     {
         String selectQuery = "SELECT _id, substr(notetext,0,10) || '...' notetext, datec, person FROM " + TABLE_NOTES + " WHERE person = " + personid;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        return cursor;
+    }
+
+    public Cursor getSyncNotes()
+    {
+        String selectQuery = "SELECT _id, notetext, datec, person, attribute FROM " + TABLE_NOTES;
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
         return cursor;
@@ -349,7 +369,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         return todo_id;
     }
 
-    public long createContactHistory(long conID, int state) {
+    public long createContactHistory(long conID, int state, Date creation) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:MM:SS");
@@ -358,8 +378,11 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(COLUMN_CON_ID, conID);
         values.put(COLUMN_CON_STATE, state);
-        values.put(COLUMN_CHANGE_DATE, cDate);
-
+        if(creation != null) {
+            values.put(COLUMN_CHANGE_DATE, sdf.format(creation));
+        }
+        else
+        {values.put(COLUMN_CHANGE_DATE, cDate);}
         // insert row
 
         long todo_id = db.insert(TABLE_conStateHistory, null, values);
@@ -419,6 +442,20 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         return todo_id;
     }
 
+    public long createSyncNote(String text, int person, int attribute, Date dateNote)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(FeedReaderContract.Notes.COLUMN_NOTE_TEXT , text);
+        values.put(FeedReaderContract.Notes.COLUMN_NOTE_DATEC, dateNote.toString());
+        values.put(FeedReaderContract.Notes.COLUMN_NOTE_PERSON, person);
+        values.put(FeedReaderContract.Notes.COLUMN_NOTE_ATTRIBUTE, attribute);
+
+        long todo_id = db.insert(FeedReaderContract.Notes.TABLE_NAME, null, values);
+
+        return todo_id;
+    }
+
     public long setAccess(String logName, String pin) {
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -459,10 +496,25 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     public long updateContactClientId(int personId, int clientId) {
         SQLiteDatabase db = this.getWritableDatabase();
 
+        if(String.valueOf(clientId).isEmpty() && clientId > 0)
+        { return 0;}
+
         ContentValues values = new ContentValues();
         values.put(FeedEntry.COLUMN_CLIENT_ID, clientId);
 
         long todo_id = db.update(FeedEntry.TABLE_NAME, values, "_id=" + personId, null);
+
+        //update of client id in contact attribute history
+        ContentValues historyValues = new ContentValues();
+        historyValues.put(COLUMN_CON_ID, clientId);
+
+        db.update(TABLE_conStateHistory, historyValues, "con_id=" + personId, null);
+
+        //update of client id in notes
+        ContentValues noteValues = new ContentValues();
+        noteValues.put(COLUMN_NOTE_PERSON, clientId);
+
+        db.update(TABLE_NOTES, noteValues, "person=" + personId, null);
 
         return todo_id;
     }
@@ -473,6 +525,8 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(FeedEntry.COLUMN_ATTRIBUTE, attribute);
         long todo_id = db.update(FeedEntry.TABLE_NAME, values, "_id=" + personId, null);
+
+        createContactHistory(personId, attribute, new Date());
 
         return todo_id;
     }
@@ -516,6 +570,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(FeedReaderContract.Notes.TABLE_NAME, null, null);
         db.delete(FeedEntry.TABLE_NAME, null, null);
+        db.delete(TABLE_conStateHistory, null, null);
     }
 
     public void deleteAllAttributes()

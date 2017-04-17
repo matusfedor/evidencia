@@ -18,6 +18,7 @@ import android.app.Activity;
 import org.json.JSONObject;
 import org.ksoap2.HeaderProperty;
 import org.ksoap2.SoapEnvelope;
+import org.ksoap2.serialization.MarshalDate;
 import org.ksoap2.serialization.PropertyInfo;
 import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapPrimitive;
@@ -168,32 +169,32 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
         request.addProperty(celsiusPI);
         //Create envelope
         SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
-                    SoapEnvelope.VER11);
+                SoapEnvelope.VER11);
 
         /*header*/
-            Element h = new Element().createElement(NAMESPACE, "UserCredentials");
-            Element Username = new Element().createElement(NAMESPACE, "userName");
-            Username.addChild(Node.TEXT, logname);
-            h.addChild(Node.ELEMENT, Username);
-            Element wssePassword = new Element().createElement(NAMESPACE, "password");
-            wssePassword.addChild(Node.TEXT, pin);
-            h.addChild(Node.ELEMENT, wssePassword);
+        Element h = new Element().createElement(NAMESPACE, "UserCredentials");
+        Element Username = new Element().createElement(NAMESPACE, "userName");
+        Username.addChild(Node.TEXT, logname);
+        h.addChild(Node.ELEMENT, Username);
+        Element wssePassword = new Element().createElement(NAMESPACE, "password");
+        wssePassword.addChild(Node.TEXT, pin);
+        h.addChild(Node.ELEMENT, wssePassword);
 
-            envelope.headerOut = new Element[]{h};
+        envelope.headerOut = new Element[]{h};
 
-            //Set output SOAP object
-            envelope.setOutputSoapObject(request);
-            //Create HTTP call object
-            HttpTransportSE androidHttpTransport = new HttpTransportSE(URL);
+        //Set output SOAP object
+        envelope.setOutputSoapObject(request);
+        //Create HTTP call object
+        HttpTransportSE androidHttpTransport = new HttpTransportSE(URL);
 
-            Log.i("bodyout", "" + envelope.bodyOut.toString());
+        Log.i("bodyout", "" + envelope.bodyOut.toString());
 
-            try {
-                androidHttpTransport.call(SOAP_ACTION, envelope);
+        try {
+            androidHttpTransport.call(SOAP_ACTION, envelope);
 
-                //Get the response
-                //SoapPrimitive response = (SoapPrimitive) envelope.getResponse();
-                SoapObject result = (SoapObject)envelope.getResponse();
+            //Get the response
+            //SoapPrimitive response = (SoapPrimitive) envelope.getResponse();
+            SoapObject result = (SoapObject)envelope.getResponse();
 
             //SoapPrimitive result = (SoapPrimitive) envelope.getResponse();
             Log.i(TAG, String.valueOf(result.getPropertyCount()));
@@ -202,32 +203,179 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
 
             for (int i = 0; i < result.getPropertyCount(); i++)
             {
-                    SoapObject s_deals = (SoapObject) result.getProperty(i);
-                    Date now = new Date();
-                    now.getDay();
-                    String titul = "";
-                    Log.i(TAG, s_deals.getProperty(0).toString());
-                    if(s_deals.getProperty(0).toString() != "anyType{}") {
-                        titul = s_deals.getProperty(0).toString();
-                    }
-                    String meno = s_deals.getProperty(1).toString();
-                    String priezvisko = s_deals.getProperty(2).toString();
-                    String mesto = s_deals.getProperty(4).toString();
-                    String ulica = s_deals.getProperty(5).toString();
-                    String pc = s_deals.getProperty(6).toString();
-                    String email = s_deals.getProperty(7).toString();
-                    String telefon = s_deals.getProperty(8).toString();
-                    int pohlavie = Integer.parseInt(s_deals.getProperty(9).toString());
-                    String attribute = s_deals.getProperty(10).toString();
-                    int clientId = Integer.parseInt(s_deals.getProperty(11).toString());
+                SoapObject s_deals = (SoapObject) result.getProperty(i);
+                Date now = new Date();
+                now.getDay();
+                String titul = "";
+                Log.i(TAG, s_deals.getProperty(0).toString());
+                if(s_deals.getProperty(0).toString() != "anyType{}") {
+                    titul = s_deals.getProperty(0).toString();
+                }
+                String meno = s_deals.getProperty(1).toString();
+                String priezvisko = s_deals.getProperty(2).toString();
+                String mesto = s_deals.getProperty(4).toString();
+                String ulica = s_deals.getProperty(5).toString();
+                String pc = s_deals.getProperty(6).toString();
+                String email = s_deals.getProperty(7).toString();
+                String telefon = s_deals.getProperty(8).toString();
+                int pohlavie = Integer.parseInt(s_deals.getProperty(9).toString());
+                String attribute = s_deals.getProperty(10).toString();
+                int clientId = Integer.parseInt(s_deals.getProperty(11).toString());
 
-                    long todo1_id = db.createToDo(titul,meno,priezvisko,now, mesto, ulica, pc, email, telefon, "", attribute, clientId);
-                    Log.i(TAG, Long.toString(todo1_id));
+                long todo1_id = db.createToDo(titul,meno,priezvisko,now, mesto, ulica, pc, email, telefon, "", attribute, clientId);
+                Log.i(TAG, Long.toString(todo1_id));
 
             }
 
             //Toast.makeText(getApplicationContext(), "Údaje boli aktualizované", Toast.LENGTH_LONG).show();
 
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void loadContactsAttHistory() {
+        //vyber ulozene nastavenie pre autentifikaciu
+        String logname = "";
+        String pin = "";
+
+        Cursor c = db.getAuth();
+
+        if(Integer.valueOf(c.getCount()) > 0) {
+
+            if (c.moveToFirst()) {
+                logname = c.getString(c.getColumnIndex("logname"));
+                pin = c.getString(c.getColumnIndex("pin"));
+            }
+            c.close();
+        }
+        else {
+            return;
+        }
+
+        //Create request
+        SoapObject request = new SoapObject(NAMESPACE, "GetAttHistory");
+        //Property which holds input parameters
+
+        //Create envelope
+        SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
+                SoapEnvelope.VER11);
+
+        /*header*/
+        Element h = new Element().createElement(NAMESPACE, "UserCredentials");
+        Element Username = new Element().createElement(NAMESPACE, "userName");
+        Username.addChild(Node.TEXT, logname);
+        h.addChild(Node.ELEMENT, Username);
+        Element wssePassword = new Element().createElement(NAMESPACE, "password");
+        wssePassword.addChild(Node.TEXT, pin);
+        h.addChild(Node.ELEMENT, wssePassword);
+
+        envelope.headerOut = new Element[]{h};
+
+        //Set output SOAP object
+        envelope.setOutputSoapObject(request);
+        //Create HTTP call object
+        HttpTransportSE androidHttpTransport = new HttpTransportSE(URL);
+
+        Log.i("loading history", "" + envelope.bodyOut.toString());
+
+        try {
+            androidHttpTransport.call("http://microsoft.com/webservices/GetAttHistory", envelope);
+
+            //Get the response
+            //SoapPrimitive response = (SoapPrimitive) envelope.getResponse();
+            SoapObject result = (SoapObject)envelope.getResponse();
+
+            //SoapPrimitive result = (SoapPrimitive) envelope.getResponse();
+            Log.i(TAG, String.valueOf(result.getPropertyCount()));
+
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+
+            for (int i = 0; i < result.getPropertyCount(); i++)
+            {
+                SoapObject s_deals = (SoapObject) result.getProperty(i);
+
+                int con_id = Integer.parseInt(s_deals.getProperty(0).toString());
+                int att_id = Integer.parseInt(s_deals.getProperty(1).toString());
+                Date creation = dateFormat.parse(s_deals.getProperty(2).toString());
+
+                long todo1_id = db.createContactHistory(con_id, att_id, creation);
+                Log.i(TAG, Long.toString(todo1_id));
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void loadNotes() {
+        //vyber ulozene nastavenie pre autentifikaciu
+        String logname = "";
+        String pin = "";
+
+        Cursor c = db.getAuth();
+
+        if(Integer.valueOf(c.getCount()) > 0) {
+
+            if (c.moveToFirst()) {
+                logname = c.getString(c.getColumnIndex("logname"));
+                pin = c.getString(c.getColumnIndex("pin"));
+            }
+            c.close();
+        }
+        else {
+            return;
+        }
+
+        //Create request
+        SoapObject request = new SoapObject(NAMESPACE, "GetNotes");
+        //Property which holds input parameters
+
+        //Create envelope
+        SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
+                SoapEnvelope.VER11);
+
+        /*header*/
+        Element h = new Element().createElement(NAMESPACE, "UserCredentials");
+        Element Username = new Element().createElement(NAMESPACE, "userName");
+        Username.addChild(Node.TEXT, logname);
+        h.addChild(Node.ELEMENT, Username);
+        Element wssePassword = new Element().createElement(NAMESPACE, "password");
+        wssePassword.addChild(Node.TEXT, pin);
+        h.addChild(Node.ELEMENT, wssePassword);
+
+        envelope.headerOut = new Element[]{h};
+
+        //Set output SOAP object
+        envelope.setOutputSoapObject(request);
+        //Create HTTP call object
+        HttpTransportSE androidHttpTransport = new HttpTransportSE(URL);
+
+        Log.i("loading notes", "" + envelope.bodyOut.toString());
+
+        try {
+            androidHttpTransport.call("http://microsoft.com/webservices/GetNotes", envelope);
+
+            //Get the response
+            //SoapPrimitive response = (SoapPrimitive) envelope.getResponse();
+            SoapObject result = (SoapObject)envelope.getResponse();
+
+            //SoapPrimitive result = (SoapPrimitive) envelope.getResponse();
+            Log.i(TAG, String.valueOf(result.getPropertyCount()));
+
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss");
+
+            for (int i = 0; i < result.getPropertyCount(); i++)
+            {
+                SoapObject s_deals = (SoapObject) result.getProperty(i);
+
+                int con_id = Integer.parseInt(s_deals.getProperty(1).toString());
+                int att_id = Integer.parseInt(s_deals.getProperty(0).toString());
+                String noteText = s_deals.getProperty(2).toString();
+                Date creation = dateFormat.parse(s_deals.getProperty(3).toString());
+
+                long todo1_id = db.createSyncNote(noteText, con_id, att_id, creation);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -776,14 +924,228 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
         }
     }
 
+    public void sendAllContactAttHistory()
+    {
+        int clientId = 0;
+        int attribute = 0;
+        Date creation = null;
+
+        String pattern = "yyyy-MM-dd HH:mm:ss";
+        SimpleDateFormat format = new SimpleDateFormat(pattern);
+
+        String myTimestamp="2014/02/17 20:49";
+        SimpleDateFormat form = new SimpleDateFormat("MM/dd/yyyy");
+
+        Cursor cursor = db.getAllContactAttHistory();
+        while (cursor.moveToNext()) {
+            clientId = cursor.getInt(cursor.getColumnIndexOrThrow("con_id"));
+            attribute = cursor.getInt(cursor.getColumnIndexOrThrow("con_state"));
+            String s = cursor.getString(cursor.getColumnIndexOrThrow("change_date"));
+
+            try {
+                creation = format.parse(s);
+            } catch (ParseException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            //creation = new Date(cursor.getLong(cursor.getColumnIndexOrThrow("change_date")));
+
+            sendContactAttHistory(clientId, attribute, creation);
+        }
+        cursor.close();
+    }
+
+    public void sendAllNotes()
+    {
+        // notetext, datec, person, attribute
+        String noteText;
+        int clientId = 0;
+        int attribute = 0;
+        Date creation = null;
+
+        String pattern = "dd.MM.yyyy";
+        SimpleDateFormat format = new SimpleDateFormat(pattern);
+
+        Cursor cursor = db.getSyncNotes();
+        while (cursor.moveToNext()) {
+            noteText = cursor.getString(cursor.getColumnIndexOrThrow("notetext"));
+            clientId = cursor.getInt(cursor.getColumnIndexOrThrow("person"));
+            attribute = cursor.getInt(cursor.getColumnIndexOrThrow("attribute"));
+
+            String s = cursor.getString(cursor.getColumnIndexOrThrow("datec"));
+
+            try {
+                creation = format.parse(s);
+            } catch (ParseException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
+            //creation = new Date(cursor.getLong(cursor.getColumnIndexOrThrow("datec")));
+
+            sendNotes(noteText, clientId, attribute, creation);
+        }
+        cursor.close();
+    }
+
+    public void sendContactAttHistory(int clientId, int attribute, Date creation) {
+        String logname = "";
+        String pin = "";
+        Cursor c = db.getAuth();
+        if(Integer.valueOf(c.getCount()) > 0) {
+
+            if (c.moveToFirst()) {
+                logname = c.getString(c.getColumnIndex("logname"));
+                pin = c.getString(c.getColumnIndex("pin"));
+            }
+            c.close();
+        }
+        else {
+            return;
+        }
+
+        SoapObject request = new SoapObject(NAMESPACE, "InsertAttHistory");
+
+        PropertyInfo personInfo = new PropertyInfo();
+        personInfo.setName("clientId");
+        personInfo.setValue(clientId);
+        personInfo.setType(int.class);
+
+        PropertyInfo personInfo2 = new PropertyInfo();
+        personInfo2.setName("attId");
+        personInfo2.setValue(attribute);
+        personInfo2.setType(String.class);
+
+        PropertyInfo personInfo3 = new PropertyInfo();
+        personInfo3.setName("creation");
+        personInfo3.setValue(creation);
+        personInfo3.setType(Date.class);
+
+        request.addProperty(personInfo);
+        request.addProperty(personInfo2);
+        request.addProperty(personInfo3);
+
+        //Create envelope
+        SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
+                SoapEnvelope.VER11);
+
+        /*header*/
+        Element h = new Element().createElement(NAMESPACE, "UserCredentials");
+        Element Username = new Element().createElement(NAMESPACE, "userName");
+        Username.addChild(Node.TEXT, logname);
+        h.addChild(Node.ELEMENT, Username);
+        Element wssePassword = new Element().createElement(NAMESPACE, "password");
+        wssePassword.addChild(Node.TEXT, pin);
+        h.addChild(Node.ELEMENT, wssePassword);
+
+        envelope.headerOut = new Element[]{h};
+        envelope.dotNet = true;
+        //Set output SOAP object
+        envelope.setOutputSoapObject(request);
+
+        new MarshalDate().register(envelope);
+
+        //Create HTTP call object
+        HttpTransportSE androidHttpTransport = new HttpTransportSE(URL);
+        Log.i("--Odosiela historiu", "" + envelope.bodyOut.toString());
+        try {
+            androidHttpTransport.call("http://microsoft.com/webservices/InsertAttHistory", envelope);
+            SoapPrimitive results = (SoapPrimitive)envelope.getResponse();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendNotes(String noteText, int clientId, int attribute, Date creation) {
+        String logname = "";
+        String pin = "";
+        Cursor c = db.getAuth();
+        if(Integer.valueOf(c.getCount()) > 0) {
+
+            if (c.moveToFirst()) {
+                logname = c.getString(c.getColumnIndex("logname"));
+                pin = c.getString(c.getColumnIndex("pin"));
+            }
+            c.close();
+        }
+        else {
+            return;
+        }
+
+        SoapObject request = new SoapObject(NAMESPACE, "InsertNote");
+
+        PropertyInfo personInfo = new PropertyInfo();
+        personInfo.setName("clientId");
+        personInfo.setValue(clientId);
+        personInfo.setType(int.class);
+
+        PropertyInfo personInfo2 = new PropertyInfo();
+        personInfo2.setName("attId");
+        personInfo2.setValue(attribute);
+        personInfo2.setType(String.class);
+
+        PropertyInfo personInfo3 = new PropertyInfo();
+        personInfo3.setName("creation");
+        personInfo3.setValue(creation);
+        personInfo3.setType(Date.class);
+
+        PropertyInfo personInfo4 = new PropertyInfo();
+        personInfo4.setName("notetext");
+        personInfo4.setValue(noteText);
+        personInfo4.setType(String.class);
+
+        request.addProperty(personInfo);
+        request.addProperty(personInfo2);
+        request.addProperty(personInfo3);
+        request.addProperty(personInfo4);
+
+        //Create envelope
+        SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
+                SoapEnvelope.VER11);
+
+        /*header*/
+        Element h = new Element().createElement(NAMESPACE, "UserCredentials");
+        Element Username = new Element().createElement(NAMESPACE, "userName");
+        Username.addChild(Node.TEXT, logname);
+        h.addChild(Node.ELEMENT, Username);
+        Element wssePassword = new Element().createElement(NAMESPACE, "password");
+        wssePassword.addChild(Node.TEXT, pin);
+        h.addChild(Node.ELEMENT, wssePassword);
+
+        envelope.headerOut = new Element[]{h};
+        envelope.dotNet = true;
+        //Set output SOAP object
+        envelope.setOutputSoapObject(request);
+        new MarshalDate().register(envelope);
+        //Create HTTP call object
+        HttpTransportSE androidHttpTransport = new HttpTransportSE(URL);
+        Log.i("--Odosiela poznamky", "" + envelope.bodyOut.toString());
+        try {
+            androidHttpTransport.call("http://microsoft.com/webservices/InsertNote", envelope);
+            SoapPrimitive results = (SoapPrimitive)envelope.getResponse();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     private class AsyncCallWS extends AsyncTask<Integer, Integer, String> {
         @Override
         protected String doInBackground(Integer... params) {
             sendAllContacts();
+            publishProgress(1);
+            sendAllContactAttHistory();
             publishProgress(2);
+            sendAllNotes();
+            publishProgress(3);
             loadAttributes();
             publishProgress(6);
             loadContacts();
+            publishProgress(8);
+            loadContactsAttHistory();
+            publishProgress(9);
+            loadNotes();
             publishProgress(10);
 
             return "Task Completed.";
