@@ -195,6 +195,7 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
             //Get the response
             //SoapPrimitive response = (SoapPrimitive) envelope.getResponse();
             SoapObject result = (SoapObject)envelope.getResponse();
+            //SoapPrimitive result = (SoapPrimitive)envelope.getResponse();
 
             //SoapPrimitive result = (SoapPrimitive) envelope.getResponse();
             Log.i(TAG, String.valueOf(result.getPropertyCount()));
@@ -206,36 +207,28 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
                 SoapObject s_deals = (SoapObject) result.getProperty(i);
                 Date now = new Date();
                 now.getDay();
-                String titul = "";
-                Log.i(TAG, s_deals.getProperty(0).toString());
-                if(s_deals.getProperty(0).toString() != "anyType{}") {
-                    titul = s_deals.getProperty(0).toString();
-                }
-                String meno = s_deals.getProperty(1).toString();
-                String priezvisko = s_deals.getProperty(2).toString();
-                String mesto = s_deals.getProperty(4).toString();
-                String ulica = s_deals.getProperty(5).toString();
-                String pc = s_deals.getProperty(6).toString();
-                String email = s_deals.getProperty(7).toString();
-                String telefon = s_deals.getProperty(8).toString();
-                int pohlavie = Integer.parseInt(s_deals.getProperty(9).toString());
-                String attribute = s_deals.getProperty(10).toString();
-                int clientId = Integer.parseInt(s_deals.getProperty(11).toString());
+
+                String titul = s_deals.getProperty(0).toString().replace("anyType{}", "");
+                String meno = s_deals.getProperty(1).toString().replace("anyType{}", "");
+                String priezvisko = s_deals.getProperty(2).toString().replace("anyType{}", "");
+                String mesto = s_deals.getProperty(4).toString().replace("anyType{}", "");
+                String ulica = s_deals.getProperty(5).toString().replace("anyType{}", ""); //getProperty(5).toString();
+                String pc = s_deals.getProperty(6).toString().replace("anyType{}", "");
+                String email = s_deals.getProperty(7).toString().replace("anyType{}", "");
+                String telefon = s_deals.getProperty(8).toString().replace("anyType{}", "");
+                int pohlavie = Integer.parseInt(s_deals.getProperty(9).toString().replace("anyType{}", ""));
+                String attribute = s_deals.getProperty(10).toString().replace("anyType{}", "");
+                int clientId = Integer.parseInt(s_deals.getProperty(11).toString().replace("anyType{}", ""));
 
                 long todo1_id = db.createToDo(titul,meno,priezvisko,now, mesto, ulica, pc, email, telefon, "", attribute, clientId);
                 Log.i(TAG, Long.toString(todo1_id));
-
             }
-
-            //Toast.makeText(getApplicationContext(), "Údaje boli aktualizované", Toast.LENGTH_LONG).show();
-
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     public void loadContactsAttHistory() {
-        //vyber ulozene nastavenie pre autentifikaciu
         String logname = "";
         String pin = "";
 
@@ -281,14 +274,7 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
 
         try {
             androidHttpTransport.call("http://microsoft.com/webservices/GetAttHistory", envelope);
-
-            //Get the response
-            //SoapPrimitive response = (SoapPrimitive) envelope.getResponse();
             SoapObject result = (SoapObject)envelope.getResponse();
-
-            //SoapPrimitive result = (SoapPrimitive) envelope.getResponse();
-            Log.i(TAG, String.valueOf(result.getPropertyCount()));
-
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
             for (int i = 0; i < result.getPropertyCount(); i++)
@@ -298,10 +284,8 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
                 int con_id = Integer.parseInt(s_deals.getProperty(0).toString());
                 int att_id = Integer.parseInt(s_deals.getProperty(1).toString());
                 Date creation = dateFormat.parse(s_deals.getProperty(2).toString());
-
                 long todo1_id = db.createContactHistory(con_id, att_id, creation);
                 Log.i(TAG, Long.toString(todo1_id));
-
             }
         } catch (Exception e) {
             e.printStackTrace();
