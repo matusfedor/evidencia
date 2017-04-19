@@ -224,9 +224,16 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         return cursor;
     }
 
-    public Cursor getContacts(String attribute)
+    public Cursor getContacts(String attribute, String searchText)
     {
-        String selectQuery = "SELECT _id, name, surname, title, city FROM " + TABLE_COMMENTS + " WHERE attribute like '%" + attribute + "%'";
+        String selectQuery;
+        if(searchText != null)
+        {
+            selectQuery = "SELECT _id, name, surname, title, city FROM " + TABLE_COMMENTS + " WHERE attribute like '%" + attribute + "%' and (name like '%" + searchText + "%' or surname like '%" + searchText + "%')";
+        }
+        else {
+            selectQuery = "SELECT _id, name, surname, title, city FROM " + TABLE_COMMENTS + " WHERE attribute like '%" + attribute + "%'";
+        }
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
         return cursor;
@@ -243,9 +250,16 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         return cursor;
     }
 
-    public Cursor getAllMarks()
+    public Cursor getAllMarks(String searchText)
     {
-        String selectQuery = "SELECT distinct cl_attribute._id, att_sc, att_full FROM " + TABLE_ATTRIBUTE + " INNER JOIN " + TABLE_COMMENTS + " ON cl_attribute._id = clients.attribute";
+        String selectQuery;
+        if(searchText != null)
+        {
+            selectQuery = "SELECT distinct cl_attribute._id, att_sc, att_full FROM " + TABLE_ATTRIBUTE + " INNER JOIN " + TABLE_COMMENTS + " ON cl_attribute._id = clients.attribute WHERE " + COLUMN_SURNAME + " LIKE '%" + searchText + "%' or " + COLUMN_NAME + " LIKE '%" + searchText + "%'";
+        }
+        else {
+            selectQuery = "SELECT distinct cl_attribute._id, att_sc, att_full FROM " + TABLE_ATTRIBUTE + " INNER JOIN " + TABLE_COMMENTS + " ON cl_attribute._id = clients.attribute";
+        }
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
         return cursor;

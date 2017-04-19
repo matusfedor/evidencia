@@ -1,13 +1,17 @@
 package com.prodigus.com.prodigus;
 
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SearchViewCompat;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
@@ -16,6 +20,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.ListView;
+import android.widget.SearchView;
 import android.widget.SimpleCursorAdapter;
 import android.view.MenuItem;
 
@@ -42,6 +47,7 @@ public class SecondActivity extends AppCompatActivity
     String personID;
     String surname;
     //StableArrayAdapter adapter;
+    android.support.v7.widget.SearchView searchView;
 
     //expandable list view
     ExpandableListAdapter listAdapter;
@@ -61,17 +67,15 @@ public class SecondActivity extends AppCompatActivity
         String itemText = intent.getStringExtra("item");
         personID = itemText;
 
-        if(personID != null)
-        {
-            Log.i("XXX",personID);
+        if (personID != null) {
+            Log.i("XXX", personID);
         }
 
-        if(personID != "")
-        {
+        if (personID != "") {
             expListView = (ExpandableListView) findViewById(R.id.lvExp);
 
             // preparing list data
-            prepareListData();
+            prepareListData(null);
 
             listAdapter = new ExpandableListAdapter(this, listDataHeader, listDataChild);
 
@@ -80,78 +84,19 @@ public class SecondActivity extends AppCompatActivity
 
             expListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
 
-            @Override
-            public boolean onChildClick(ExpandableListView parent, View v,
-                                        int groupPosition, int childPosition, long id) {
-                personID = String.valueOf(listDataChild.get(listDataHeader.get(groupPosition)).get(childPosition).getId());
-                Intent nextScreen = new Intent(getApplicationContext(), TabContactMain.class);
-                nextScreen.putExtra("personId",personID);
-                startActivity(nextScreen);
-
-                Log.i("QQQidd",personID);
-                //startActivity(new Intent(SecondActivity.this, TabContactMain.class));
-
-                /*Toast.makeText(
-                        getApplicationContext(),
-                        listDataHeader.get(groupPosition)
-                                + " : "
-                                + listDataChild.get(
-                                listDataHeader.get(groupPosition)).get(
-                                childPosition), Toast.LENGTH_SHORT)
-                        .show();*/
-                return false;
-            }
-        });
+                @Override
+                public boolean onChildClick(ExpandableListView parent, View v,
+                                            int groupPosition, int childPosition, long id) {
+                    personID = String.valueOf(listDataChild.get(listDataHeader.get(groupPosition)).get(childPosition).getId());
+                    Intent nextScreen = new Intent(getApplicationContext(), TabContactMain.class);
+                    nextScreen.putExtra("personId", personID);
+                    startActivity(nextScreen);
+                    return false;
+                }
+            });
         }
 
-        Button btnNextScreen = (Button) findViewById(R.id.button);
-        todoAdapter = new TodoCursorAdapter(this, todoCursor);
-/*
-        adapter = new StableArrayAdapter(this,
-                android.R.layout.simple_list_item_1, contactList);*/
-
-        btnNextScreen.setOnClickListener(new View.OnClickListener() {
-
-            public void onClick(View arg0) {
-                //Starting a new Intent
-                /*Intent nextScreen = new Intent(getApplicationContext(), ThirdActivity.class);
-                startActivity(nextScreen);*/
-                /*
-                contactList = db.getAllContacts();
-                SQLiteDatabase db_c = db.getWritableDatabase();
-                Cursor todoCursor = db_c.rawQuery("SELECT  * FROM " + FeedEntry.TABLE_NAME, null);
-                lw = (ListView) findViewById(R.id.listView);
-                lw.setAdapter(todoAdapter);
-                */
-                surname = ((EditText) findViewById(R.id.editText)).getText().toString();
-                Cursor cursor = db.getAllRows(surname);
-                String[] fromFieldNames = new String[] {FeedEntry._ID, FeedEntry.COLUMN_NAME,FeedEntry.COLUMN_SURNAME};
-                int[] toViewIDs = new int[] {R.id.tvID, R.id.tvName, R.id.tvSurname};
-                SimpleCursorAdapter myCursorAdapter;
-                myCursorAdapter = new SimpleCursorAdapter(getBaseContext(), R.layout.clistview, cursor, fromFieldNames, toViewIDs, 0);
-                ListView myList = (ListView) findViewById(R.id.lvExp);
-                myList.setAdapter(myCursorAdapter);
-
-                myList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    public void onItemClick(AdapterView<?> listView, View view,
-                                            int position, long id) {
-                        // Get the cursor, positioned to the corresponding row in the result set
-                        Cursor cursor = (Cursor) listView.getItemAtPosition(position);
-
-                        // Get the state's capital from this row in the database.
-                        String countryCode = cursor.getString(cursor.getColumnIndexOrThrow("_id"));
-                        surname = ((EditText) findViewById(R.id.editText)).getText().toString();
-
-                        Log.i("QQQid",countryCode);
-
-                        Intent nextScreen = new Intent(getApplicationContext(), Detail_Activity.class);
-                        nextScreen.putExtra("item",countryCode);
-                        nextScreen.putExtra("surname",surname);
-                        startActivity(nextScreen);
-                    }
-                });
-            }
-        });
+        handleIntent(getIntent());
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbarCon);
         setSupportActionBar(toolbar);
@@ -168,6 +113,16 @@ public class SecondActivity extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_contact, menu);
+
+        SearchManager searchManager =
+                (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        searchView =
+                (android.support.v7.widget.SearchView) menu.findItem(R.id.search).getActionView();
+        searchView.setSearchableInfo(
+                searchManager.getSearchableInfo(getComponentName()));
+
+        searchView.setOnQueryTextListener(searchQueryListener);
+
         return true;
     }
 
@@ -209,45 +164,83 @@ public class SecondActivity extends AppCompatActivity
         return true;
     }
 
-    private void prepareListData() {
+    private void prepareListData(String searchText) {
         listDataHeader = new ArrayList<String>();
         listDataChild = new HashMap<String, List<ChildItems>>();
 
         //List<String> childs = new ArrayList<String>();
 
-        Cursor c = db.getAllMarks();
+        Cursor c = db.getAllMarks(searchText);
         int i = 0;
 
-        while (c.moveToNext())
-        {
-            try
-            {
+        while (c.moveToNext()) {
+            try {
                 listDataHeader.add(c.getString(c.getColumnIndex("att_full")));
-                listDataChild.put(listDataHeader.get(i), getContactList(c.getString(c.getColumnIndex("_id"))));
+                listDataChild.put(listDataHeader.get(i), getContactList(c.getString(c.getColumnIndex("_id")), searchText));
                 i++;
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 Log.e("LogMarks", "Error " + e.toString());
             }
         }
     }
 
-    private List getContactList(String attribute)
-    {
+    private List getContactList(String attribute, String searchText) {
         List<ChildItems> contacts = new ArrayList<ChildItems>();
-        Cursor c = db.getContacts(attribute);
-        while (c.moveToNext())
-        {
-            try
-            {
-                Log.i("zz-id",c.getString(c.getColumnIndex("_id")));
+        Cursor c = db.getContacts(attribute, searchText);
+        while (c.moveToNext()) {
+            try {
+                Log.i("zz-id", c.getString(c.getColumnIndex("_id")));
                 contacts.add(new ChildItems(c.getInt(c.getColumnIndex("_id")), c.getString(c.getColumnIndex("title")) + " " + c.getString(c.getColumnIndex("name")) + " " + c.getString(c.getColumnIndex("surname")) + ", " + c.getString(c.getColumnIndex("city"))));
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 Log.e("LogMarks", "Error " + e.toString());
             }
 
         }
         return contacts;
     }
+
+    private void handleIntent(Intent intent) {
+
+        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+            String query = intent.getStringExtra(SearchManager.QUERY);
+
+            prepareListData(query);
+            listAdapter.setDataHeader(listDataHeader);
+            listAdapter.setDataChild(listDataChild);
+            listAdapter.notifyDataSetChanged();
+            expListView.invalidateViews();
+            expListView.refreshDrawableState();
+        }
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        handleIntent(intent);
+    }
+
+    private android.support.v7.widget.SearchView.OnQueryTextListener searchQueryListener = new android.support.v7.widget.SearchView.OnQueryTextListener() {
+        @Override
+        public boolean onQueryTextSubmit(String query) {
+            search(query);
+            return true;
+        }
+
+        @Override
+        public boolean onQueryTextChange(String newText) {
+            if (TextUtils.isEmpty(newText)) {
+                search("");
+            }
+
+            return true;
+        }
+
+        public void search(String query) {
+            prepareListData(query);
+            listAdapter.setDataHeader(listDataHeader);
+            listAdapter.setDataChild(listDataChild);
+            listAdapter.notifyDataSetChanged();
+            expListView.invalidateViews();
+            expListView.refreshDrawableState();
+        }
+    };
 }

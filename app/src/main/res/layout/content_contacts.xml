@@ -13,33 +13,11 @@
     tools:context="com.prodigus.com.prodigus.SecondActivity"
     tools:showIn="@layout/app_bar_contacts">
 
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/editText"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_toLeftOf="@+id/button"
-        android:hint="Zadajte priezvisko"
-        android:layout_marginTop="10dp"/>
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Vyhľadaj"
-        android:id="@+id/button"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentRight="true"
-        android:layout_marginRight="1mm"
-        />
-
     <ExpandableListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/editText"
         android:id="@+id/lvExp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
-
 
 </RelativeLayout>
