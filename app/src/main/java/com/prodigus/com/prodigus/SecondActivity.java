@@ -189,8 +189,14 @@ public class SecondActivity extends AppCompatActivity
         Cursor c = db.getContacts(attribute, searchText);
         while (c.moveToNext()) {
             try {
-                Log.i("zz-id", c.getString(c.getColumnIndex("_id")));
-                contacts.add(new ChildItems(c.getInt(c.getColumnIndex("_id")), c.getString(c.getColumnIndex("title")) + " " + c.getString(c.getColumnIndex("name")) + " " + c.getString(c.getColumnIndex("surname")) + ", " + c.getString(c.getColumnIndex("city"))));
+                String sdsd = c.getString(c.getColumnIndex("title"));
+                if(!c.getString(c.getColumnIndex("title")).isEmpty())
+                {
+                    contacts.add(new ChildItems(c.getInt(c.getColumnIndex("_id")), c.getString(c.getColumnIndex("title")) + " " + c.getString(c.getColumnIndex("name")) + " " + c.getString(c.getColumnIndex("surname")) + " " + c.getString(c.getColumnIndex("city"))));
+                }
+                else {
+                    contacts.add(new ChildItems(c.getInt(c.getColumnIndex("_id")), c.getString(c.getColumnIndex("name")) + " " + c.getString(c.getColumnIndex("surname")) + " " + c.getString(c.getColumnIndex("city"))));
+                }
             } catch (Exception e) {
                 Log.e("LogMarks", "Error " + e.toString());
             }

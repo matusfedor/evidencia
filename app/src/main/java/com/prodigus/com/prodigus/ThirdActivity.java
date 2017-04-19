@@ -7,6 +7,8 @@ import android.app.DialogFragment;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.util.Log;
@@ -132,10 +134,13 @@ public class ThirdActivity extends AppCompatActivity implements OnClickListener 
             EditText bdate = ((EditText) findViewById(R.id.edBornDate));
             bdate.setText(borndate.toString());
         }
-        Button btnAdd = (Button) findViewById(R.id.btnAdd);
-        btnAdd.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View arg0) {
+
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.addFloatButton);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
                 FeedEntry todo;
+                long todo1_id = -1;
 
                 SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
 
@@ -146,7 +151,7 @@ public class ThirdActivity extends AppCompatActivity implements OnClickListener 
                 Date borndate = new Date();
                 try {
                     borndate = sdf.parse(bdate);
-                    } catch (ParseException e) {
+                } catch (ParseException e) {
                     e.printStackTrace();}
                 //String gender = ((EditText) findViewById(R.id.edGender)).getText().toString();
                 Spinner gender = (Spinner) findViewById(R.id.Gender_spinner);
@@ -158,7 +163,7 @@ public class ThirdActivity extends AppCompatActivity implements OnClickListener 
                 String phone = ((EditText) findViewById(R.id.edPhone)).getText().toString();
 
                 if(personId == null || personId == ""){
-                    long todo1_id = db.createToDo(title, name, surname, borndate, city, street, number, email, phone, genderS, "1", 0);
+                    todo1_id = db.createToDo(title, name, surname, borndate, city, street, number, email, phone, genderS, "1", 0);
 
                     if(todo1_id > 0){
                         db.createContactHistory(todo1_id, 1, null);
@@ -166,11 +171,13 @@ public class ThirdActivity extends AppCompatActivity implements OnClickListener 
                 }
                 else
                 {
-                    long todo1_id = db.updateToDo(Integer.parseInt(personId), title, name, surname, borndate, city, street, number, email, phone, genderS, "1");
+                    todo1_id = db.updateToDo(Integer.parseInt(personId), title, name, surname, borndate, city, street, number, email, phone, genderS, "1");
                 }
                 et = (EditText) findViewById(R.id.edSurname);
-                //et.setText(Long.toString(todo1_id));
 
+                if(todo1_id > 0)
+                Snackbar.make(view, "Záznam uložený", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
             }
         });
 
