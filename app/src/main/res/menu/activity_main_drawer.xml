@@ -4,19 +4,19 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_contacts"
-            android:icon="@drawable/ic_menu_camera"
+            android:icon="@drawable/ic_group_black_24px"
             android:title="Kontakty" />
         <item
             android:id="@+id/nav_statistics"
-            android:icon="@drawable/ic_menu_slideshow"
+            android:icon="@drawable/ic_equalizer_black_24px"
             android:title="Štatistiky" />
         <item
             android:id="@+id/nav_pzp"
-            android:icon="@drawable/ic_menu_gallery"
+            android:icon="@drawable/ic_directions_car_black_24px"
             android:title="PZP" />
         <item
             android:id="@+id/nav_sync"
-            android:icon="@drawable/ic_menu_manage"
+            android:icon="@drawable/ic_cached_black_24px"
             android:title="Synchronizácia" />
     </group>
 
@@ -24,7 +24,7 @@
         <menu>
             <item
                 android:id="@+id/nav_share"
-                android:icon="@drawable/ic_menu_share"
+                android:icon="@drawable/ic_settings_black_24px"
                 android:title="Nastavenia" />
             <item
                 android:id="@+id/nav_logout"

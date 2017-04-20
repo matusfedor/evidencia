@@ -545,6 +545,16 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         return todo_id;
     }
 
+    public long updateNote(int nodeId, String text, long attribute) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(FeedReaderContract.Notes.COLUMN_NOTE_TEXT, text);
+        values.put(FeedReaderContract.Notes.COLUMN_NOTE_ATTRIBUTE, attribute);
+        long todo_id = db.update(FeedReaderContract.Notes.TABLE_NAME, values, "_id=" + nodeId, null);
+        return todo_id;
+    }
+
     public void updAccess(String logName, String pin) {
         SQLiteDatabase db = this.getWritableDatabase();
 

@@ -99,46 +99,22 @@ public class AddNote extends AppCompatActivity implements View.OnClickListener {
             attribute.setSelection(getIndex(attribute,cursor.getString(cursor.getColumnIndex("attribute"))));
         }
 
-        /*ulozenie poznamky*/
-        /*Button btnAdd = (Button) findViewById(R.id.btnAddN);
-        btnAdd.setOnClickListener(new View.OnClickListener() {
-
-            public void onClick(View arg0) {
-
-                String note = ((EditText) findViewById(R.id.NoteText)).getText().toString();
-                Spinner meetingType = (Spinner) findViewById(R.id.meetingType);
-                //long meetingTypeString = meetingType.getSelectedItem();
-                int meetingTypeInt = ((Genders) meetingType.getSelectedItem()).getId();
-
-                long noteId = db.createNote(note,personID,meetingTypeInt);
-                Log.i("Note id: ", Long.toString(noteId));
-
-                ((EditText) findViewById(R.id.NoteText)).setText("");
-                Toast.makeText(getApplicationContext(), "Poznámka bola uložená", Toast.LENGTH_LONG).show();
-
-                //List<Integer> statusList = new ArrayList<Integer>();
-                int statusList = db.getPersonsStatuses(parseInt(personID));
-                int newNoteStatus = db.GetAttributeOrder(meetingTypeInt);
-                int numberOfGreater = 0;
-
-                if(newNoteStatus > statusList) {
-                    db.updateStatus(parseInt(personID), meetingTypeInt);
-                    Toast.makeText(getApplicationContext(), "Status bol zmeneny", Toast.LENGTH_LONG).show();
-                }
-            }
-        });*/
-
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.addFloatButtonNote);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                String noteIdScreen = ((TextView) findViewById(R.id.noteID)).getText().toString();
                 String note = ((EditText) findViewById(R.id.NoteText)).getText().toString();
                 Spinner meetingType = (Spinner) findViewById(R.id.meetingType);
                 //long meetingTypeString = meetingType.getSelectedItem();
                 int meetingTypeInt = ((Genders) meetingType.getSelectedItem()).getId();
 
-                long noteId = db.createNote(note,personID,meetingTypeInt);
-                Log.i("Note id: ", Long.toString(noteId));
+                if(noteIdScreen.isEmpty()) {
+                    long noteId = db.createNote(note, personID, meetingTypeInt);
+                }
+                else {
+                    long noteId = db.updateNote(Integer.parseInt(noteIdScreen), note, meetingTypeInt);
+                }
 
                 ((EditText) findViewById(R.id.NoteText)).setText("");
                 Toast.makeText(getApplicationContext(), "Poznámka bola uložená", Toast.LENGTH_LONG).show();

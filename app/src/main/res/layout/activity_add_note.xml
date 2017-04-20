@@ -51,23 +51,6 @@
             android:id="@+id/noteID"
             android:visibility="invisible" />
 
-        <EditText
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/NoteText"
-            android:hint="Zadajte text"
-            android:inputType="textMultiLine"
-            android:minLines="10"
-            android:gravity="top"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentBottom="true"
-            android:layout_below="@+id/meetingType" />
-
-
-
         <TextView
             android:id="@+id/tbTypStretnutia"
             android:layout_width="fill_parent"
@@ -110,6 +93,29 @@
             android:layout_alignParentStart="true"
             android:layout_marginTop="11dp"
             android:id="@+id/meetingType" />
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="1dip"
+            android:background="#000000"
+            android:layout_below="@+id/meetingType"
+            android:layout_marginTop="10dp"/>
+
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/NoteText"
+            android:hint="Zadajte text"
+            android:inputType="textMultiLine"
+            android:minLines="9"
+            android:gravity="top"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_below="@+id/meetingType"
+            android:layout_marginTop="10dp"/>
 
     </RelativeLayout>
 
