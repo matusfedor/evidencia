@@ -166,12 +166,14 @@ public class AddNote extends AppCompatActivity implements View.OnClickListener {
         if (id == R.id.menuAdd_Note) {
             Intent nextScreen = new Intent(getApplicationContext(), ShowNotes.class);
             nextScreen.putExtra("item",personID);
+            nextScreen.putExtra("currentTab",'1');
             startActivity(nextScreen);
             return true;
         }
 
         if (id == android.R.id.home) {
             Intent nextScreen = new Intent(getApplicationContext(), TabContactMain.class);
+            nextScreen.putExtra("tabId","1");
             nextScreen.putExtra("personId",personID);
             startActivity(nextScreen);
             return true;
