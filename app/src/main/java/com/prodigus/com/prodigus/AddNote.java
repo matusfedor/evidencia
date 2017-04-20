@@ -5,6 +5,8 @@ import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -25,9 +27,11 @@ import android.widget.Toast;
 import com.prodigus.com.prodigus.R;
 import com.prodigus.com.prodigus.activity.TabContactMain;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import static java.lang.Integer.parseInt;
@@ -96,7 +100,7 @@ public class AddNote extends AppCompatActivity implements View.OnClickListener {
         }
 
         /*ulozenie poznamky*/
-        Button btnAdd = (Button) findViewById(R.id.btnAddN);
+        /*Button btnAdd = (Button) findViewById(R.id.btnAddN);
         btnAdd.setOnClickListener(new View.OnClickListener() {
 
             public void onClick(View arg0) {
@@ -121,6 +125,37 @@ public class AddNote extends AppCompatActivity implements View.OnClickListener {
                     db.updateStatus(parseInt(personID), meetingTypeInt);
                     Toast.makeText(getApplicationContext(), "Status bol zmeneny", Toast.LENGTH_LONG).show();
                 }
+            }
+        });*/
+
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.addFloatButtonNote);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String note = ((EditText) findViewById(R.id.NoteText)).getText().toString();
+                Spinner meetingType = (Spinner) findViewById(R.id.meetingType);
+                //long meetingTypeString = meetingType.getSelectedItem();
+                int meetingTypeInt = ((Genders) meetingType.getSelectedItem()).getId();
+
+                long noteId = db.createNote(note,personID,meetingTypeInt);
+                Log.i("Note id: ", Long.toString(noteId));
+
+                ((EditText) findViewById(R.id.NoteText)).setText("");
+                Toast.makeText(getApplicationContext(), "Poznámka bola uložená", Toast.LENGTH_LONG).show();
+
+                //List<Integer> statusList = new ArrayList<Integer>();
+                int statusList = db.getPersonsStatuses(parseInt(personID));
+                int newNoteStatus = db.GetAttributeOrder(meetingTypeInt);
+                int numberOfGreater = 0;
+
+                if(newNoteStatus > statusList) {
+                    db.updateStatus(parseInt(personID), meetingTypeInt);
+                    Toast.makeText(getApplicationContext(), "Status bol zmeneny", Toast.LENGTH_LONG).show();
+                }
+                /*
+                if(todo1_id > 0)
+                    Snackbar.make(view, "Záznam uložený", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();*/
             }
         });
     }

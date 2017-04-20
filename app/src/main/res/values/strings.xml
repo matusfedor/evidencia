@@ -1,20 +1,20 @@
 <resources>
-    <string name="app_name">Prodigus</string>
+    <string name="app_name">Evidencia</string>
 
     <string name="search_hint">Hľadaj podľa Mena a Priezviska</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
-    <string name="action_settings">Settings</string>
+    <string name="action_settings">Nastavenia</string>
 
     <string name="title_activity_main">Evidencia kontaktov</string>
     <string name="title_activity_second">Vyhľadať kontakt</string>
     <string name="action_show">Ukáž poznámky</string>
     <string name="title_activity_third">Pridať kontakt</string>
     <string name="title_activity_detail_">Detail_Activity</string>
-    <string name="title_activity_settings">Settings</string>
-    <string name="title_activity_add_note">Add meeting</string>
+    <string name="title_activity_settings">Nastavenia</string>
+    <string name="title_activity_add_note">Pridať stretnutie</string>
     <string name="title_activity_show_notes">ShowNotes</string>
     <string name="title_activity_login">Login</string>
     <string name="title_activity_synchro">Synchronizácia</string>
@@ -36,9 +36,9 @@
     <string name="error_field_required">This field is required</string>
     <string name="permission_rationale">"Contacts permissions are needed for providing email completions."
     </string>
-    <string name="title_activity_tab_contact_main">TabContactMain</string>
+    <string name="title_activity_tab_contact_main">Kontakty</string>
     <string name="section_format">Hello World from section: %1$d</string>
-    <string name="title_activity_tab_statistics">TabStatistics</string>
+    <string name="title_activity_tab_statistics">Štatistiky</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment"></string>

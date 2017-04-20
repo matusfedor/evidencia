@@ -27,9 +27,9 @@
                 android:icon="@drawable/ic_menu_share"
                 android:title="Nastavenia" />
             <item
-                android:id="@+id/nav_send"
-                android:icon="@drawable/ic_menu_send"
-                android:title="Hlásenia" />
+                android:id="@+id/nav_logout"
+                android:icon="@drawable/ic_menu_share"
+                android:title="Odhlásiť" />
         </menu>
     </item>
 

@@ -232,8 +232,8 @@ public class TabStatistics extends AppCompatActivity implements NavigationView.O
             startActivity(new Intent(TabStatistics.this, Synchronize.class));
         } else if (id == R.id.nav_share) {
 
-        } else if (id == R.id.nav_send) {
-
+        } else if (id == R.id.nav_logout) {
+            startActivity(new Intent(TabStatistics.this, LoginActivity.class));
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

@@ -49,8 +49,8 @@ public class TabContactMain extends AppCompatActivity {
 
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFragment(new TabContactDetail(), "Personal");
-        adapter.addFragment(new TabContactMeetings(), "Meetings");
+        adapter.addFragment(new TabContactDetail(), "Osobné údaje");
+        adapter.addFragment(new TabContactMeetings(), "Stretnutia");
 
         viewPager.setAdapter(adapter);
     }

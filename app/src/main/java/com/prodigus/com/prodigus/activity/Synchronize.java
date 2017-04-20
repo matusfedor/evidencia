@@ -1207,8 +1207,8 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
             startActivity(new Intent(Synchronize.this, Synchronize.class));
         } else if (id == R.id.nav_share) {
 
-        } else if (id == R.id.nav_send) {
-
+        } else if (id == R.id.nav_logout) {
+            startActivity(new Intent(Synchronize.this, LoginActivity.class));
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.layout_synchronize);
