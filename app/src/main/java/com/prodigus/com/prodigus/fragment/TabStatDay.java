@@ -84,6 +84,8 @@ public class TabStatDay extends Fragment {
             }
         });
 
+        prepareStatData();
+
         return myFragmentView;
     }
 
@@ -102,14 +104,14 @@ public class TabStatDay extends Fragment {
         {
             try
             {
-                entries.add(new BarEntry(cValue.getColumnIndex("pocet"), dayStat));
+                entries.add(new BarEntry(cValue.getFloat(0), dayStat));
                 dayStat++;
             }
             catch (Exception e) {
             }
         }
 
-        BarDataSet dataset = new BarDataSet(entries, "# of Calls");
+        BarDataSet dataset = new BarDataSet(entries, "Klienti");
         ArrayList<String> labels = new ArrayList<String>();
         Cursor c = db.getAllStatMarks();
         while (c.moveToNext())
@@ -125,7 +127,7 @@ public class TabStatDay extends Fragment {
         BarChart myChart = (BarChart) myFragmentView.findViewById(R.id.chart);
         BarData data = new BarData(labels, dataset);
         myChart.setData(data);
-        myChart.setDescription("# of times Alice called Bob");
+        myChart.setDescription("");
 
         myChart.invalidate();
     }
