@@ -217,6 +217,8 @@ public class TabContactMeetings extends Fragment {
 
     private List getNotesList(String attribute)
     {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+
         List<ChildItems> notes = new ArrayList<ChildItems>();
         Cursor c = db.getNotesByAttribute(attribute, parseInt(personId));
         while (c.moveToNext())

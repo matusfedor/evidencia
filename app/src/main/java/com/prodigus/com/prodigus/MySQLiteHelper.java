@@ -60,7 +60,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     //endregion
 
     private static final String DATABASE_NAME = "contact.db";
-    private static final int DATABASE_VERSION = 13;
+    private static final int DATABASE_VERSION = 14;
 
     public MySQLiteHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -128,9 +128,11 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     private static final String TABLE_NOTESS =  "create table "
             + TABLE_NOTES + "(" + COLUMN_NOTE_ID + " integer primary key autoincrement, "
             + COLUMN_NOTE_TEXT + " text not null,"
-            + COLUMN_NOTE_DATEC + " text not null,"
+            + COLUMN_NOTE_DATEC + " numeric,"
             + COLUMN_NOTE_PERSON + " text not null, "
             + COLUMN_NOTE_ATTRIBUTE + " text not null) ";
+
+    ////+ COLUMN_NOTE_DATEC + " text not null,"
 
     private static final String TABLE_ATTRIBUTES =  "create table "
             + "cl_attribute" + "( _id integer primary key, "
@@ -438,16 +440,20 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         int seconds = dt.getYear();
         String curTime = hours + ":" + minutes + ":" + seconds;*/
 
-        Calendar calendar = Calendar.getInstance();
+        /*Calendar calendar = Calendar.getInstance();
         int hours = calendar.get(Calendar.DAY_OF_MONTH);
         int minutes = calendar.get(Calendar.MONTH)+1;
         int seconds = calendar.get(Calendar.YEAR);
-        String curTime = hours + "." + minutes + "." + seconds;
+        String curTime = hours + "." + minutes + "." + seconds;*/
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:MM:SS");
+        Date now = new Date();
+        now.getDate();
 
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(FeedReaderContract.Notes.COLUMN_NOTE_TEXT , text);
-        values.put(FeedReaderContract.Notes.COLUMN_NOTE_DATEC, curTime);
+        values.put(FeedReaderContract.Notes.COLUMN_NOTE_DATEC, sdf.format(now));
         values.put(FeedReaderContract.Notes.COLUMN_NOTE_PERSON, person);
         values.put(FeedReaderContract.Notes.COLUMN_NOTE_ATTRIBUTE, attribute);
 
@@ -458,10 +464,13 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 
     public long createSyncNote(String text, int person, int attribute, Date dateNote)
     {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:MM:SS");
+
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(FeedReaderContract.Notes.COLUMN_NOTE_TEXT , text);
-        values.put(FeedReaderContract.Notes.COLUMN_NOTE_DATEC, dateNote.toString());
+        //values.put(FeedReaderContract.Notes.COLUMN_NOTE_DATEC, dateNote.toString());
+        values.put(FeedReaderContract.Notes.COLUMN_NOTE_DATEC, sdf.format(dateNote));
         values.put(FeedReaderContract.Notes.COLUMN_NOTE_PERSON, person);
         values.put(FeedReaderContract.Notes.COLUMN_NOTE_ATTRIBUTE, attribute);
 

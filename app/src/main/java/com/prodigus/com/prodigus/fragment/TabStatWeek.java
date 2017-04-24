@@ -87,6 +87,7 @@ public class TabStatWeek extends Fragment {
             }
         });
 
+        prepareStatData();
 
         return myFragmentView;
     }

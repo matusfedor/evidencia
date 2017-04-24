@@ -349,6 +349,8 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
 
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss");
 
+            SimpleDateFormat dateFormat2 = new SimpleDateFormat("dd.MM.yyyy");
+
             for (int i = 0; i < result.getPropertyCount(); i++)
             {
                 SoapObject s_deals = (SoapObject) result.getProperty(i);
@@ -357,6 +359,7 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
                 int att_id = Integer.parseInt(s_deals.getProperty(0).toString());
                 String noteText = s_deals.getProperty(2).toString();
                 Date creation = dateFormat.parse(s_deals.getProperty(3).toString());
+                //Date creation = dateFormat2.parse(s_deals.getProperty(3).toString());
 
                 long todo1_id = db.createSyncNote(noteText, con_id, att_id, creation);
             }
