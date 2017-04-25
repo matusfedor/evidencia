@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -23,6 +24,9 @@ import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.data.DataSet;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineDataSet;
 import com.prodigus.com.prodigus.Genders;
 import com.prodigus.com.prodigus.MySQLiteHelper;
 import com.prodigus.com.prodigus.R;
@@ -31,12 +35,14 @@ import com.prodigus.com.prodigus.activity.TabStatistics;
 import org.achartengine.ChartFactory;
 import org.achartengine.GraphicalView;
 import org.achartengine.chart.PointStyle;
+import org.achartengine.model.TimeSeries;
 import org.achartengine.model.XYMultipleSeriesDataset;
 import org.achartengine.model.XYSeries;
 import org.achartengine.renderer.XYMultipleSeriesRenderer;
 import org.achartengine.renderer.XYSeriesRenderer;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 public class TabStatDay extends Fragment {
@@ -119,21 +125,25 @@ public class TabStatDay extends Fragment {
     }
 
     public void prepareStatData() {
-        ArrayList<BarEntry> entries = new ArrayList<>();
+        ArrayList<Entry> entries = new ArrayList<>();
         Cursor cValue = db.getStatCounts(0);
         int dayStat = 0;
         while (cValue.moveToNext())
         {
             try
             {
-                entries.add(new BarEntry(cValue.getFloat(0), dayStat));
+                entries.add(new Entry(cValue.getFloat(0), dayStat));
                 dayStat++;
             }
             catch (Exception e) {
             }
         }
 
-        BarDataSet dataset = new BarDataSet(entries, "Klienti");
+        LineDataSet dataSet = new LineDataSet(entries, "Label");
+        dataSet.setDrawValues(false);
+        
+
+        /*BarDataSet dataset = new BarDataSet(entries, "Klienti");
         ArrayList<String> labels = new ArrayList<String>();
         Cursor c = db.getAllStatMarks();
         while (c.moveToNext())
@@ -144,25 +154,37 @@ public class TabStatDay extends Fragment {
             }
             catch (Exception e) {
             }
-        }
+        }*/
 
-        BarChart myChart = (BarChart) myFragmentView.findViewById(R.id.chart);
+        /*BarChart myChart = (BarChart) myFragmentView.findViewById(R.id.chart);
         BarData data = new BarData(labels, dataset);
         myChart.setData(data);
         myChart.setDescription("");
 
-        myChart.invalidate();
+        myChart.invalidate();*/
     }
 
     private View createTempGraph(int line) {
         // We start creating the XYSeries to plot the temperature
-        XYSeries series = new XYSeries("Denny graf");
+        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM");
 
-        // We start filling the series
-        int hour = 0;
-        for (int i=0; i< 10; i++) {
-            series.add(hour++, i);
+        TimeSeries series = new TimeSeries("Denny graf");
+        //XYSeries series = new XYSeries("Denny graf");
+
+        Cursor c = db.getDayStatistics(8);
+        while (c.moveToNext())
+        {
+            try
+            {
+                series.add(sdf.parse(c.getString(c.getColumnIndex("datum"))),c.getDouble(c.getColumnIndex("cnt")));
+            }
+            catch (Exception e) {
+                Log.i("",e.getMessage());
+            }
         }
+
+
+
 
         // Now we create the renderer
         XYSeriesRenderer renderer = new XYSeriesRenderer();
@@ -175,7 +197,7 @@ public class TabStatDay extends Fragment {
         renderer.setPointStrokeWidth(3);
 
         //second serie
-        XYSeries series2 = new XYSeries("AFA graf");
+        /*XYSeries series2 = new XYSeries("AFA graf");
         int hours = 0;
         for (int i=10; i< 20; i++) {
             series2.add(hours++, i);
@@ -186,32 +208,32 @@ public class TabStatDay extends Fragment {
         renderer2.setDisplayBoundingPoints(true);
         renderer2.setPointStyle(PointStyle.CIRCLE);
         renderer2.setPointStrokeWidth(3);
-
+*/
 
         // Now we add our series
         XYMultipleSeriesDataset dataset = new XYMultipleSeriesDataset();
         dataset.addSeries(series);
 
-        if(line == 2) {
+        /*if(line == 2) {
             dataset.addSeries(series2);
-        }
+        }*/
 
         // Finaly we create the multiple series renderer to control the graph
         XYMultipleSeriesRenderer mRenderer = new XYMultipleSeriesRenderer();
         mRenderer.addSeriesRenderer(renderer);
 
-        if(line == 2) {
+        /*if(line == 2) {
             mRenderer.addSeriesRenderer(renderer2);
-        }
+        }*/
 
         // We want to avoid black border
         mRenderer.setMarginsColor(Color.argb(0x00, 0xff, 0x00, 0x00)); // transparent margins
         // Disable Pan on two axis
         mRenderer.setPanEnabled(false, false);
-        mRenderer.setYAxisMax(35);
+        //mRenderer.setYAxisMax(35);
         mRenderer.setYAxisMin(0);
         mRenderer.setShowGrid(true); // we show the grid
-        chartView = ChartFactory.getLineChartView(getActivity(), dataset, mRenderer);
+        chartView = ChartFactory.getTimeChartView(getActivity(), dataset, mRenderer, "dd.MM");
 
 
         // Enable chart click

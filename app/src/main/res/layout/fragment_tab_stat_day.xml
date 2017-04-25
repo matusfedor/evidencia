@@ -16,6 +16,7 @@
         android:id="@+id/chart"
         android:orientation="vertical">
 
+       
     </LinearLayout>
 
 </FrameLayout>
