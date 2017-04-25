@@ -2,14 +2,21 @@ package com.prodigus.com.prodigus.fragment;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
 import android.widget.AdapterView;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.PopupMenu;
 import android.widget.Spinner;
 
 import com.github.mikephil.charting.charts.BarChart;
@@ -20,6 +27,14 @@ import com.prodigus.com.prodigus.Genders;
 import com.prodigus.com.prodigus.MySQLiteHelper;
 import com.prodigus.com.prodigus.R;
 import com.prodigus.com.prodigus.activity.TabStatistics;
+
+import org.achartengine.ChartFactory;
+import org.achartengine.GraphicalView;
+import org.achartengine.chart.PointStyle;
+import org.achartengine.model.XYMultipleSeriesDataset;
+import org.achartengine.model.XYSeries;
+import org.achartengine.renderer.XYMultipleSeriesRenderer;
+import org.achartengine.renderer.XYSeriesRenderer;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -36,8 +51,11 @@ public class TabStatDay extends Fragment {
     private String mParam2;
     private float testfl = 0f;
     MySQLiteHelper db;
-
     private OnFragmentInteractionListener mListener;
+
+    private LinearLayout chartLyt;
+    private Animation fadeAnim;
+    private GraphicalView chartView;
 
     public TabStatDay() {
         // Required empty public constructor
@@ -67,7 +85,10 @@ public class TabStatDay extends Fragment {
                              Bundle savedInstanceState) {
 
         myFragmentView = inflater.inflate(R.layout.fragment_tab_stat_day, container, false);
+        chartLyt = (LinearLayout) myFragmentView.findViewById(R.id.chart);
+
         db = new MySQLiteHelper(getActivity());
+        setHasOptionsMenu(true);
 
         ((TabStatistics)getActivity()).setFragmentRefreshListener(new TabStatistics.FragmentRefreshListener() {
             @Override
@@ -80,11 +101,12 @@ public class TabStatDay extends Fragment {
                 catch(IOException ex) { isConnected = false;}
 
 
-                prepareStatData();
+                //prepareStatData();
             }
         });
 
-        prepareStatData();
+        chartLyt.addView(createTempGraph(1), 0);
+        //prepareStatData();
 
         return myFragmentView;
     }
@@ -132,16 +154,100 @@ public class TabStatDay extends Fragment {
         myChart.invalidate();
     }
 
-    /*@Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
+    private View createTempGraph(int line) {
+        // We start creating the XYSeries to plot the temperature
+        XYSeries series = new XYSeries("Denny graf");
+
+        // We start filling the series
+        int hour = 0;
+        for (int i=0; i< 10; i++) {
+            series.add(hour++, i);
         }
-    }*/
+
+        // Now we create the renderer
+        XYSeriesRenderer renderer = new XYSeriesRenderer();
+        renderer.setLineWidth(2);
+        renderer.setColor(Color.RED);
+        // Include low and max value
+        renderer.setDisplayBoundingPoints(true);
+        // we add point markers
+        renderer.setPointStyle(PointStyle.CIRCLE);
+        renderer.setPointStrokeWidth(3);
+
+        //second serie
+        XYSeries series2 = new XYSeries("AFA graf");
+        int hours = 0;
+        for (int i=10; i< 20; i++) {
+            series2.add(hours++, i);
+        }
+        XYSeriesRenderer renderer2 = new XYSeriesRenderer();
+        renderer2.setLineWidth(2);
+        renderer2.setColor(Color.BLUE);
+        renderer2.setDisplayBoundingPoints(true);
+        renderer2.setPointStyle(PointStyle.CIRCLE);
+        renderer2.setPointStrokeWidth(3);
+
+
+        // Now we add our series
+        XYMultipleSeriesDataset dataset = new XYMultipleSeriesDataset();
+        dataset.addSeries(series);
+
+        if(line == 2) {
+            dataset.addSeries(series2);
+        }
+
+        // Finaly we create the multiple series renderer to control the graph
+        XYMultipleSeriesRenderer mRenderer = new XYMultipleSeriesRenderer();
+        mRenderer.addSeriesRenderer(renderer);
+
+        if(line == 2) {
+            mRenderer.addSeriesRenderer(renderer2);
+        }
+
+        // We want to avoid black border
+        mRenderer.setMarginsColor(Color.argb(0x00, 0xff, 0x00, 0x00)); // transparent margins
+        // Disable Pan on two axis
+        mRenderer.setPanEnabled(false, false);
+        mRenderer.setYAxisMax(35);
+        mRenderer.setYAxisMin(0);
+        mRenderer.setShowGrid(true); // we show the grid
+        chartView = ChartFactory.getLineChartView(getActivity(), dataset, mRenderer);
+
+
+        // Enable chart click
+        mRenderer.setClickEnabled(true);
+        /*chartView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                applyAnim(v, createPressGraph());
+            }
+        });*/
+
+        return chartView;
+    }
+
+    private void applyAnim(final View v, final View nextView) {
+
+        Animation.AnimationListener list = new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+
+                chartLyt.removeViewAt(0);
+                chartLyt.addView(nextView,0);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        };
+        fadeAnim.setAnimationListener(list);
+        v.startAnimation(fadeAnim);
+    }
 
     @Override
     public void onDetach() {
@@ -158,5 +264,34 @@ public class TabStatDay extends Fragment {
     {
         String command = "ping -c 1 google.com";
         return (Runtime.getRuntime().exec (command).waitFor() == 0);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_statistics, menu);
+        super.onCreateOptionsMenu(menu,inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.red:
+                if (item.isChecked())
+                {
+                    createTempGraph(2);
+                    chartView.repaint();
+                    chartLyt.addView(createTempGraph(2), 0);
+                    item.setChecked(false);
+                }
+                else item.setChecked(true);
+
+                return true;
+            case R.id.blue:
+                if (item.isChecked()) item.setChecked(false);
+                else item.setChecked(true);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 }
