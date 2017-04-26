@@ -114,10 +114,10 @@ public class TabStatistics extends AppCompatActivity implements NavigationView.O
 
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFragment(new TabStatDay(), "Day");
-        adapter.addFragment(new TabStatWeek(), "Week");
-        adapter.addFragment(new TabStatMonth(), "Month");
-        adapter.addFragment(new TabStatQrt(), "Quarter");
+        adapter.addFragment(new TabStatDay(), "Denne");
+        adapter.addFragment(new TabStatWeek(), "Týždenne");
+        adapter.addFragment(new TabStatMonth(), "Mesačne");
+        //adapter.addFragment(new TabStatQrt(), "Quarter");
 
         viewPager.setAdapter(adapter);
     }

@@ -3,6 +3,7 @@ package com.prodigus.com.prodigus.fragment;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -63,6 +64,9 @@ public class TabStatDay extends Fragment {
     private Animation fadeAnim;
     private GraphicalView chartView;
 
+    private boolean serieCheckedAfa = true;
+    private boolean serieCheckedTelk = true;
+
     public TabStatDay() {
         // Required empty public constructor
     }
@@ -111,7 +115,7 @@ public class TabStatDay extends Fragment {
             }
         });
 
-        chartLyt.addView(createTempGraph(1), 0);
+        chartLyt.addView(createTempGraph(), 0);
         //prepareStatData();
 
         return myFragmentView;
@@ -164,27 +168,53 @@ public class TabStatDay extends Fragment {
         myChart.invalidate();*/
     }
 
-    private View createTempGraph(int line) {
+    private View createTempGraph() {
         // We start creating the XYSeries to plot the temperature
         SimpleDateFormat sdf = new SimpleDateFormat("dd.MM");
+        TimeSeries seriesAfa = new TimeSeries("Denný graf AFA");
+        TimeSeries seriesTelk = new TimeSeries("Denný graf TELK");
 
-        TimeSeries series = new TimeSeries("Denny graf");
-        //XYSeries series = new XYSeries("Denny graf");
+        double maxValue = 0;
 
-        Cursor c = db.getDayStatistics(8);
-        while (c.moveToNext())
+        if(serieCheckedAfa)
         {
-            try
+            Cursor c = db.getDayStatistics(8);
+            while (c.moveToNext())
             {
-                series.add(sdf.parse(c.getString(c.getColumnIndex("datum"))),c.getDouble(c.getColumnIndex("cnt")));
-            }
-            catch (Exception e) {
-                Log.i("",e.getMessage());
+                try
+                {
+                    seriesAfa.add(sdf.parse(c.getString(c.getColumnIndex("datum"))),c.getDouble(c.getColumnIndex("cnt")));
+
+                    if(c.getDouble(c.getColumnIndex("cnt")) > maxValue)
+                    {
+                        maxValue = c.getDouble(c.getColumnIndex("cnt"));
+                    }
+                }
+                catch (Exception e) {
+                    Log.i("",e.getMessage());
+                }
             }
         }
 
+        if(serieCheckedTelk)
+        {
+            Cursor c = db.getDayStatistics(6);
+            while (c.moveToNext())
+            {
+                try
+                {
+                    seriesTelk.add(sdf.parse(c.getString(c.getColumnIndex("datum"))),c.getDouble(c.getColumnIndex("cnt")));
 
-
+                    if(c.getDouble(c.getColumnIndex("cnt")) > maxValue)
+                    {
+                        maxValue = c.getDouble(c.getColumnIndex("cnt"));
+                    }
+                }
+                catch (Exception e) {
+                    Log.i("",e.getMessage());
+                }
+            }
+        }
 
         // Now we create the renderer
         XYSeriesRenderer renderer = new XYSeriesRenderer();
@@ -195,55 +225,65 @@ public class TabStatDay extends Fragment {
         // we add point markers
         renderer.setPointStyle(PointStyle.CIRCLE);
         renderer.setPointStrokeWidth(3);
+        renderer.setShowLegendItem(false);
 
         //second serie
-        /*XYSeries series2 = new XYSeries("AFA graf");
-        int hours = 0;
-        for (int i=10; i< 20; i++) {
-            series2.add(hours++, i);
-        }
         XYSeriesRenderer renderer2 = new XYSeriesRenderer();
         renderer2.setLineWidth(2);
         renderer2.setColor(Color.BLUE);
+        // Include low and max value
         renderer2.setDisplayBoundingPoints(true);
+        // we add point markers
         renderer2.setPointStyle(PointStyle.CIRCLE);
         renderer2.setPointStrokeWidth(3);
-*/
+        renderer2.setShowLegendItem(false);
 
         // Now we add our series
         XYMultipleSeriesDataset dataset = new XYMultipleSeriesDataset();
-        dataset.addSeries(series);
-
-        /*if(line == 2) {
-            dataset.addSeries(series2);
-        }*/
-
+        if(serieCheckedAfa) {
+            dataset.addSeries(seriesAfa);
+        }
+        if(serieCheckedTelk)
+        {
+            dataset.addSeries(seriesTelk);
+        }
         // Finaly we create the multiple series renderer to control the graph
         XYMultipleSeriesRenderer mRenderer = new XYMultipleSeriesRenderer();
-        mRenderer.addSeriesRenderer(renderer);
-
-        /*if(line == 2) {
+        if(serieCheckedAfa) {
+            mRenderer.addSeriesRenderer(renderer);
+        }
+        if(serieCheckedTelk)
+        {
             mRenderer.addSeriesRenderer(renderer2);
-        }*/
+        }
 
         // We want to avoid black border
-        mRenderer.setMarginsColor(Color.argb(0x00, 0xff, 0x00, 0x00)); // transparent margins
-        // Disable Pan on two axis
-        mRenderer.setPanEnabled(false, false);
-        //mRenderer.setYAxisMax(35);
+        //mRenderer.setMarginsColor(Color.argb(0x00, 0xff, 0x00, 0x00)); // transparent margins
+        mRenderer.setMarginsColor(Color.WHITE); // transparent margins
+        mRenderer.setPanEnabled(true, true);
+        mRenderer.setYAxisMax(maxValue + 2);
         mRenderer.setYAxisMin(0);
-        mRenderer.setShowGrid(true); // we show the grid
-        chartView = ChartFactory.getTimeChartView(getActivity(), dataset, mRenderer, "dd.MM");
+        mRenderer.setShowGrid(true);
+        mRenderer.setLabelsTextSize(30);
+        mRenderer.setYLabelsAlign(Paint.Align.RIGHT);
+        mRenderer.setMargins(new int[]{40,50,20,20});
+        mRenderer.setYLabelsPadding(10);
+        mRenderer.setAxesColor(Color.BLACK);
+        mRenderer.setXLabelsColor(Color.BLACK);
+        mRenderer.setYLabelsColor(0, Color.BLACK);
+        mRenderer.setZoomEnabled(true, true);
+        mRenderer.setInScroll(true);
 
+        chartView = ChartFactory.getTimeChartView(getActivity(), dataset, mRenderer, "dd.MM");
 
         // Enable chart click
         mRenderer.setClickEnabled(true);
-        /*chartView.setOnClickListener(new View.OnClickListener() {
+        chartView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                applyAnim(v, createPressGraph());
+                //applyAnim(v, createPressGraph());
             }
-        });*/
+        });
 
         return chartView;
     }
@@ -300,17 +340,35 @@ public class TabStatDay extends Fragment {
             case R.id.red:
                 if (item.isChecked())
                 {
-                    createTempGraph(2);
+                    serieCheckedAfa = false;
+                    chartLyt.addView(createTempGraph(), 0);
                     chartView.repaint();
-                    chartLyt.addView(createTempGraph(2), 0);
                     item.setChecked(false);
                 }
-                else item.setChecked(true);
+                else
+                {
+                    serieCheckedAfa = true;
+                    chartLyt.addView(createTempGraph(), 0);
+                    chartView.repaint();
+                    item.setChecked(true);
+                }
 
                 return true;
             case R.id.blue:
-                if (item.isChecked()) item.setChecked(false);
-                else item.setChecked(true);
+                if (item.isChecked())
+                {
+                    serieCheckedTelk = false;
+                    chartLyt.addView(createTempGraph(), 0);
+                    chartView.repaint();
+                    item.setChecked(false);
+                }
+                else
+                {
+                    serieCheckedTelk = true;
+                    chartLyt.addView(createTempGraph(), 0);
+                    chartView.repaint();
+                    item.setChecked(true);
+                }
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

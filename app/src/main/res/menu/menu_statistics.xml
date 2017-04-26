@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <group android:checkableBehavior="all">
-        <item android:id="@+id/red"
+        <item android:id="@+id/red" android:checked="true"
             android:title="AFA" />
-        <item android:id="@+id/blue"
+        <item android:id="@+id/blue" android:checked="true"
             android:title="FA" />
     </group>
 </menu>
