@@ -66,6 +66,10 @@ public class TabStatDay extends Fragment {
 
     private boolean serieCheckedAfa = true;
     private boolean serieCheckedTelk = true;
+    private boolean serieCheckedTerm = false;
+    private boolean serieCheckedFa = false;
+    private boolean serieCheckedPk = false;
+    private boolean serieCheckedKlient = false;
 
     public TabStatDay() {
         // Required empty public constructor
@@ -171,8 +175,12 @@ public class TabStatDay extends Fragment {
     private View createTempGraph() {
         // We start creating the XYSeries to plot the temperature
         SimpleDateFormat sdf = new SimpleDateFormat("dd.MM");
-        TimeSeries seriesAfa = new TimeSeries("Denný graf AFA");
-        TimeSeries seriesTelk = new TimeSeries("Denný graf TELK");
+        TimeSeries seriesAfa = new TimeSeries("Denný graf Anketa finančná analýza");
+        TimeSeries seriesTelk = new TimeSeries("Denný graf Telefonický hovor s kontaktom");
+        TimeSeries seriesTerm = new TimeSeries("Denný graf Termín");
+        TimeSeries seriesFa = new TimeSeries("Denný graf Finančná analýza");
+        TimeSeries seriesPk = new TimeSeries("Denný graf Potenciálny klienti");
+        TimeSeries seriesKlient = new TimeSeries("Denný graf Klienti");
 
         double maxValue = 0;
 
@@ -216,6 +224,86 @@ public class TabStatDay extends Fragment {
             }
         }
 
+        if(serieCheckedTerm)
+        {
+            Cursor c = db.getDayStatistics(15);
+            while (c.moveToNext())
+            {
+                try
+                {
+                    seriesTerm.add(sdf.parse(c.getString(c.getColumnIndex("datum"))),c.getDouble(c.getColumnIndex("cnt")));
+
+                    if(c.getDouble(c.getColumnIndex("cnt")) > maxValue)
+                    {
+                        maxValue = c.getDouble(c.getColumnIndex("cnt"));
+                    }
+                }
+                catch (Exception e) {
+                    Log.i("",e.getMessage());
+                }
+            }
+        }
+
+        if(serieCheckedFa)
+        {
+            Cursor c = db.getDayStatistics(16);
+            while (c.moveToNext())
+            {
+                try
+                {
+                    seriesFa.add(sdf.parse(c.getString(c.getColumnIndex("datum"))),c.getDouble(c.getColumnIndex("cnt")));
+
+                    if(c.getDouble(c.getColumnIndex("cnt")) > maxValue)
+                    {
+                        maxValue = c.getDouble(c.getColumnIndex("cnt"));
+                    }
+                }
+                catch (Exception e) {
+                    Log.i("",e.getMessage());
+                }
+            }
+        }
+
+        if(serieCheckedPk)
+        {
+            Cursor c = db.getDayStatistics(2);
+            while (c.moveToNext())
+            {
+                try
+                {
+                    seriesPk.add(sdf.parse(c.getString(c.getColumnIndex("datum"))),c.getDouble(c.getColumnIndex("cnt")));
+
+                    if(c.getDouble(c.getColumnIndex("cnt")) > maxValue)
+                    {
+                        maxValue = c.getDouble(c.getColumnIndex("cnt"));
+                    }
+                }
+                catch (Exception e) {
+                    Log.i("",e.getMessage());
+                }
+            }
+        }
+
+        if(serieCheckedKlient)
+        {
+            Cursor c = db.getDayStatistics(1);
+            while (c.moveToNext())
+            {
+                try
+                {
+                    seriesKlient.add(sdf.parse(c.getString(c.getColumnIndex("datum"))),c.getDouble(c.getColumnIndex("cnt")));
+
+                    if(c.getDouble(c.getColumnIndex("cnt")) > maxValue)
+                    {
+                        maxValue = c.getDouble(c.getColumnIndex("cnt"));
+                    }
+                }
+                catch (Exception e) {
+                    Log.i("",e.getMessage());
+                }
+            }
+        }
+
         // Now we create the renderer
         XYSeriesRenderer renderer = new XYSeriesRenderer();
         renderer.setLineWidth(2);
@@ -238,6 +326,44 @@ public class TabStatDay extends Fragment {
         renderer2.setPointStrokeWidth(3);
         renderer2.setShowLegendItem(false);
 
+        XYSeriesRenderer renderer3 = new XYSeriesRenderer();
+        renderer3.setLineWidth(2);
+        renderer3.setColor(Color.GREEN);
+        // Include low and max value
+        renderer3.setDisplayBoundingPoints(true);
+        // we add point markers
+        renderer3.setPointStyle(PointStyle.CIRCLE);
+        renderer3.setPointStrokeWidth(3);
+        renderer3.setShowLegendItem(false);
+
+        XYSeriesRenderer renderer4 = new XYSeriesRenderer();
+        renderer4.setLineWidth(2);
+        renderer4.setColor(Color.YELLOW);
+        // Include low and max value
+        renderer4.setDisplayBoundingPoints(true);
+        // we add point markers
+        renderer4.setPointStyle(PointStyle.CIRCLE);
+        renderer4.setPointStrokeWidth(3);
+        renderer4.setShowLegendItem(false);
+
+        XYSeriesRenderer renderer5 = new XYSeriesRenderer();
+        renderer5.setLineWidth(2);
+        renderer5.setColor(Color.BLACK);
+        renderer5.setDisplayBoundingPoints(true);
+        renderer5.setPointStyle(PointStyle.CIRCLE);
+        renderer5.setPointStrokeWidth(3);
+        renderer5.setShowLegendItem(false);
+
+        XYSeriesRenderer renderer6 = new XYSeriesRenderer();
+        renderer6.setLineWidth(2);
+        renderer6.setColor(Color.CYAN);
+        // Include low and max value
+        renderer6.setDisplayBoundingPoints(true);
+        // we add point markers
+        renderer6.setPointStyle(PointStyle.CIRCLE);
+        renderer6.setPointStrokeWidth(3);
+        renderer6.setShowLegendItem(false);
+
         // Now we add our series
         XYMultipleSeriesDataset dataset = new XYMultipleSeriesDataset();
         if(serieCheckedAfa) {
@@ -247,6 +373,22 @@ public class TabStatDay extends Fragment {
         {
             dataset.addSeries(seriesTelk);
         }
+        if(serieCheckedTerm)
+        {
+            dataset.addSeries(seriesTerm);
+        }
+        if(serieCheckedFa)
+        {
+            dataset.addSeries(seriesFa);
+        }
+        if(serieCheckedPk)
+        {
+            dataset.addSeries(seriesPk);
+        }
+        if(serieCheckedKlient)
+        {
+            dataset.addSeries(seriesKlient);
+        }
         // Finaly we create the multiple series renderer to control the graph
         XYMultipleSeriesRenderer mRenderer = new XYMultipleSeriesRenderer();
         if(serieCheckedAfa) {
@@ -255,6 +397,22 @@ public class TabStatDay extends Fragment {
         if(serieCheckedTelk)
         {
             mRenderer.addSeriesRenderer(renderer2);
+        }
+        if(serieCheckedTerm)
+        {
+            mRenderer.addSeriesRenderer(renderer3);
+        }
+        if(serieCheckedFa)
+        {
+            mRenderer.addSeriesRenderer(renderer4);
+        }
+        if(serieCheckedPk)
+        {
+            mRenderer.addSeriesRenderer(renderer5);
+        }
+        if(serieCheckedKlient)
+        {
+            mRenderer.addSeriesRenderer(renderer6);
         }
 
         // We want to avoid black border
@@ -365,6 +523,74 @@ public class TabStatDay extends Fragment {
                 else
                 {
                     serieCheckedTelk = true;
+                    chartLyt.addView(createTempGraph(), 0);
+                    chartView.repaint();
+                    item.setChecked(true);
+                }
+                return true;
+
+            case R.id.green:
+                if (item.isChecked())
+                {
+                    serieCheckedTerm = false;
+                    chartLyt.addView(createTempGraph(), 0);
+                    chartView.repaint();
+                    item.setChecked(false);
+                }
+                else
+                {
+                    serieCheckedTerm = true;
+                    chartLyt.addView(createTempGraph(), 0);
+                    chartView.repaint();
+                    item.setChecked(true);
+                }
+                return true;
+
+            case R.id.yellow:
+                if (item.isChecked())
+                {
+                    serieCheckedFa = false;
+                    chartLyt.addView(createTempGraph(), 0);
+                    chartView.repaint();
+                    item.setChecked(false);
+                }
+                else
+                {
+                    serieCheckedFa = true;
+                    chartLyt.addView(createTempGraph(), 0);
+                    chartView.repaint();
+                    item.setChecked(true);
+                }
+                return true;
+
+            case R.id.black:
+                if (item.isChecked())
+                {
+                    serieCheckedPk = false;
+                    chartLyt.addView(createTempGraph(), 0);
+                    chartView.repaint();
+                    item.setChecked(false);
+                }
+                else
+                {
+                    serieCheckedPk = true;
+                    chartLyt.addView(createTempGraph(), 0);
+                    chartView.repaint();
+                    item.setChecked(true);
+                }
+                return true;
+
+            case R.id.cyan:
+                if (item.isChecked())
+                {
+                    serieCheckedKlient = false;
+                    chartLyt.addView(createTempGraph(), 0);
+                    chartView.repaint();
+                    item.setChecked(false);
+                }
+                else
+                {
+                    serieCheckedKlient = true;
                     chartLyt.addView(createTempGraph(), 0);
                     chartView.repaint();
                     item.setChecked(true);

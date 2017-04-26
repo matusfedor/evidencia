@@ -15,8 +15,6 @@
         android:layout_height="match_parent"
         android:id="@+id/chart"
         android:orientation="vertical">
-
-       
     </LinearLayout>
 
 </FrameLayout>

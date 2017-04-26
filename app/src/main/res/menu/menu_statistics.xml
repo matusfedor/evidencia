@@ -4,7 +4,15 @@
         <item android:id="@+id/red" android:checked="true"
             android:title="AFA" />
         <item android:id="@+id/blue" android:checked="true"
+            android:title="TELK" />
+        <item android:id="@+id/green"
+            android:title="TERM" />
+        <item android:id="@+id/yellow"
             android:title="FA" />
+        <item android:id="@+id/black"
+            android:title="PK" />
+        <item android:id="@+id/cyan"
+            android:title="Klienti" />
     </group>
 </menu>
 

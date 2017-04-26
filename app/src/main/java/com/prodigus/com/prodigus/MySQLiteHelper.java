@@ -383,7 +383,15 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         return cursor;
     }
 
-    public Cursor getSyncNotes()
+    public Cursor getWeekStatistics(int attribute) {
+        String selectQuery = "SELECT strftime('%W',date('now')) week, count(*) cnt FROM contactStateHistory WHERE con_state = " + attribute + " AND date(change_date)  <  DATE('now', 'weekday 1') AND date(change_date)  >  DATE('now', 'weekday 1', '-7 days')";
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        return cursor;
+    }
+
+        public Cursor getSyncNotes()
     {
         String selectQuery = "SELECT _id, notetext, datec, person, attribute FROM " + TABLE_NOTES;
         SQLiteDatabase db = this.getReadableDatabase();
