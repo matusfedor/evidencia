@@ -190,20 +190,23 @@ public class TabStatWeek extends Fragment {
 
         if(serieCheckedAfa)
         {
-            Cursor c = db.getWeekStatistics(8);
-            while (c.moveToNext())
+            for(int k=0; k < 30; k++)
             {
-                try
+                Cursor c = db.getWeekStatistics(8, k);
+                while (c.moveToNext())
                 {
-                    seriesAfa.add((c.getDouble(c.getColumnIndex("week"))),c.getDouble(c.getColumnIndex("cnt")));
-
-                    if(c.getDouble(c.getColumnIndex("cnt")) > maxValue)
+                    try
                     {
-                        maxValue = c.getDouble(c.getColumnIndex("cnt"));
+                        seriesAfa.add((c.getDouble(c.getColumnIndex("week"))),c.getDouble(c.getColumnIndex("cnt")));
+
+                        if(c.getDouble(c.getColumnIndex("cnt")) > maxValue)
+                        {
+                            maxValue = c.getDouble(c.getColumnIndex("cnt"));
+                        }
                     }
-                }
-                catch (Exception e) {
-                    Log.i("",e.getMessage());
+                    catch (Exception e) {
+                        Log.i("",e.getMessage());
+                    }
                 }
             }
         }
@@ -436,7 +439,9 @@ public class TabStatWeek extends Fragment {
         mRenderer.setZoomEnabled(true, true);
         mRenderer.setInScroll(true);
 
-        chartView = ChartFactory.getTimeChartView(getActivity(), dataset, mRenderer, "dd.MM");
+        //chartView = ChartFactory.getTimeChartView(getActivity(), dataset, mRenderer, "dd.MM");
+
+        chartView = ChartFactory.getLineChartView(getActivity(), dataset, mRenderer);
 
         // Enable chart click
         mRenderer.setClickEnabled(true);

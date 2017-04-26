@@ -317,6 +317,14 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         return cursor;
     }
 
+    public Cursor getDayStatistics(int attribute, int step)
+    {
+        String selectQuery = "SELECT strftime('%d.%m.%Y',date('now','" + step * (-1) + " day')) datum , count(*) cnt FROM contactStateHistory WHERE con_state = " + attribute + " AND date(change_date) = date('now','" + step * (-1) + " day')";
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        return cursor;
+    }
+
     public Cursor getDayStatistics(int attribute)
     {
         String selectQuery = "SELECT strftime('%d.%m.',date('now')) datum , count(*) cnt FROM contactStateHistory WHERE con_state = " + attribute + " AND date(change_date) = date('now')" +
@@ -391,7 +399,15 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         return cursor;
     }
 
-        public Cursor getSyncNotes()
+    public Cursor getWeekStatistics(int attribute, int step) {
+        String selectQuery = "SELECT strftime('%W',date('now','" + step * (-7) + " days')) week, count(*) cnt FROM contactStateHistory WHERE con_state = " + attribute + " AND date(change_date)  <  DATE('now', 'weekday 1','" + step * (-7) + " days') AND date(change_date)  >  DATE('now', 'weekday 1', ' " + -7 * (step + 1) + " days')";
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        return cursor;
+    }
+
+    public Cursor getSyncNotes()
     {
         String selectQuery = "SELECT _id, notetext, datec, person, attribute FROM " + TABLE_NOTES;
         SQLiteDatabase db = this.getReadableDatabase();

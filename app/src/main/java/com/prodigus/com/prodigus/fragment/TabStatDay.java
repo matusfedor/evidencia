@@ -36,6 +36,7 @@ import com.prodigus.com.prodigus.activity.TabStatistics;
 import org.achartengine.ChartFactory;
 import org.achartengine.GraphicalView;
 import org.achartengine.chart.PointStyle;
+import org.achartengine.chart.TimeChart;
 import org.achartengine.model.TimeSeries;
 import org.achartengine.model.XYMultipleSeriesDataset;
 import org.achartengine.model.XYSeries;
@@ -174,7 +175,7 @@ public class TabStatDay extends Fragment {
 
     private View createTempGraph() {
         // We start creating the XYSeries to plot the temperature
-        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM");
+        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
         TimeSeries seriesAfa = new TimeSeries("Denný graf Anketa finančná analýza");
         TimeSeries seriesTelk = new TimeSeries("Denný graf Telefonický hovor s kontaktom");
         TimeSeries seriesTerm = new TimeSeries("Denný graf Termín");
@@ -186,120 +187,133 @@ public class TabStatDay extends Fragment {
 
         if(serieCheckedAfa)
         {
-            Cursor c = db.getDayStatistics(8);
-            while (c.moveToNext())
+            for(int s = 0; s < 30; s++)
             {
-                try
+                Cursor c = db.getDayStatistics(8, s);
+                while (c.moveToNext())
                 {
-                    seriesAfa.add(sdf.parse(c.getString(c.getColumnIndex("datum"))),c.getDouble(c.getColumnIndex("cnt")));
-
-                    if(c.getDouble(c.getColumnIndex("cnt")) > maxValue)
+                    try
                     {
-                        maxValue = c.getDouble(c.getColumnIndex("cnt"));
+                        seriesAfa.add(sdf.parse(c.getString(c.getColumnIndex("datum"))),c.getDouble(c.getColumnIndex("cnt")));
+
+                        if(c.getDouble(c.getColumnIndex("cnt")) > maxValue)
+                        {
+                            maxValue = c.getDouble(c.getColumnIndex("cnt"));
+                        }
                     }
-                }
-                catch (Exception e) {
-                    Log.i("",e.getMessage());
+                    catch (Exception e) {
+                        Log.i("",e.getMessage());
+                    }
                 }
             }
         }
 
         if(serieCheckedTelk)
         {
-            Cursor c = db.getDayStatistics(6);
-            while (c.moveToNext())
+            for(int s = 0; s < 30; s++)
             {
-                try
+                Cursor c = db.getDayStatistics(6,s);
+                while (c.moveToNext())
                 {
-                    seriesTelk.add(sdf.parse(c.getString(c.getColumnIndex("datum"))),c.getDouble(c.getColumnIndex("cnt")));
-
-                    if(c.getDouble(c.getColumnIndex("cnt")) > maxValue)
+                    try
                     {
-                        maxValue = c.getDouble(c.getColumnIndex("cnt"));
+                        seriesTelk.add(sdf.parse(c.getString(c.getColumnIndex("datum"))),c.getDouble(c.getColumnIndex("cnt")));
+
+                        if(c.getDouble(c.getColumnIndex("cnt")) > maxValue)
+                        {
+                            maxValue = c.getDouble(c.getColumnIndex("cnt"));
+                        }
                     }
-                }
-                catch (Exception e) {
-                    Log.i("",e.getMessage());
+                    catch (Exception e) {
+                        Log.i("",e.getMessage());
+                    }
                 }
             }
         }
 
         if(serieCheckedTerm)
         {
-            Cursor c = db.getDayStatistics(15);
-            while (c.moveToNext())
+            for(int s = 0; s < 30; s++)
             {
-                try
+                Cursor c = db.getDayStatistics(15,s);
+                while (c.moveToNext())
                 {
-                    seriesTerm.add(sdf.parse(c.getString(c.getColumnIndex("datum"))),c.getDouble(c.getColumnIndex("cnt")));
-
-                    if(c.getDouble(c.getColumnIndex("cnt")) > maxValue)
+                    try
                     {
-                        maxValue = c.getDouble(c.getColumnIndex("cnt"));
+                        seriesTerm.add(sdf.parse(c.getString(c.getColumnIndex("datum"))),c.getDouble(c.getColumnIndex("cnt")));
+
+                        if(c.getDouble(c.getColumnIndex("cnt")) > maxValue)
+                        {
+                            maxValue = c.getDouble(c.getColumnIndex("cnt"));
+                        }
                     }
-                }
-                catch (Exception e) {
-                    Log.i("",e.getMessage());
+                    catch (Exception e) {
+                        Log.i("",e.getMessage());
+                    }
                 }
             }
         }
 
         if(serieCheckedFa)
         {
-            Cursor c = db.getDayStatistics(16);
-            while (c.moveToNext())
-            {
-                try
-                {
-                    seriesFa.add(sdf.parse(c.getString(c.getColumnIndex("datum"))),c.getDouble(c.getColumnIndex("cnt")));
+            for(int s = 0; s < 30; s++) {
+                Cursor c = db.getDayStatistics(16,s);
+                while (c.moveToNext()) {
+                    try {
+                        seriesFa.add(sdf.parse(c.getString(c.getColumnIndex("datum"))), c.getDouble(c.getColumnIndex("cnt")));
 
-                    if(c.getDouble(c.getColumnIndex("cnt")) > maxValue)
-                    {
-                        maxValue = c.getDouble(c.getColumnIndex("cnt"));
+                        if (c.getDouble(c.getColumnIndex("cnt")) > maxValue) {
+                            maxValue = c.getDouble(c.getColumnIndex("cnt"));
+                        }
+                    } catch (Exception e) {
+                        Log.i("", e.getMessage());
                     }
-                }
-                catch (Exception e) {
-                    Log.i("",e.getMessage());
                 }
             }
         }
 
         if(serieCheckedPk)
         {
-            Cursor c = db.getDayStatistics(2);
-            while (c.moveToNext())
+            for(int s = 0; s < 30; s++)
             {
-                try
+                Cursor c = db.getDayStatistics(2,s);
+                while (c.moveToNext())
                 {
-                    seriesPk.add(sdf.parse(c.getString(c.getColumnIndex("datum"))),c.getDouble(c.getColumnIndex("cnt")));
-
-                    if(c.getDouble(c.getColumnIndex("cnt")) > maxValue)
+                    try
                     {
-                        maxValue = c.getDouble(c.getColumnIndex("cnt"));
+                        seriesPk.add(sdf.parse(c.getString(c.getColumnIndex("datum"))),c.getDouble(c.getColumnIndex("cnt")));
+
+                        if(c.getDouble(c.getColumnIndex("cnt")) > maxValue)
+                        {
+                            maxValue = c.getDouble(c.getColumnIndex("cnt"));
+                        }
                     }
-                }
-                catch (Exception e) {
-                    Log.i("",e.getMessage());
+                    catch (Exception e) {
+                        Log.i("",e.getMessage());
+                    }
                 }
             }
         }
 
         if(serieCheckedKlient)
         {
-            Cursor c = db.getDayStatistics(1);
-            while (c.moveToNext())
+            for(int s = 0; s < 30; s++)
             {
-                try
+                Cursor c = db.getDayStatistics(1,s);
+                while (c.moveToNext())
                 {
-                    seriesKlient.add(sdf.parse(c.getString(c.getColumnIndex("datum"))),c.getDouble(c.getColumnIndex("cnt")));
-
-                    if(c.getDouble(c.getColumnIndex("cnt")) > maxValue)
+                    try
                     {
-                        maxValue = c.getDouble(c.getColumnIndex("cnt"));
+                        seriesKlient.add(sdf.parse(c.getString(c.getColumnIndex("datum"))),c.getDouble(c.getColumnIndex("cnt")));
+
+                        if(c.getDouble(c.getColumnIndex("cnt")) > maxValue)
+                        {
+                            maxValue = c.getDouble(c.getColumnIndex("cnt"));
+                        }
                     }
-                }
-                catch (Exception e) {
-                    Log.i("",e.getMessage());
+                    catch (Exception e) {
+                        Log.i("",e.getMessage());
+                    }
                 }
             }
         }
@@ -432,7 +446,17 @@ public class TabStatDay extends Fragment {
         mRenderer.setZoomEnabled(true, true);
         mRenderer.setInScroll(true);
 
-        chartView = ChartFactory.getTimeChartView(getActivity(), dataset, mRenderer, "dd.MM");
+        int x[]={1,2,3,4,5,6};
+        String xaxis[]={"jan","feb","march","april","maj","jun"};
+
+        //chartView = ChartFactory.getTimeChartView(getActivity(), dataset, mRenderer, "dd.MM");
+        chartView = ChartFactory.getTimeChartView(getActivity(), dataset, mRenderer, "W");
+        //graphTimeframe
+
+        /*mRenderer.setXLabels(0);
+        for(int i=0;i<x.length;i++){
+            mRenderer.addXTextLabel(x[i],xaxis[i]);
+        }*/
 
         // Enable chart click
         mRenderer.setClickEnabled(true);
