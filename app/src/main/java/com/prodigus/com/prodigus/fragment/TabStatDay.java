@@ -20,6 +20,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.data.BarData;
@@ -106,9 +107,11 @@ public class TabStatDay extends Fragment {
         db = new MySQLiteHelper(getActivity());
         setHasOptionsMenu(true);
 
-        ((TabStatistics)getActivity()).setFragmentRefreshListener(new TabStatistics.FragmentRefreshListener() {
+        /*((TabStatistics)getActivity()).setFragmentRefreshListener(new TabStatistics.FragmentRefreshListener() {
             @Override
             public void onRefresh() {
+
+                Toast.makeText(getActivity(), "Test day", Toast.LENGTH_SHORT).show();
                 Boolean isConnected;
                 try{
                     isConnected = isConnected();
@@ -118,6 +121,14 @@ public class TabStatDay extends Fragment {
 
 
                 //prepareStatData();
+            }
+        });*/
+
+        ((TabStatistics)getActivity()).setFragmentRefreshListener(new TabStatistics.FragmentRefreshListener() {
+            @Override
+            public void onRefresh() {
+                //prepareStatData();
+                Toast.makeText(getActivity(), "Test day", Toast.LENGTH_SHORT).show();
             }
         });
 

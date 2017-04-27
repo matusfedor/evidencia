@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.data.BarData;
@@ -109,10 +110,18 @@ public class TabStatMonth extends Fragment {
         chartLyt = (LinearLayout) myFragmentView.findViewById(R.id.chartMonth);
         db = new MySQLiteHelper(getActivity());
 
-        ((TabStatistics)getActivity()).setFragmentRefreshListener(new TabStatistics.FragmentRefreshListener() {
+        /*((TabStatistics)getActivity()).setFragmentRefreshListener(new TabStatistics.FragmentRefreshListener() {
             @Override
             public void onRefresh() {
                 chartLyt.addView(createTempGraph(), 0);
+            }
+        });*/
+
+        ((TabStatistics)getActivity()).setFragmentRefreshListener(new TabStatistics.FragmentRefreshListener() {
+            @Override
+            public void onRefresh() {
+                //prepareStatData();
+                Toast.makeText(getActivity(), "Test month", Toast.LENGTH_SHORT).show();
             }
         });
 

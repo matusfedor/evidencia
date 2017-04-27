@@ -1,6 +1,8 @@
 package com.prodigus.com.prodigus.activity;
 
 import android.content.Intent;
+import android.database.Cursor;
+import android.os.AsyncTask;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -16,6 +18,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -29,8 +32,10 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.prodigus.com.prodigus.Genders;
+import com.prodigus.com.prodigus.MySQLiteHelper;
 import com.prodigus.com.prodigus.R;
 import com.prodigus.com.prodigus.SecondActivity;
+import com.prodigus.com.prodigus.Users;
 import com.prodigus.com.prodigus.ViewPagerAdapter;
 import com.prodigus.com.prodigus.fragment.TabContactDetail;
 import com.prodigus.com.prodigus.fragment.TabStatDay;
@@ -38,7 +43,17 @@ import com.prodigus.com.prodigus.fragment.TabStatMonth;
 import com.prodigus.com.prodigus.fragment.TabStatQrt;
 import com.prodigus.com.prodigus.fragment.TabStatWeek;
 
+import org.ksoap2.SoapEnvelope;
+import org.ksoap2.serialization.PropertyInfo;
+import org.ksoap2.serialization.SoapObject;
+import org.ksoap2.serialization.SoapSerializationEnvelope;
+import org.ksoap2.transport.HttpTransportSE;
+import org.kxml2.kdom.Element;
+import org.kxml2.kdom.Node;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class TabStatistics extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -48,15 +63,21 @@ public class TabStatistics extends AppCompatActivity implements NavigationView.O
     private ViewPager mViewPager;
     private Toolbar toolbar;
     private TabLayout tabLayout;
+    MySQLiteHelper db;
 
-    protected List<Genders> gens = null;
+    private final String NAMESPACE = "http://microsoft.com/webservices/";
+    private final String URL = "http://evidencia.prodigus.sk/EvidenceService.asmx";
+    private final String SOAP_ACTION = "http://microsoft.com/webservices/GetUsers";
+    private final String METHOD_NAME = "GetUsers";
+
+    protected List<Users> gens = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tab_statistics);
 
-
+        db = new MySQLiteHelper(getApplicationContext());
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -90,12 +111,16 @@ public class TabStatistics extends AppCompatActivity implements NavigationView.O
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        gens = new ArrayList<Genders>();
-        gens.add(new Genders(1,"Stanislav Ditte"));
-        gens.add(new Genders(2,"Žaneta Verešpejová"));
+        gens = new ArrayList<Users>();
 
-        Spinner spinner = (Spinner) findViewById(R.id.userSpinner);
-        ArrayAdapter<Genders> adapter = new ArrayAdapter<Genders>(this, R.layout.text_spinner, gens);
+        //gens.add(new Genders(1,"Stanislav Ditte"));
+        //gens.add(new Genders(2,"Žaneta Verešpejová"));
+
+        //gens.add(new Users("Ditte","Stanislav Ditte"));
+        //gens.add(new Users("Vere","Žaneta Verešpejová"));
+
+        /*Spinner spinner = (Spinner) findViewById(R.id.userSpinner);
+        ArrayAdapter<Users> adapter = new ArrayAdapter<Users>(this, R.layout.text_spinner, gens);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
 
@@ -109,7 +134,11 @@ public class TabStatistics extends AppCompatActivity implements NavigationView.O
             public void onNothingSelected(AdapterView<?> adapterView) {
 
             }
-        });
+        });*/
+
+        AsyncCallWS task = new AsyncCallWS();
+        task.execute();
+
     }
 
     private void setupViewPager(ViewPager viewPager) {
@@ -253,5 +282,115 @@ public class TabStatistics extends AppCompatActivity implements NavigationView.O
 
     public interface FragmentRefreshListener{
         void onRefresh();
+    }
+
+    public void loadUsers() {
+        String logname = "";
+        String pin = "";
+
+        Cursor c = db.getAuth();
+
+        if(Integer.valueOf(c.getCount()) > 0) {
+
+            if (c.moveToFirst()) {
+                logname = c.getString(c.getColumnIndex("logname"));
+                pin = c.getString(c.getColumnIndex("pin"));
+            }
+            c.close();
+        }
+        else {
+            return;
+        }
+
+        //Create request
+        SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
+
+        PropertyInfo celsiusPI = new PropertyInfo();
+        //Set Name
+        celsiusPI.setName("userName");
+        //Set Value
+        celsiusPI.setValue(logname);
+        //Set dataType
+        //celsiusPI.setType(double.class);
+        celsiusPI.setType(String.class);
+        //Add the property to request object
+        request.addProperty(celsiusPI);
+        //Create envelope
+        SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
+                SoapEnvelope.VER11);
+
+        /*header*/
+        Element h = new Element().createElement(NAMESPACE, "UserCredentials");
+        Element Username = new Element().createElement(NAMESPACE, "userName");
+        Username.addChild(Node.TEXT, logname);
+        h.addChild(Node.ELEMENT, Username);
+        Element wssePassword = new Element().createElement(NAMESPACE, "password");
+        wssePassword.addChild(Node.TEXT, pin);
+        h.addChild(Node.ELEMENT, wssePassword);
+
+        envelope.headerOut = new Element[]{h};
+
+        //Set output SOAP object
+        envelope.setOutputSoapObject(request);
+        //Create HTTP call object
+        HttpTransportSE androidHttpTransport = new HttpTransportSE(URL);
+
+        Log.i("loading users", "" + envelope.bodyOut.toString());
+
+        try {
+            androidHttpTransport.call(SOAP_ACTION, envelope);
+            SoapObject result = (SoapObject)envelope.getResponse();
+
+            for (int i = 0; i < result.getPropertyCount(); i++)
+            {
+                SoapObject s_deals = (SoapObject) result.getProperty(i);
+
+                String nick = (s_deals.getProperty(0).toString());
+                String name = (s_deals.getProperty(1).toString());
+
+                gens.add(new Users(nick, name));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        Spinner spinner = (Spinner) findViewById(R.id.userSpinner);
+        ArrayAdapter<Users> adapter = new ArrayAdapter<Users>(this, R.layout.text_spinner, gens);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                if(getFragmentRefreshListener()!=null){
+                    getFragmentRefreshListener().onRefresh();
+                }
+            }
+
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+    }
+
+    private class AsyncCallWS extends AsyncTask<Integer, Integer, String> {
+        @Override
+        protected String doInBackground(Integer... params) {
+            loadUsers();
+            return "Task Completed.";
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+        }
+
+        @Override
+        protected void onPreExecute() {
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+        }
+
     }
 }
