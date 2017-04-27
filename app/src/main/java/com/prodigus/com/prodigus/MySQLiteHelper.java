@@ -400,7 +400,15 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     }
 
     public Cursor getWeekStatistics(int attribute, int step) {
-        String selectQuery = "SELECT strftime('%W',date('now','" + step * (-7) + " days')) week, count(*) cnt FROM contactStateHistory WHERE con_state = " + attribute + " AND date(change_date)  <  DATE('now', 'weekday 1','" + step * (-7) + " days') AND date(change_date)  >  DATE('now', 'weekday 1', ' " + -7 * (step + 1) + " days')";
+        String selectQuery = "SELECT strftime('%W.%Y',date('now','" + step * (-7) + " days')) week, count(*) cnt FROM contactStateHistory WHERE con_state = " + attribute + " AND date(change_date)  <  DATE('now', 'weekday 1','" + step * (-7) + " days') AND date(change_date)  >  DATE('now', 'weekday 1', ' " + -7 * (step + 1) + " days')";
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        return cursor;
+    }
+
+    public Cursor getMonthStatistics(int attribute, int step) {
+        String selectQuery = "SELECT strftime('%m.%Y',date('now','start of month','" + step * (-1) + " month')) month, count(*) cnt FROM contactStateHistory WHERE con_state = " + attribute + " AND date(change_date)  <  DATE('now', 'start of month','" + step * (-1) + " month', '-1 day') AND date(change_date)  >  DATE('now', 'start of month', ' " + step * (-1) + " month')";
 
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);

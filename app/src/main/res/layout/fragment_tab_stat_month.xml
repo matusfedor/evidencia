@@ -11,15 +11,10 @@
         android:text="@string/hello_blank_fragment" />
 
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="412dp">
-
-        <com.github.mikephil.charting.charts.BarChart
-            android:id="@+id/chartMonth"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
+        android:layout_height="match_parent"
+        android:id="@+id/chartMonth"
+        android:orientation="vertical">
     </LinearLayout>
 
 </FrameLayout>

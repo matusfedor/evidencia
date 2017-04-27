@@ -110,6 +110,8 @@ public class TabStatWeek extends Fragment {
         chartLyt = (LinearLayout) myFragmentView.findViewById(R.id.chartWeek);
         db = new MySQLiteHelper(getActivity());
 
+        setHasOptionsMenu(true);
+
         ((TabStatistics)getActivity()).setFragmentRefreshListener(new TabStatistics.FragmentRefreshListener() {
             @Override
             public void onRefresh() {
@@ -179,12 +181,14 @@ public class TabStatWeek extends Fragment {
 
     private View createTempGraph() {
         // We start creating the XYSeries to plot the temperature
-        XYSeries seriesAfa = new XYSeries("Denný graf Anketa finančná analýza");
-        XYSeries seriesTelk = new XYSeries("Denný graf Telefonický hovor s kontaktom");
-        XYSeries seriesTerm = new XYSeries("Denný graf Termín");
-        XYSeries seriesFa = new XYSeries("Denný graf Finančná analýza");
-        XYSeries seriesPk = new XYSeries("Denný graf Potenciálny klienti");
-        XYSeries seriesKlient = new XYSeries("Denný graf Klienti");
+        SimpleDateFormat sdf = new SimpleDateFormat("ww.yyyy");
+
+        TimeSeries seriesAfa = new TimeSeries("Denný graf Anketa finančná analýza");
+        TimeSeries seriesTelk = new TimeSeries("Denný graf Telefonický hovor s kontaktom");
+        TimeSeries seriesTerm = new TimeSeries("Denný graf Termín");
+        TimeSeries seriesFa = new TimeSeries("Denný graf Finančná analýza");
+        TimeSeries seriesPk = new TimeSeries("Denný graf Potenciálny klienti");
+        TimeSeries seriesKlient = new TimeSeries("Denný graf Klienti");
 
         double maxValue = 0;
 
@@ -197,7 +201,7 @@ public class TabStatWeek extends Fragment {
                 {
                     try
                     {
-                        seriesAfa.add((c.getDouble(c.getColumnIndex("week"))),c.getDouble(c.getColumnIndex("cnt")));
+                        seriesAfa.add(sdf.parse(c.getString(c.getColumnIndex("week"))),c.getDouble(c.getColumnIndex("cnt")));
 
                         if(c.getDouble(c.getColumnIndex("cnt")) > maxValue)
                         {
@@ -213,100 +217,87 @@ public class TabStatWeek extends Fragment {
 
         if(serieCheckedTelk)
         {
-            Cursor c = db.getWeekStatistics(6);
-            while (c.moveToNext())
-            {
-                try
-                {
-                    seriesTelk.add(c.getDouble(c.getColumnIndex("week")),c.getDouble(c.getColumnIndex("cnt")));
+            for(int k=0; k < 30; k++) {
+                Cursor c = db.getWeekStatistics(6, k);
+                while (c.moveToNext()) {
+                    try {
+                        seriesTelk.add(sdf.parse(c.getString(c.getColumnIndex("week"))), c.getDouble(c.getColumnIndex("cnt")));
 
-                    if(c.getDouble(c.getColumnIndex("cnt")) > maxValue)
-                    {
-                        maxValue = c.getDouble(c.getColumnIndex("cnt"));
+                        if (c.getDouble(c.getColumnIndex("cnt")) > maxValue) {
+                            maxValue = c.getDouble(c.getColumnIndex("cnt"));
+                        }
+                    } catch (Exception e) {
+                        Log.i("", e.getMessage());
                     }
-                }
-                catch (Exception e) {
-                    Log.i("",e.getMessage());
                 }
             }
         }
 
         if(serieCheckedTerm)
         {
-            Cursor c = db.getWeekStatistics(15);
-            while (c.moveToNext())
-            {
-                try
-                {
-                    seriesTerm.add(c.getDouble(c.getColumnIndex("week")),c.getDouble(c.getColumnIndex("cnt")));
+            for(int k=0; k < 30; k++) {
+                Cursor c = db.getWeekStatistics(15,k);
+                while (c.moveToNext()) {
+                    try {
+                        seriesTerm.add(sdf.parse(c.getString(c.getColumnIndex("week"))), c.getDouble(c.getColumnIndex("cnt")));
 
-                    if(c.getDouble(c.getColumnIndex("cnt")) > maxValue)
-                    {
-                        maxValue = c.getDouble(c.getColumnIndex("cnt"));
+                        if (c.getDouble(c.getColumnIndex("cnt")) > maxValue) {
+                            maxValue = c.getDouble(c.getColumnIndex("cnt"));
+                        }
+                    } catch (Exception e) {
+                        Log.i("", e.getMessage());
                     }
-                }
-                catch (Exception e) {
-                    Log.i("",e.getMessage());
                 }
             }
         }
 
         if(serieCheckedFa)
         {
-            Cursor c = db.getWeekStatistics(16);
-            while (c.moveToNext())
-            {
-                try
-                {
-                    seriesFa.add(c.getDouble(c.getColumnIndex("week")),c.getDouble(c.getColumnIndex("cnt")));
-
-                    if(c.getDouble(c.getColumnIndex("cnt")) > maxValue)
-                    {
-                        maxValue = c.getDouble(c.getColumnIndex("cnt"));
+            for(int k=0; k < 30; k++) {
+                Cursor c = db.getWeekStatistics(16, k);
+                while (c.moveToNext()) {
+                    try {
+                        seriesFa.add(sdf.parse(c.getString(c.getColumnIndex("week"))), c.getDouble(c.getColumnIndex("cnt")));
+                        if (c.getDouble(c.getColumnIndex("cnt")) > maxValue) {
+                            maxValue = c.getDouble(c.getColumnIndex("cnt"));
+                        }
+                    } catch (Exception e) {
+                        Log.i("", e.getMessage());
                     }
-                }
-                catch (Exception e) {
-                    Log.i("",e.getMessage());
                 }
             }
         }
 
         if(serieCheckedPk)
         {
-            Cursor c = db.getWeekStatistics(2);
-            while (c.moveToNext())
-            {
-                try
-                {
-                    seriesPk.add(c.getDouble(c.getColumnIndex("week")),c.getDouble(c.getColumnIndex("cnt")));
-
-                    if(c.getDouble(c.getColumnIndex("cnt")) > maxValue)
-                    {
-                        maxValue = c.getDouble(c.getColumnIndex("cnt"));
+            for(int k=0; k < 30; k++) {
+                Cursor c = db.getWeekStatistics(2, k);
+                while (c.moveToNext()) {
+                    try {
+                        seriesPk.add(sdf.parse(c.getString(c.getColumnIndex("week"))), c.getDouble(c.getColumnIndex("cnt")));
+                        if (c.getDouble(c.getColumnIndex("cnt")) > maxValue) {
+                            maxValue = c.getDouble(c.getColumnIndex("cnt"));
+                        }
+                    } catch (Exception e) {
+                        Log.i("", e.getMessage());
                     }
-                }
-                catch (Exception e) {
-                    Log.i("",e.getMessage());
                 }
             }
         }
 
         if(serieCheckedKlient)
         {
-            Cursor c = db.getWeekStatistics(1);
-            while (c.moveToNext())
-            {
-                try
-                {
-                    seriesKlient.add(c.getDouble(c.getColumnIndex("week")),c.getDouble(c.getColumnIndex("cnt")));
-
-                    if(c.getDouble(c.getColumnIndex("cnt")) > maxValue)
-                    {
-                        maxValue = c.getDouble(c.getColumnIndex("cnt"));
+            for(int k=0; k < 30; k++) {
+                Cursor c = db.getWeekStatistics(1, k);
+                while (c.moveToNext()) {
+                    try {
+                        seriesKlient.add(sdf.parse(c.getString(c.getColumnIndex("week"))), c.getDouble(c.getColumnIndex("cnt")));
+                        if (c.getDouble(c.getColumnIndex("cnt")) > maxValue) {
+                            maxValue = c.getDouble(c.getColumnIndex("cnt"));
+                        }
+                    } catch (Exception e) {
+                        Log.i("", e.getMessage());
                     }
-                }
-                catch (Exception e) {
-                    Log.i("",e.getMessage());
                 }
             }
         }
@@ -439,9 +430,7 @@ public class TabStatWeek extends Fragment {
         mRenderer.setZoomEnabled(true, true);
         mRenderer.setInScroll(true);
 
-        //chartView = ChartFactory.getTimeChartView(getActivity(), dataset, mRenderer, "dd.MM");
-
-        chartView = ChartFactory.getLineChartView(getActivity(), dataset, mRenderer);
+        chartView = ChartFactory.getTimeChartView(getActivity(), dataset, mRenderer, "ww.yyyy");
 
         // Enable chart click
         mRenderer.setClickEnabled(true);

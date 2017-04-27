@@ -46,6 +46,7 @@ import org.achartengine.renderer.XYSeriesRenderer;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class TabStatDay extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
@@ -446,18 +447,17 @@ public class TabStatDay extends Fragment {
         mRenderer.setZoomEnabled(true, true);
         mRenderer.setInScroll(true);
 
-        int x[]={1,2,3,4,5,6};
-        String xaxis[]={"jan","feb","march","april","maj","jun"};
-
-        //chartView = ChartFactory.getTimeChartView(getActivity(), dataset, mRenderer, "dd.MM");
-        chartView = ChartFactory.getTimeChartView(getActivity(), dataset, mRenderer, "W");
+        chartView = ChartFactory.getTimeChartView(getActivity(), dataset, mRenderer, "dd.MM");
         //graphTimeframe
 
-        /*mRenderer.setXLabels(0);
-        for(int i=0;i<x.length;i++){
-            mRenderer.addXTextLabel(x[i],xaxis[i]);
-        }*/
-
+        /*
+        mRenderer.setXLabels(0);
+        String[] date={"25.04.2017","26.04.2017","27.04.2017"};
+        for(int i=0;i<date.length;i++){
+            mRenderer.addXTextLabel(i+1,date[i]);
+        }
+        mRenderer.setShowCustomTextGrid(true);
+*/
         // Enable chart click
         mRenderer.setClickEnabled(true);
         chartView.setOnClickListener(new View.OnClickListener() {
