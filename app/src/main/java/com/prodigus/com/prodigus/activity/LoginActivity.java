@@ -402,13 +402,13 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         @Override
         protected Boolean doInBackground(Void... params) {
 
-            Boolean isConnected;
-            try{
+            Boolean isConnected = true;
+            /*try{
                 isConnected = isConnected();
             }
             catch(InterruptedException ex) { isConnected = false;}
             catch(IOException ex) { isConnected = false;}
-
+            */
             if(isConnected) {
                 SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
 
@@ -442,6 +442,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     if ((Boolean.parseBoolean(result.toString())))
                     {
                         db.updAccess(mEmail, mPassword);
+                        Cursor c = db.getAuth();
+                        if (c.getCount() == 0) {
+                            db.createAuth(mEmail, mPassword);
+                        }
+                        c.close();
                         return true;}
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -454,7 +459,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                         pin = c.getString(c.getColumnIndex("pin"));
                 }
                 c.close();
-                if(name.equals(mEmail) && pin.equals(mPassword)) {return true;}
+                if(name != null) {
+                    if (name.equals(mEmail) && pin.equals(mPassword)) {
+                        return true;
+                    }
+                }
             }
             return false;
         }

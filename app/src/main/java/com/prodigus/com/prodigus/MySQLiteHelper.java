@@ -66,6 +66,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     public static final String COLUMN_CNT = "stat_count";
     public static final String COLUMN_USER = "stat_user";
     public static final String COLUMN_ATTRIBUTE = "stat_attribute";
+    public static final String COLUMN_STAT_TYPE = "stat_type";
     //endregion
 
     //region Users
@@ -76,7 +77,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     //endregion
 
     private static final String DATABASE_NAME = "contact.db";
-    private static final int DATABASE_VERSION = 15;
+    private static final int DATABASE_VERSION = 17;
 
     public MySQLiteHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -155,10 +156,11 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 
     private static final String TABLE_STATISTICS =  "create table "
             + TABLE_STATS + "(" + COLUMN_STAT_ID + " integer primary key autoincrement, "
-            + COLUMN_DATE + " numeric not null,"
+            + COLUMN_DATE + " text not null,"
             + COLUMN_CNT + " integer not null,"
             + COLUMN_USER + " text not null,"
-            + COLUMN_ATTRIBUTE + " integer not null)";
+            + COLUMN_ATTRIBUTE + " integer not null,"
+            + COLUMN_STAT_TYPE + " text null )";
 
     private static final String TABLE_CREATE_USERS =  "create table "
             + TABLE_USERS + "(" + COLUMN_USR_ID + " integer primary key autoincrement, "
@@ -589,6 +591,34 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         return todo_id;
     }
 
+    public long createStats(String stat_date, int cnt, String user, int attribute, String type) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put("stat_date",stat_date);
+        values.put("stat_count",cnt);
+        values.put("stat_user",user);
+        values.put("stat_attribute",attribute);
+        values.put("stat_type",type);
+
+
+        long todo_id = db.insert(TABLE_STATS, null, values);
+
+        return todo_id;
+    }
+
+    public long createAuth(String name, String pin) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put("logname",name);
+        values.put("pin",pin);
+
+        long todo_id = db.insert(TABLE_ACCESS, null, values);
+
+        return todo_id;
+    }
+
     public long createNote(String text, String person, long attribute)
     {
         /*
@@ -772,6 +802,8 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         db.delete(FeedReaderContract.Notes.TABLE_NAME, null, null);
         db.delete(FeedEntry.TABLE_NAME, null, null);
         db.delete(TABLE_conStateHistory, null, null);
+        db.delete(TABLE_USERS, null, null);
+        db.delete(TABLE_STATS, null, null);
     }
 
     public void deleteAllAttributes()

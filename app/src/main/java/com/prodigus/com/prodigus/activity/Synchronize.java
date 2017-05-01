@@ -53,10 +53,12 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 
 import com.prodigus.com.prodigus.MySQLiteHelper;
 import com.prodigus.com.prodigus.R;
 import com.prodigus.com.prodigus.SecondActivity;
+import com.prodigus.com.prodigus.Stats;
 import com.prodigus.com.prodigus.Users;
 
 import static com.prodigus.com.prodigus.R.id.progressBar;
@@ -67,8 +69,12 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
     private final String URL = "http://evidencia.prodigus.sk/EvidenceService.asmx";
     private final String SOAP_ACTION = "http://microsoft.com/webservices/GetPerson";
     private final String SOAP_ACTION_Attribute = "http://microsoft.com/webservices/GetAttributes";
+    private final String SOAP_ACTION_USER = "http://microsoft.com/webservices/GetUsers";
+    private final String SOAP_ACTION_STATS = "http://microsoft.com/webservices/GetStatistics";
     private final String METHOD_NAME = "GetPerson";
     private final String METHOD_NAME_Attribute = "GetAttributes";
+    private final String METHOD_NAME_USER = "GetUsers";
+    private final String METHOD_NAME_STAT = "GetStatistics";
 
     private String TAG = "PGGURU";
     private StringReader xmlReader;
@@ -391,7 +397,7 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
         }
 
         //Create request
-        SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
+        SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME_USER);
 
         PropertyInfo celsiusPI = new PropertyInfo();
         //Set Name
@@ -426,7 +432,7 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
         Log.i("loading users", "" + envelope.bodyOut.toString());
 
         try {
-            androidHttpTransport.call(SOAP_ACTION, envelope);
+            androidHttpTransport.call(SOAP_ACTION_USER, envelope);
             SoapObject result = (SoapObject)envelope.getResponse();
 
             for (int i = 0; i < result.getPropertyCount(); i++)
@@ -442,6 +448,96 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void loadUserStatistics(String type, int steps, int attribute, String user) {
+        List<Stats> gens = null;
+
+        String logname = "";
+        String pin = "";
+
+        Cursor c = db.getAuth();
+
+        if(Integer.valueOf(c.getCount()) > 0) {
+
+            if (c.moveToFirst()) {
+                logname = c.getString(c.getColumnIndex("logname"));
+                pin = c.getString(c.getColumnIndex("pin"));
+            }
+            c.close();
+        }
+        else {
+            return;
+        }
+
+        //Create request
+        SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME_STAT);
+
+        PropertyInfo usernameProp = new PropertyInfo();
+        usernameProp.setName("username");
+        usernameProp.setValue(user);
+        usernameProp.setType(String.class);
+        request.addProperty(usernameProp);
+
+        PropertyInfo typeProp = new PropertyInfo();
+        typeProp.setName("userType");
+        typeProp.setValue(type);
+        typeProp.setType(String.class);
+        request.addProperty(typeProp);
+
+        PropertyInfo stepsProp = new PropertyInfo();
+        stepsProp.setName("steps");
+        stepsProp.setValue(steps);
+        stepsProp.setType(int.class);
+        request.addProperty(stepsProp);
+
+        PropertyInfo attributeProp = new PropertyInfo();
+        attributeProp.setName("attribute");
+        attributeProp.setValue(attribute);
+        attributeProp.setType(int.class);
+        request.addProperty(attributeProp);
+
+        //Create envelope
+        SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
+                SoapEnvelope.VER11);
+
+        /*header*/
+        Element h = new Element().createElement(NAMESPACE, "UserCredentials");
+        Element Username = new Element().createElement(NAMESPACE, "userName");
+        Username.addChild(Node.TEXT, logname);
+        h.addChild(Node.ELEMENT, Username);
+        Element wssePassword = new Element().createElement(NAMESPACE, "password");
+        wssePassword.addChild(Node.TEXT, pin);
+        h.addChild(Node.ELEMENT, wssePassword);
+
+        envelope.headerOut = new Element[]{h};
+        envelope.dotNet = true;
+        //Set output SOAP object
+        envelope.setOutputSoapObject(request);
+        //Create HTTP call object
+        HttpTransportSE androidHttpTransport = new HttpTransportSE(URL);
+
+        Log.i("loading stats", "" + envelope.bodyOut.toString());
+
+        try {
+            androidHttpTransport.call(SOAP_ACTION_STATS, envelope);
+            SoapObject result = (SoapObject)envelope.getResponse();
+
+            for (int i = 0; i < result.getPropertyCount(); i++)
+            {
+                SoapObject s_deals = (SoapObject) result.getProperty(i);
+
+                String datum = (s_deals.getProperty(0).toString());
+                int cnt = Integer.parseInt(s_deals.getProperty(1).toString());
+
+                long userId = db.createStats(datum, cnt, user, attribute, type);
+
+                //gens.add(new Stats(datum, cnt));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        //return gens;
     }
 
     public void sendAllContacts()
@@ -1211,6 +1307,34 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
             loadNotes();
             publishProgress(7);
             loadUsers();
+            publishProgress(8);
+
+            Cursor cursor = db.getUsers();
+            cursor.moveToFirst();
+            while (cursor.moveToNext()) {
+                String nick = cursor.getString(cursor.getColumnIndexOrThrow("usr_nick"));
+                loadUserStatistics("D", 1, 8, nick );
+                loadUserStatistics("D", 30, 6, nick );
+                loadUserStatistics("D", 30, 15, nick );
+                loadUserStatistics("D", 30, 16, nick );
+                loadUserStatistics("D", 30, 2, nick );
+                loadUserStatistics("D", 30, 1, nick );
+
+                loadUserStatistics("W", 30, 8, nick );
+                loadUserStatistics("W", 30, 6, nick );
+                loadUserStatistics("W", 30, 15, nick );
+                loadUserStatistics("W", 30, 16, nick );
+                loadUserStatistics("W", 30, 2, nick );
+                loadUserStatistics("W", 30, 1, nick );
+
+                loadUserStatistics("M", 30, 8, nick );
+                loadUserStatistics("M", 30, 6, nick );
+                loadUserStatistics("M", 30, 15, nick );
+                loadUserStatistics("M", 30, 16, nick );
+                loadUserStatistics("M", 30, 2, nick );
+                loadUserStatistics("M", 30, 1, nick );
+            }
+            cursor.close();
             publishProgress(10);
 
             return "Task Completed.";
