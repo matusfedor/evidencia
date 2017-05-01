@@ -39,6 +39,8 @@ public class TabStatQrt extends Fragment {
     private String mParam2;
     MySQLiteHelper db;
 
+    private String logUser;
+
     private OnFragmentInteractionListener mListener;
 
     public TabStatQrt() {
@@ -81,7 +83,8 @@ public class TabStatQrt extends Fragment {
 
         ((TabStatistics)getActivity()).setFragmentRefreshListener(new TabStatistics.FragmentRefreshListener() {
             @Override
-            public void onRefresh() {
+            public void onRefresh(String logname) {
+                logUser = logname;
                 prepareStatData();
             }
         });

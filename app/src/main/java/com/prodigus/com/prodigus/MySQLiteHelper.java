@@ -59,8 +59,24 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     public static final String COLUMN_CHANGE_DATE = "change_date";
     //endregion
 
+    //region Statistics
+    public static final String TABLE_STATS = "statistics";
+    public static final String COLUMN_STAT_ID = "_id";
+    public static final String COLUMN_DATE = "stat_date";
+    public static final String COLUMN_CNT = "stat_count";
+    public static final String COLUMN_USER = "stat_user";
+    public static final String COLUMN_ATTRIBUTE = "stat_attribute";
+    //endregion
+
+    //region Users
+    public static final String TABLE_USERS = "users";
+    public static final String COLUMN_USR_ID = "_id";
+    public static final String COLUMN_USR_NICK = "usr_nick";
+    public static final String COLUMN_USR_NAME = "usr_name";
+    //endregion
+
     private static final String DATABASE_NAME = "contact.db";
-    private static final int DATABASE_VERSION = 14;
+    private static final int DATABASE_VERSION = 15;
 
     public MySQLiteHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -74,12 +90,15 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         database.execSQL(TABLE_NOTESS);
         database.execSQL(TABLE_ATTRIBUTES);
         database.execSQL(TABLE_ContactStateHistory);
-        database.execSQL("Insert into cl_attribute values (1,'AFA','Finan. analyza','C',1)");
+        database.execSQL(TABLE_STATISTICS);
+        database.execSQL(TABLE_CREATE_USERS);
+
+        /*database.execSQL("Insert into cl_attribute values (1,'AFA','Finan. analyza','C',1)");
         database.execSQL("Insert into cl_attribute values (2,'TEL','Telef. kontakt','N',2)");
         database.execSQL("Insert into cl_attribute values (3,'OSO','Osobné stretnutie','N',3)");
-        database.execSQL("Insert into cl_attribute values (4,'SKO','Školenie','N',4)");
+        database.execSQL("Insert into cl_attribute values (4,'SKO','Školenie','N',4)");*/
 
-        database.execSQL("Insert into settAccess values (1,'Ditte','9595')");
+        //database.execSQL("Insert into settAccess values (1,'Ditte','9595')");
 
     }
 
@@ -93,6 +112,8 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_NOTES);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_ATTRIBUTE);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_conStateHistory);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_STATS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_USERS);
         onCreate(db);
     }
     //endregion
@@ -131,6 +152,18 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
             + COLUMN_NOTE_DATEC + " numeric,"
             + COLUMN_NOTE_PERSON + " text not null, "
             + COLUMN_NOTE_ATTRIBUTE + " text not null) ";
+
+    private static final String TABLE_STATISTICS =  "create table "
+            + TABLE_STATS + "(" + COLUMN_STAT_ID + " integer primary key autoincrement, "
+            + COLUMN_DATE + " numeric not null,"
+            + COLUMN_CNT + " integer not null,"
+            + COLUMN_USER + " text not null,"
+            + COLUMN_ATTRIBUTE + " integer not null)";
+
+    private static final String TABLE_CREATE_USERS =  "create table "
+            + TABLE_USERS + "(" + COLUMN_USR_ID + " integer primary key autoincrement, "
+            + COLUMN_USR_NICK + " text not null,"
+            + COLUMN_USR_NAME + " text not null )";
 
     ////+ COLUMN_NOTE_DATEC + " text not null,"
 
@@ -325,6 +358,14 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         return cursor;
     }
 
+    public Cursor getDayStatistics(int attribute, int step, String user)
+    {
+        String selectQuery = "SELECT strftime('%d.%m.%Y',date('now','" + step * (-1) + " day')) datum , count(*) cnt FROM " + TABLE_STATS + " WHERE " + COLUMN_ATTRIBUTE + " = " + attribute + " AND date(" + COLUMN_DATE + ") = date('now','" + step * (-1) + " day') AND " + COLUMN_USER + " = " + user;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        return cursor;
+    }
+
     public Cursor getDayStatistics(int attribute)
     {
         String selectQuery = "SELECT strftime('%d.%m.',date('now')) datum , count(*) cnt FROM contactStateHistory WHERE con_state = " + attribute + " AND date(change_date) = date('now')" +
@@ -457,6 +498,23 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         return noteTypesList;
     }
 
+    public Cursor getUsers() {
+        List<Users> usersList = new ArrayList<Users>();
+        String selectQuery = "SELECT usr_nick, usr_name FROM " + TABLE_USERS;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                Users user = new Users(cursor.getString(0),cursor.getString(1));
+                usersList.add(user);
+            } while (cursor.moveToNext());
+        }
+
+        // return contact list
+        return cursor;
+    }
+
     //endregion
 
     //region Insert SQL
@@ -515,6 +573,18 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         values.put("att_status_order",att_con_order);
 
         long todo_id = db.insert("cl_attribute", null, values);
+
+        return todo_id;
+    }
+
+    public long createUsers(String nick, String name) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put("usr_nick",nick);
+        values.put("usr_name",name);
+
+        long todo_id = db.insert("users", null, values);
 
         return todo_id;
     }

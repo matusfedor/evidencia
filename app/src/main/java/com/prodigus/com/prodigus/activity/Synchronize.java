@@ -37,9 +37,12 @@ import android.util.Xml;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -54,6 +57,7 @@ import java.util.Iterator;
 import com.prodigus.com.prodigus.MySQLiteHelper;
 import com.prodigus.com.prodigus.R;
 import com.prodigus.com.prodigus.SecondActivity;
+import com.prodigus.com.prodigus.Users;
 
 import static com.prodigus.com.prodigus.R.id.progressBar;
 
@@ -362,6 +366,78 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
                 //Date creation = dateFormat2.parse(s_deals.getProperty(3).toString());
 
                 long todo1_id = db.createSyncNote(noteText, con_id, att_id, creation);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void loadUsers() {
+        String logname = "";
+        String pin = "";
+
+        Cursor c = db.getAuth();
+
+        if(Integer.valueOf(c.getCount()) > 0) {
+
+            if (c.moveToFirst()) {
+                logname = c.getString(c.getColumnIndex("logname"));
+                pin = c.getString(c.getColumnIndex("pin"));
+            }
+            c.close();
+        }
+        else {
+            return;
+        }
+
+        //Create request
+        SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
+
+        PropertyInfo celsiusPI = new PropertyInfo();
+        //Set Name
+        celsiusPI.setName("userName");
+        //Set Value
+        celsiusPI.setValue(logname);
+        //Set dataType
+        //celsiusPI.setType(double.class);
+        celsiusPI.setType(String.class);
+        //Add the property to request object
+        request.addProperty(celsiusPI);
+        //Create envelope
+        SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
+                SoapEnvelope.VER11);
+
+        /*header*/
+        Element h = new Element().createElement(NAMESPACE, "UserCredentials");
+        Element Username = new Element().createElement(NAMESPACE, "userName");
+        Username.addChild(Node.TEXT, logname);
+        h.addChild(Node.ELEMENT, Username);
+        Element wssePassword = new Element().createElement(NAMESPACE, "password");
+        wssePassword.addChild(Node.TEXT, pin);
+        h.addChild(Node.ELEMENT, wssePassword);
+
+        envelope.headerOut = new Element[]{h};
+
+        //Set output SOAP object
+        envelope.setOutputSoapObject(request);
+        //Create HTTP call object
+        HttpTransportSE androidHttpTransport = new HttpTransportSE(URL);
+
+        Log.i("loading users", "" + envelope.bodyOut.toString());
+
+        try {
+            androidHttpTransport.call(SOAP_ACTION, envelope);
+            SoapObject result = (SoapObject)envelope.getResponse();
+
+            for (int i = 0; i < result.getPropertyCount(); i++)
+            {
+                SoapObject s_deals = (SoapObject) result.getProperty(i);
+
+                String nick = (s_deals.getProperty(0).toString());
+                String name = (s_deals.getProperty(1).toString());
+
+                //gens.add(new Users(nick, name));
+                long userId = db.createUsers(nick, name);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -1127,12 +1203,14 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
             sendAllNotes();
             publishProgress(3);
             loadAttributes();
-            publishProgress(6);
+            publishProgress(4);
             loadContacts();
-            publishProgress(8);
+            publishProgress(5);
             loadContactsAttHistory();
-            publishProgress(9);
+            publishProgress(6);
             loadNotes();
+            publishProgress(7);
+            loadUsers();
             publishProgress(10);
 
             return "Task Completed.";

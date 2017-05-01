@@ -64,11 +64,14 @@ public class TabStatistics extends AppCompatActivity implements NavigationView.O
     private Toolbar toolbar;
     private TabLayout tabLayout;
     MySQLiteHelper db;
+    Spinner spinner;
 
     private final String NAMESPACE = "http://microsoft.com/webservices/";
     private final String URL = "http://evidencia.prodigus.sk/EvidenceService.asmx";
     private final String SOAP_ACTION = "http://microsoft.com/webservices/GetUsers";
     private final String METHOD_NAME = "GetUsers";
+
+    private String spinnerSelected;
 
     protected List<Users> gens = null;
 
@@ -113,39 +116,55 @@ public class TabStatistics extends AppCompatActivity implements NavigationView.O
 
         gens = new ArrayList<Users>();
 
+        Cursor cUsers = db.getUsers();
+
+        if(Integer.valueOf(cUsers.getCount()) > 0) {
+
+            if (cUsers.moveToFirst()) {
+                gens.add(new Users(cUsers.getString(cUsers.getColumnIndex("usr_nick")),cUsers.getString(cUsers.getColumnIndex("usr_name"))));
+            }
+            cUsers.close();
+        }
+        else {
+            return;
+        }
+
         //gens.add(new Genders(1,"Stanislav Ditte"));
         //gens.add(new Genders(2,"Žaneta Verešpejová"));
 
         //gens.add(new Users("Ditte","Stanislav Ditte"));
         //gens.add(new Users("Vere","Žaneta Verešpejová"));
 
-        /*Spinner spinner = (Spinner) findViewById(R.id.userSpinner);
+        Spinner spinner = (Spinner) findViewById(R.id.userSpinner);
         ArrayAdapter<Users> adapter = new ArrayAdapter<Users>(this, R.layout.text_spinner, gens);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
 
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                Object item = adapterView.getItemAtPosition(i);
                 if(getFragmentRefreshListener()!=null){
-                    getFragmentRefreshListener().onRefresh();
+                    getFragmentRefreshListener().onRefresh(item.toString());
                 }
             }
 
             public void onNothingSelected(AdapterView<?> adapterView) {
 
             }
-        });*/
+        });
 
-        AsyncCallWS task = new AsyncCallWS();
-        task.execute();
+        //AsyncCallWS task = new AsyncCallWS();
+        //task.execute();
 
     }
 
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFragment(new TabStatDay(), "Denne");
-        adapter.addFragment(new TabStatWeek(), "Týždenne");
-        adapter.addFragment(new TabStatMonth(), "Mesačne");
+        adapter.addFragment(new TabStatDay().newInstance(spinnerSelected), "Denne");
+        adapter.addFragment(new TabStatWeek().newInstance(spinnerSelected), "Týždenne");
+        adapter.addFragment(new TabStatMonth().newInstance(spinnerSelected), "Mesačne");
+
+        //viewPager.setCurrentItem(spinner.getSelectedItem().toString());
         //adapter.addFragment(new TabStatQrt(), "Quarter");
 
         viewPager.setAdapter(adapter);
@@ -281,7 +300,7 @@ public class TabStatistics extends AppCompatActivity implements NavigationView.O
     private FragmentRefreshListener fragmentRefreshListener;
 
     public interface FragmentRefreshListener{
-        void onRefresh();
+        void onRefresh(String logname);
     }
 
     public void loadUsers() {
@@ -354,15 +373,18 @@ public class TabStatistics extends AppCompatActivity implements NavigationView.O
             e.printStackTrace();
         }
 
-        Spinner spinner = (Spinner) findViewById(R.id.userSpinner);
+        spinner = (Spinner) findViewById(R.id.userSpinner);
         ArrayAdapter<Users> adapter = new ArrayAdapter<Users>(this, R.layout.text_spinner, gens);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
 
+        spinnerSelected = spinner.getSelectedItem().toString();
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                Object item = adapterView.getItemAtPosition(i);
+
                 if(getFragmentRefreshListener()!=null){
-                    getFragmentRefreshListener().onRefresh();
+                    getFragmentRefreshListener().onRefresh(item.toString());
                 }
             }
 

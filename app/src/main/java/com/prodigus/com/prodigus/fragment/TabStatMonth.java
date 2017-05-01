@@ -57,6 +57,8 @@ public class TabStatMonth extends Fragment {
     private String mParam2;
     MySQLiteHelper db;
 
+    private String logUser;
+
     private OnFragmentInteractionListener mListener;
 
     private LinearLayout chartLyt;
@@ -75,20 +77,11 @@ public class TabStatMonth extends Fragment {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment TabStatMonth.
-     */
     // TODO: Rename and change types and number of parameters
-    public static TabStatMonth newInstance(String param1, String param2) {
+    public static TabStatMonth newInstance(String selectedUser) {
         TabStatMonth fragment = new TabStatMonth();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putString(ARG_PARAM1, selectedUser);
         fragment.setArguments(args);
         return fragment;
     }
@@ -97,8 +90,7 @@ public class TabStatMonth extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            logUser = getArguments().getString(ARG_PARAM1);
         }
     }
 
@@ -119,8 +111,8 @@ public class TabStatMonth extends Fragment {
 
         ((TabStatistics)getActivity()).setFragmentRefreshListener(new TabStatistics.FragmentRefreshListener() {
             @Override
-            public void onRefresh() {
-                //prepareStatData();
+            public void onRefresh(String logname) {
+                logUser = logname;
                 Toast.makeText(getActivity(), "Test month", Toast.LENGTH_SHORT).show();
             }
         });
