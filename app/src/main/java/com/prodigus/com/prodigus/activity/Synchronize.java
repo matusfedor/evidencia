@@ -1313,7 +1313,7 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
             cursor.moveToFirst();
             while (cursor.moveToNext()) {
                 String nick = cursor.getString(cursor.getColumnIndexOrThrow("usr_nick"));
-                loadUserStatistics("D", 1, 8, nick );
+                loadUserStatistics("D", 30, 8, nick );
                 loadUserStatistics("D", 30, 6, nick );
                 loadUserStatistics("D", 30, 15, nick );
                 loadUserStatistics("D", 30, 16, nick );

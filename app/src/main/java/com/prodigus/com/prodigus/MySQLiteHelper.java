@@ -362,73 +362,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 
     public Cursor getDayStatistics(int attribute, int step, String user)
     {
-        String selectQuery = "SELECT strftime('%d.%m.%Y',date('now','" + step * (-1) + " day')) datum , count(*) cnt FROM " + TABLE_STATS + " WHERE " + COLUMN_ATTRIBUTE + " = " + attribute + " AND date(" + COLUMN_DATE + ") = date('now','" + step * (-1) + " day') AND " + COLUMN_USER + " = " + user;
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery(selectQuery, null);
-        return cursor;
-    }
-
-    public Cursor getDayStatistics(int attribute)
-    {
-        String selectQuery = "SELECT strftime('%d.%m.',date('now')) datum , count(*) cnt FROM contactStateHistory WHERE con_state = " + attribute + " AND date(change_date) = date('now')" +
-                " UNION ALL" +
-                " SELECT strftime('%d.%m.',date('now','-1 day')) datum , count(*) cnt FROM contactStateHistory WHERE con_state = " + attribute + " AND date(change_date) = date('now','-1 day')" +
-                " UNION ALL" +
-                " SELECT strftime('%d.%m.',date('now','-2 day')) datum, count(*) cnt FROM contactStateHistory WHERE con_state = " + attribute + " AND date(change_date) = date('now','-2 day')" +
-                " UNION ALL" +
-                " SELECT strftime('%d.%m.',date('now','-3 day')) datum, count(*) cnt FROM contactStateHistory WHERE con_state = " + attribute + " AND date(change_date) = date('now','-3 day')" +
-                " UNION ALL" +
-                " SELECT strftime('%d.%m.',date('now','-4 day')) datum, count(*) cnt FROM contactStateHistory WHERE con_state = " + attribute + " AND date(change_date) = date('now','-4 day')" +
-                " UNION ALL" +
-                " SELECT strftime('%d.%m.',date('now','-5 day')) datum, count(*) cnt FROM contactStateHistory WHERE con_state = " + attribute + " AND date(change_date) = date('now','-5 day')" +
-                " UNION ALL" +
-                " SELECT strftime('%d.%m.',date('now','-6 day')) datum, count(*) cnt FROM contactStateHistory WHERE con_state = " + attribute + " AND date(change_date) = date('now','-6 day')" +
-                " UNION ALL" +
-                " SELECT strftime('%d.%m.',date('now','-7 day')) datum, count(*) cnt FROM contactStateHistory WHERE con_state = " + attribute + "  AND date(change_date) = date('now','-7 day')" +
-                " UNION ALL" +
-                " SELECT strftime('%d.%m.',date('now','-8 day')) datum, count(*) cnt FROM contactStateHistory WHERE con_state = " + attribute + "  AND date(change_date) = date('now','-8 day')" +
-                " UNION ALL" +
-                " SELECT strftime('%d.%m.',date('now','-9 day')) datum, count(*) cnt FROM contactStateHistory WHERE con_state = " + attribute + "  AND date(change_date) = date('now','-9 day')" +
-                " UNION ALL" +
-                " SELECT strftime('%d.%m.',date('now','-10 day')) datum, count(*) cnt FROM contactStateHistory WHERE con_state = " + attribute + "  AND date(change_date) = date('now','-10 day')" +
-                " UNION ALL" +
-                " SELECT strftime('%d.%m.',date('now','-11 day')) datum, count(*) cnt FROM contactStateHistory WHERE con_state = " + attribute + "  AND date(change_date) = date('now','-11 day')" +
-                " UNION ALL" +
-                " SELECT strftime('%d.%m.',date('now','-12 day')) datum, count(*) cnt FROM contactStateHistory WHERE con_state = " + attribute + "  AND date(change_date) = date('now','-12 day')" +
-                " UNION ALL" +
-                " SELECT strftime('%d.%m.',date('now','-13 day')) datum, count(*) cnt FROM contactStateHistory WHERE con_state = " + attribute + "  AND date(change_date) = date('now','-13 day')" +
-                " UNION ALL" +
-                " SELECT strftime('%d.%m.',date('now','-14 day')) datum, count(*) cnt FROM contactStateHistory WHERE con_state = " + attribute + "  AND date(change_date) = date('now','-14 day')" +
-                " UNION ALL" +
-                " SELECT strftime('%d.%m.',date('now','-15 day')) datum, count(*) cnt FROM contactStateHistory WHERE con_state = " + attribute + "  AND date(change_date) = date('now','-15 day')" +
-                " UNION ALL" +
-                " SELECT strftime('%d.%m.',date('now','-16 day')) datum, count(*) cnt FROM contactStateHistory WHERE con_state = " + attribute + "  AND date(change_date) = date('now','-16 day')" +
-                " UNION ALL" +
-                " SELECT strftime('%d.%m.',date('now','-17 day')) datum, count(*) cnt FROM contactStateHistory WHERE con_state = " + attribute + "  AND date(change_date) = date('now','-17 day')" +
-                " UNION ALL" +
-                " SELECT strftime('%d.%m.',date('now','-18 day')) datum, count(*) cnt FROM contactStateHistory WHERE con_state = " + attribute + "  AND date(change_date) = date('now','-18 day')" +
-                " UNION ALL" +
-                " SELECT strftime('%d.%m.',date('now','-19 day')) datum, count(*) cnt FROM contactStateHistory WHERE con_state = " + attribute + "  AND date(change_date) = date('now','-19 day')" +
-                " UNION ALL" +
-                " SELECT strftime('%d.%m.',date('now','-20 day')) datum, count(*) cnt FROM contactStateHistory WHERE con_state = " + attribute + "  AND date(change_date) = date('now','-20 day')" +
-                " UNION ALL" +
-                " SELECT strftime('%d.%m.',date('now','-21 day')) datum, count(*) cnt FROM contactStateHistory WHERE con_state = " + attribute + "  AND date(change_date) = date('now','-21 day')" +
-                " UNION ALL" +
-                " SELECT strftime('%d.%m.',date('now','-22 day')) datum, count(*) cnt FROM contactStateHistory WHERE con_state = " + attribute + "  AND date(change_date) = date('now','-22 day')" +
-                " UNION ALL" +
-                " SELECT strftime('%d.%m.',date('now','-23 day')) datum, count(*) cnt FROM contactStateHistory WHERE con_state = " + attribute + "  AND date(change_date) = date('now','-23 day')" +
-                " UNION ALL" +
-                " SELECT strftime('%d.%m.',date('now','-24 day')) datum, count(*) cnt FROM contactStateHistory WHERE con_state = " + attribute + "  AND date(change_date) = date('now','-24 day')" +
-                " UNION ALL" +
-                " SELECT strftime('%d.%m.',date('now','-25 day')) datum, count(*) cnt FROM contactStateHistory WHERE con_state = " + attribute + "  AND date(change_date) = date('now','-25 day')" +
-                " UNION ALL" +
-                " SELECT strftime('%d.%m.',date('now','-26 day')) datum, count(*) cnt FROM contactStateHistory WHERE con_state = " + attribute + "  AND date(change_date) = date('now','-26 day')" +
-                " UNION ALL" +
-                " SELECT strftime('%d.%m.',date('now','-27 day')) datum, count(*) cnt FROM contactStateHistory WHERE con_state = " + attribute + "  AND date(change_date) = date('now','-27 day')" +
-                " UNION ALL" +
-                " SELECT strftime('%d.%m.',date('now','-28 day')) datum, count(*) cnt FROM contactStateHistory WHERE con_state = " + attribute + "  AND date(change_date) = date('now','-28 day')" +
-                " UNION ALL" +
-                " SELECT strftime('%d.%m.',date('now','-29 day')) datum, count(*) cnt FROM contactStateHistory WHERE con_state = " + attribute + "  AND date(change_date) = date('now','-29 day')";
+        String selectQuery = "SELECT strftime('%d.%m.%Y',date('now','" + step * (-1) + " day')) datum , count(*) cnt FROM " + TABLE_STATS + " WHERE " + COLUMN_ATTRIBUTE + " = " + attribute + " AND date(" + COLUMN_DATE + ") = date('now','" + step * (-1) + " day') AND " + COLUMN_USER + " = '" + user + "'";
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
         return cursor;
@@ -450,9 +384,25 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         return cursor;
     }
 
+    public Cursor getWeekStatistics(int attribute, int step, String user)
+    {
+        String selectQuery = "SELECT strftime('%W.%Y',date('now','" + step * (-7) + " days')) week , count(*) cnt FROM " + TABLE_STATS + " WHERE " + COLUMN_ATTRIBUTE + " = " + attribute + " AND date(" + COLUMN_DATE + ") <  DATE('now', 'weekday 1','" + step * (-7) + " days') AND date(" + COLUMN_DATE + ")  >  DATE('now', 'weekday 1', ' " + -7 * (step + 1) + " days') AND " + COLUMN_USER + " = '" + user + "'";
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        return cursor;
+    }
+
     public Cursor getMonthStatistics(int attribute, int step) {
         String selectQuery = "SELECT strftime('%m.%Y',date('now','start of month','" + step * (-1) + " month')) month, count(*) cnt FROM contactStateHistory WHERE con_state = " + attribute + " AND date(change_date)  <  DATE('now', 'start of month','" + step * (-1) + " month', '-1 day') AND date(change_date)  >  DATE('now', 'start of month', ' " + step * (-1) + " month')";
 
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        return cursor;
+    }
+
+    public Cursor getMonthStatistics(int attribute, int step, String user)
+    {
+        String selectQuery = "SELECT strftime('%m.%Y',date('now','start of month','" + step * (-1) + " month')) month, count(*) cnt FROM " + TABLE_STATS + " WHERE " + COLUMN_ATTRIBUTE + " = " + attribute + " AND date(" + COLUMN_DATE + ") <  DATE('now', 'start of month','" + step * (-1) + " month', '-1 day') AND date(" + COLUMN_DATE + ")  >  DATE('now', 'start of month', ' " + step * (-1) + " month') AND " + COLUMN_USER + " = '" + user + "'";
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
         return cursor;
@@ -506,12 +456,12 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
 
-        if (cursor.moveToFirst()) {
+        /*if (cursor.moveToFirst()) {
             do {
                 Users user = new Users(cursor.getString(0),cursor.getString(1));
                 usersList.add(user);
             } while (cursor.moveToNext());
-        }
+        }*/
 
         // return contact list
         return cursor;

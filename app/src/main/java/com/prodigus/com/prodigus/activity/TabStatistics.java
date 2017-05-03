@@ -61,6 +61,7 @@ public class TabStatistics extends AppCompatActivity implements NavigationView.O
     private SectionsPagerAdapter mSectionsPagerAdapter;
 
     private ViewPager mViewPager;
+    private ViewPagerAdapter viewPagerAdapter;
     private Toolbar toolbar;
     private TabLayout tabLayout;
     MySQLiteHelper db;
@@ -73,7 +74,13 @@ public class TabStatistics extends AppCompatActivity implements NavigationView.O
 
     private String spinnerSelected;
 
+    private TabStatDay tabStatDay;
+    private TabStatWeek tabStatWeek;
+    private TabStatMonth tabStatMonth;
+
     protected List<Users> gens = null;
+
+    private String logUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,17 +91,6 @@ public class TabStatistics extends AppCompatActivity implements NavigationView.O
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        // Create the adapter that will return a fragment for each of the three
-        // primary sections of the activity.
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
-
-        // Set up the ViewPager with the sections adapter.
-        mViewPager = (ViewPager) findViewById(R.id.container);
-        //mViewPager.setAdapter(mSectionsPagerAdapter);
-        setupViewPager(mViewPager);
-
-        tabLayout = (TabLayout) findViewById(R.id.tabs);
-        tabLayout.setupWithViewPager(mViewPager);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -117,35 +113,78 @@ public class TabStatistics extends AppCompatActivity implements NavigationView.O
         gens = new ArrayList<Users>();
 
         Cursor cUsers = db.getUsers();
+        while (cUsers.moveToNext()) {
+            gens.add(new Users(cUsers.getString(cUsers.getColumnIndex("usr_nick")),cUsers.getString(cUsers.getColumnIndex("usr_name"))));
+        }
+        cUsers.close();
 
-        if(Integer.valueOf(cUsers.getCount()) > 0) {
+        Cursor authCursor = db.getAuth();
+        if(Integer.valueOf(authCursor.getCount()) > 0) {
 
-            if (cUsers.moveToFirst()) {
-                gens.add(new Users(cUsers.getString(cUsers.getColumnIndex("usr_nick")),cUsers.getString(cUsers.getColumnIndex("usr_name"))));
+            if (authCursor.moveToFirst()) {
+                logUser = authCursor.getString(authCursor.getColumnIndex("logname"));
             }
-            cUsers.close();
+            authCursor.close();
         }
         else {
-            return;
+            logUser = "";
         }
-
-        //gens.add(new Genders(1,"Stanislav Ditte"));
-        //gens.add(new Genders(2,"Žaneta Verešpejová"));
-
-        //gens.add(new Users("Ditte","Stanislav Ditte"));
-        //gens.add(new Users("Vere","Žaneta Verešpejová"));
 
         Spinner spinner = (Spinner) findViewById(R.id.userSpinner);
         ArrayAdapter<Users> adapter = new ArrayAdapter<Users>(this, R.layout.text_spinner, gens);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
 
+        spinnerSelected = ((Users)spinner.getSelectedItem()).getNick();
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 Object item = adapterView.getItemAtPosition(i);
-                if(getFragmentRefreshListener()!=null){
-                    getFragmentRefreshListener().onRefresh(item.toString());
+                /*if(getFragmentRefreshListener()!=null){
+                    getFragmentRefreshListener().onRefresh(((Users)item).getNick());
+                }*/
+                String name = ((Users)item).getNick();
+
+                //if (tabStatDay != null && tabStatDay.isVisible())
+
+                int currItem = mViewPager.getCurrentItem();
+
+                switch(currItem)
+                {
+                    case 0:
+                        tabStatDay.setSelectedUser(name);
+                        tabStatDay.setLogUser(logUser);
+                        tabStatDay.addViewChart(logUser.equals(name));
+
+                        tabStatWeek.setSelectedUser(name);
+                        tabStatWeek.setLogUser(logUser);
+                        tabStatMonth.setSelectedUser(name);
+                        tabStatMonth.setLogUser(logUser);
+                        break;
+                    case 1:
+                        tabStatWeek.setSelectedUser(name);
+                        tabStatWeek.setLogUser(logUser);
+                        tabStatWeek.addViewChart(true);
+
+                        tabStatDay.setSelectedUser(name);
+                        tabStatDay.setLogUser(logUser);
+                        tabStatDay.onResume();
+                        tabStatMonth.setSelectedUser(name);
+                        tabStatMonth.setLogUser(logUser);
+                        break;
+                    case 2:
+                        tabStatMonth.setSelectedUser(name);
+                        tabStatMonth.setLogUser(logUser);
+                        tabStatMonth.addViewChart(true);
+
+                        tabStatDay.setSelectedUser(name);
+                        tabStatDay.setLogUser(logUser);
+                        tabStatWeek.setSelectedUser(name);
+                        tabStatWeek.setLogUser(logUser);
+                        break;
+                    default: break;
                 }
+
+                viewPagerAdapter.notifyDataSetChanged();
             }
 
             public void onNothingSelected(AdapterView<?> adapterView) {
@@ -153,29 +192,35 @@ public class TabStatistics extends AppCompatActivity implements NavigationView.O
             }
         });
 
-        //AsyncCallWS task = new AsyncCallWS();
-        //task.execute();
+        // Create the adapter that will return a fragment for each of the three
+        // primary sections of the activity.
+        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+
+        // Set up the ViewPager with the sections adapter.
+        mViewPager = (ViewPager) findViewById(R.id.container);
+        //mViewPager.setAdapter(mSectionsPagerAdapter);
+        setupViewPager(mViewPager);
+
+        tabLayout = (TabLayout) findViewById(R.id.tabs);
+        tabLayout.setupWithViewPager(mViewPager);
 
     }
 
     private void setupViewPager(ViewPager viewPager) {
-        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFragment(new TabStatDay().newInstance(spinnerSelected), "Denne");
-        adapter.addFragment(new TabStatWeek().newInstance(spinnerSelected), "Týždenne");
-        adapter.addFragment(new TabStatMonth().newInstance(spinnerSelected), "Mesačne");
+        viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
+        tabStatDay = new TabStatDay().newInstance(spinnerSelected, logUser);
+        tabStatWeek = new TabStatWeek().newInstance(spinnerSelected, logUser);
+        tabStatMonth = new TabStatMonth().newInstance(spinnerSelected, logUser);
+
+        viewPagerAdapter.addFragment(tabStatDay, "Denne");
+        viewPagerAdapter.addFragment(tabStatWeek, "Týždenne");
+        viewPagerAdapter.addFragment(tabStatMonth, "Mesačne");
 
         //viewPager.setCurrentItem(spinner.getSelectedItem().toString());
         //adapter.addFragment(new TabStatQrt(), "Quarter");
 
-        viewPager.setAdapter(adapter);
+        viewPager.setAdapter(viewPagerAdapter);
     }
-
-    /*@Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_tab_statistics, menu);
-        return true;
-    }*/
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

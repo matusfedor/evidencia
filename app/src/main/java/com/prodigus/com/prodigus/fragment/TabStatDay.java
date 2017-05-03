@@ -70,14 +70,10 @@ public class TabStatDay extends Fragment {
     private static final String ARG_PARAM2 = "param2";
     private View myFragmentView;
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-    private float testfl = 0f;
     MySQLiteHelper db;
     private OnFragmentInteractionListener mListener;
     private String logUser;
-    private String logname;
+    private String selectedUser;
 
     private LinearLayout chartLyt;
     private Animation fadeAnim;
@@ -90,27 +86,16 @@ public class TabStatDay extends Fragment {
     private boolean serieCheckedPk = false;
     private boolean serieCheckedKlient = false;
 
-    private final String NAMESPACE = "http://microsoft.com/webservices/";
-    private final String URL = "http://evidencia.prodigus.sk/EvidenceService.asmx";
-    private final String SOAP_ACTION = "http://microsoft.com/webservices/GetStatistics";
-    private final String METHOD_NAME = "GetStatistics";
-
-    TimeSeries seriesAfa;
-    TimeSeries seriesTelk;
-    TimeSeries seriesTerm;
-    TimeSeries seriesFa;
-    TimeSeries seriesPk;
-    TimeSeries seriesKlient;
-
     public TabStatDay() {
         // Required empty public constructor
     }
 
     // TODO: Rename and change types and number of parameters
-    public static TabStatDay newInstance(String selectedUser) {
+    public static TabStatDay newInstance(String selectedUser, String logUser) {
         TabStatDay fragment = new TabStatDay();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, selectedUser);
+        args.putString(ARG_PARAM2, logUser);
         fragment.setArguments(args);
         return fragment;
     }
@@ -119,7 +104,8 @@ public class TabStatDay extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            logUser = getArguments().getString(ARG_PARAM1);
+            selectedUser = getArguments().getString(ARG_PARAM1);
+            logUser = getArguments().getString(ARG_PARAM2);
         }
     }
 
@@ -129,50 +115,12 @@ public class TabStatDay extends Fragment {
 
         myFragmentView = inflater.inflate(R.layout.fragment_tab_stat_day, container, false);
         chartLyt = (LinearLayout) myFragmentView.findViewById(R.id.chart);
-
         db = new MySQLiteHelper(getActivity());
+
         setHasOptionsMenu(true);
 
-        /*((TabStatistics)getActivity()).setFragmentRefreshListener(new TabStatistics.FragmentRefreshListener() {
-            @Override
-            public void onRefresh() {
-
-                Toast.makeText(getActivity(), "Test day", Toast.LENGTH_SHORT).show();
-                Boolean isConnected;
-                try{
-                    isConnected = isConnected();
-                }
-                catch(InterruptedException ex) { isConnected = false;}
-                catch(IOException ex) { isConnected = false;}
-
-
-                //prepareStatData();
-            }
-        });*/
-
-        ((TabStatistics)getActivity()).setFragmentRefreshListener(new TabStatistics.FragmentRefreshListener() {
-            @Override
-            public void onRefresh(String logname) {
-                //prepareStatData();
-                logUser = logname;
-                Toast.makeText(getActivity(), "Test day", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        Cursor authCursor = db.getAuth();
-        if(Integer.valueOf(authCursor.getCount()) > 0) {
-
-            if (authCursor.moveToFirst()) {
-                logname = authCursor.getString(authCursor.getColumnIndex("logname"));
-            }
-            authCursor.close();
-        }
-        else {
-            return null;
-        }
-
-        chartLyt.addView(createTempGraph(), 0);
-        //prepareStatData();
+        //chartLyt.addView(createTempGraph(), 0);
+        addViewChart(logUser.equals(selectedUser));
 
         return myFragmentView;
     }
@@ -184,50 +132,7 @@ public class TabStatDay extends Fragment {
         }
     }
 
-    public void prepareStatData() {
-        ArrayList<Entry> entries = new ArrayList<>();
-        Cursor cValue = db.getStatCounts(0);
-        int dayStat = 0;
-        while (cValue.moveToNext())
-        {
-            try
-            {
-                entries.add(new Entry(cValue.getFloat(0), dayStat));
-                dayStat++;
-            }
-            catch (Exception e) {
-            }
-        }
-
-        LineDataSet dataSet = new LineDataSet(entries, "Label");
-        dataSet.setDrawValues(false);
-        
-
-        /*BarDataSet dataset = new BarDataSet(entries, "Klienti");
-        ArrayList<String> labels = new ArrayList<String>();
-        Cursor c = db.getAllStatMarks();
-        while (c.moveToNext())
-        {
-            try
-            {
-                labels.add(c.getString(c.getColumnIndex("att_sc")));
-            }
-            catch (Exception e) {
-            }
-        }*/
-
-        /*BarChart myChart = (BarChart) myFragmentView.findViewById(R.id.chart);
-        BarData data = new BarData(labels, dataset);
-        myChart.setData(data);
-        myChart.setDescription("");
-
-        myChart.invalidate();*/
-    }
-
     private View createTempGraph() {
-
-        Cursor authCursor = db.getAuth();
-
         // We start creating the XYSeries to plot the temperature
         SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
         TimeSeries seriesAfa = new TimeSeries("Denný graf Anketa finančná analýza");
@@ -519,9 +424,6 @@ public class TabStatDay extends Fragment {
     }
 
     private View createTempUserGraph() {
-
-        Cursor authCursor = db.getAuth();
-
         // We start creating the XYSeries to plot the temperature
         SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
         TimeSeries seriesAfa = new TimeSeries("Denný graf Anketa finančná analýza");
@@ -536,7 +438,7 @@ public class TabStatDay extends Fragment {
         if(serieCheckedAfa)
         {
             for (int s = 0; s < 30; s++) {
-                Cursor c = db.getDayStatistics(8, s, logname);
+                Cursor c = db.getDayStatistics(8, s, selectedUser);
                 while (c.moveToNext()) {
                     try {
                         seriesAfa.add(sdf.parse(c.getString(c.getColumnIndex("datum"))), c.getDouble(c.getColumnIndex("cnt")));
@@ -555,7 +457,7 @@ public class TabStatDay extends Fragment {
         {
             for(int s = 0; s < 30; s++)
             {
-                Cursor c = db.getDayStatistics(6,s, logname);
+                Cursor c = db.getDayStatistics(6,s, selectedUser);
                 while (c.moveToNext())
                 {
                     try
@@ -578,7 +480,7 @@ public class TabStatDay extends Fragment {
         {
             for(int s = 0; s < 30; s++)
             {
-                Cursor c = db.getDayStatistics(15,s, logname);
+                Cursor c = db.getDayStatistics(15,s, selectedUser);
                 while (c.moveToNext())
                 {
                     try
@@ -600,7 +502,7 @@ public class TabStatDay extends Fragment {
         if(serieCheckedFa)
         {
             for(int s = 0; s < 30; s++) {
-                Cursor c = db.getDayStatistics(16,s, logname);
+                Cursor c = db.getDayStatistics(16,s, selectedUser);
                 while (c.moveToNext()) {
                     try {
                         seriesFa.add(sdf.parse(c.getString(c.getColumnIndex("datum"))), c.getDouble(c.getColumnIndex("cnt")));
@@ -619,7 +521,7 @@ public class TabStatDay extends Fragment {
         {
             for(int s = 0; s < 30; s++)
             {
-                Cursor c = db.getDayStatistics(2,s, logname);
+                Cursor c = db.getDayStatistics(2,s, selectedUser);
                 while (c.moveToNext())
                 {
                     try
@@ -642,7 +544,7 @@ public class TabStatDay extends Fragment {
         {
             for(int s = 0; s < 30; s++)
             {
-                Cursor c = db.getDayStatistics(1,s, logname);
+                Cursor c = db.getDayStatistics(1,s, selectedUser);
                 while (c.moveToNext())
                 {
                     try
@@ -799,197 +701,7 @@ public class TabStatDay extends Fragment {
             mRenderer.addXTextLabel(i+1,date[i]);
         }
         mRenderer.setShowCustomTextGrid(true);
-*/
-        // Enable chart click
-        mRenderer.setClickEnabled(true);
-        chartView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //applyAnim(v, createPressGraph());
-            }
-        });
-
-        return chartView;
-    }
-
-    private View createTempGraphFromWS() {
-        // We start creating the XYSeries to plot the temperature
-        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
-        TimeSeries seriesAfa = new TimeSeries("Denný graf Anketa finančná analýza");
-        TimeSeries seriesTelk = new TimeSeries("Denný graf Telefonický hovor s kontaktom");
-        TimeSeries seriesTerm = new TimeSeries("Denný graf Termín");
-        TimeSeries seriesFa = new TimeSeries("Denný graf Finančná analýza");
-        TimeSeries seriesPk = new TimeSeries("Denný graf Potenciálny klienti");
-        TimeSeries seriesKlient = new TimeSeries("Denný graf Klienti");
-
-        double maxValue = 0;
-
-        if(serieCheckedAfa)
-        {
-            AsyncCallWS task = new AsyncCallWS();
-            task.execute(8);
-        }
-
-        if(serieCheckedTelk)
-        {
-            AsyncCallWS task = new AsyncCallWS();
-            task.execute(8);
-        }
-
-        if(serieCheckedTerm)
-        {
-            AsyncCallWS task = new AsyncCallWS();
-            task.execute(15);
-        }
-
-        if(serieCheckedFa)
-        {
-            AsyncCallWS task = new AsyncCallWS();
-            task.execute(16);
-        }
-
-        if(serieCheckedPk)
-        {
-            AsyncCallWS task = new AsyncCallWS();
-            task.execute(2);
-        }
-
-        if(serieCheckedKlient)
-        {
-            AsyncCallWS task = new AsyncCallWS();
-            task.execute(1);
-        }
-
-        // Now we create the renderer
-        XYSeriesRenderer renderer = new XYSeriesRenderer();
-        renderer.setLineWidth(2);
-        renderer.setColor(Color.RED);
-        // Include low and max value
-        renderer.setDisplayBoundingPoints(true);
-        // we add point markers
-        renderer.setPointStyle(PointStyle.CIRCLE);
-        renderer.setPointStrokeWidth(3);
-        renderer.setShowLegendItem(false);
-
-        //second serie
-        XYSeriesRenderer renderer2 = new XYSeriesRenderer();
-        renderer2.setLineWidth(2);
-        renderer2.setColor(Color.BLUE);
-        // Include low and max value
-        renderer2.setDisplayBoundingPoints(true);
-        // we add point markers
-        renderer2.setPointStyle(PointStyle.CIRCLE);
-        renderer2.setPointStrokeWidth(3);
-        renderer2.setShowLegendItem(false);
-
-        XYSeriesRenderer renderer3 = new XYSeriesRenderer();
-        renderer3.setLineWidth(2);
-        renderer3.setColor(Color.GREEN);
-        // Include low and max value
-        renderer3.setDisplayBoundingPoints(true);
-        // we add point markers
-        renderer3.setPointStyle(PointStyle.CIRCLE);
-        renderer3.setPointStrokeWidth(3);
-        renderer3.setShowLegendItem(false);
-
-        XYSeriesRenderer renderer4 = new XYSeriesRenderer();
-        renderer4.setLineWidth(2);
-        renderer4.setColor(Color.YELLOW);
-        // Include low and max value
-        renderer4.setDisplayBoundingPoints(true);
-        // we add point markers
-        renderer4.setPointStyle(PointStyle.CIRCLE);
-        renderer4.setPointStrokeWidth(3);
-        renderer4.setShowLegendItem(false);
-
-        XYSeriesRenderer renderer5 = new XYSeriesRenderer();
-        renderer5.setLineWidth(2);
-        renderer5.setColor(Color.BLACK);
-        renderer5.setDisplayBoundingPoints(true);
-        renderer5.setPointStyle(PointStyle.CIRCLE);
-        renderer5.setPointStrokeWidth(3);
-        renderer5.setShowLegendItem(false);
-
-        XYSeriesRenderer renderer6 = new XYSeriesRenderer();
-        renderer6.setLineWidth(2);
-        renderer6.setColor(Color.CYAN);
-        // Include low and max value
-        renderer6.setDisplayBoundingPoints(true);
-        // we add point markers
-        renderer6.setPointStyle(PointStyle.CIRCLE);
-        renderer6.setPointStrokeWidth(3);
-        renderer6.setShowLegendItem(false);
-
-        // Now we add our series
-        XYMultipleSeriesDataset dataset = new XYMultipleSeriesDataset();
-        if(serieCheckedAfa) {
-            dataset.addSeries(seriesAfa);
-        }
-        if(serieCheckedTelk)
-        {
-            dataset.addSeries(seriesTelk);
-        }
-        if(serieCheckedTerm)
-        {
-            dataset.addSeries(seriesTerm);
-        }
-        if(serieCheckedFa)
-        {
-            dataset.addSeries(seriesFa);
-        }
-        if(serieCheckedPk)
-        {
-            dataset.addSeries(seriesPk);
-        }
-        if(serieCheckedKlient)
-        {
-            dataset.addSeries(seriesKlient);
-        }
-        // Finaly we create the multiple series renderer to control the graph
-        XYMultipleSeriesRenderer mRenderer = new XYMultipleSeriesRenderer();
-        if(serieCheckedAfa) {
-            mRenderer.addSeriesRenderer(renderer);
-        }
-        if(serieCheckedTelk)
-        {
-            mRenderer.addSeriesRenderer(renderer2);
-        }
-        if(serieCheckedTerm)
-        {
-            mRenderer.addSeriesRenderer(renderer3);
-        }
-        if(serieCheckedFa)
-        {
-            mRenderer.addSeriesRenderer(renderer4);
-        }
-        if(serieCheckedPk)
-        {
-            mRenderer.addSeriesRenderer(renderer5);
-        }
-        if(serieCheckedKlient)
-        {
-            mRenderer.addSeriesRenderer(renderer6);
-        }
-
-        // We want to avoid black border
-        //mRenderer.setMarginsColor(Color.argb(0x00, 0xff, 0x00, 0x00)); // transparent margins
-        mRenderer.setMarginsColor(Color.WHITE); // transparent margins
-        mRenderer.setPanEnabled(true, true);
-        mRenderer.setYAxisMax(maxValue + 2);
-        mRenderer.setYAxisMin(0);
-        mRenderer.setShowGrid(true);
-        mRenderer.setLabelsTextSize(30);
-        mRenderer.setYLabelsAlign(Paint.Align.RIGHT);
-        mRenderer.setMargins(new int[]{40,50,20,20});
-        mRenderer.setYLabelsPadding(10);
-        mRenderer.setAxesColor(Color.BLACK);
-        mRenderer.setXLabelsColor(Color.BLACK);
-        mRenderer.setYLabelsColor(0, Color.BLACK);
-        mRenderer.setZoomEnabled(true, true);
-        mRenderer.setInScroll(true);
-
-        chartView = ChartFactory.getTimeChartView(getActivity(), dataset, mRenderer, "dd.MM");
-
+        */
         // Enable chart click
         mRenderer.setClickEnabled(true);
         chartView.setOnClickListener(new View.OnClickListener() {
@@ -1048,7 +760,7 @@ public class TabStatDay extends Fragment {
         super.onCreateOptionsMenu(menu,inflater);
     }
 
-    private void addViewChart(Boolean logged)
+    public void addViewChart(Boolean logged)
     {
         if(logged)
         {
@@ -1068,14 +780,14 @@ public class TabStatDay extends Fragment {
                 if (item.isChecked())
                 {
                     serieCheckedAfa = false;
-                    addViewChart(logUser.equals(logname));
+                    addViewChart(logUser.equals(selectedUser));
                     chartView.repaint();
                     item.setChecked(false);
                 }
                 else
                 {
                     serieCheckedAfa = true;
-                    addViewChart(logUser.equals(logname));
+                    addViewChart(logUser.equals(selectedUser));
                     chartView.repaint();
                     item.setChecked(true);
                 }
@@ -1085,14 +797,14 @@ public class TabStatDay extends Fragment {
                 if (item.isChecked())
                 {
                     serieCheckedTelk = false;
-                    addViewChart(logUser.equals(logname));
+                    addViewChart(logUser.equals(selectedUser));
                     chartView.repaint();
                     item.setChecked(false);
                 }
                 else
                 {
                     serieCheckedTelk = true;
-                    addViewChart(logUser.equals(logname));
+                    addViewChart(logUser.equals(selectedUser));
                     chartView.repaint();
                     item.setChecked(true);
                 }
@@ -1102,14 +814,14 @@ public class TabStatDay extends Fragment {
                 if (item.isChecked())
                 {
                     serieCheckedTerm = false;
-                    addViewChart(logUser.equals(logname));
+                    addViewChart(logUser.equals(selectedUser));
                     chartView.repaint();
                     item.setChecked(false);
                 }
                 else
                 {
                     serieCheckedTerm = true;
-                    addViewChart(logUser.equals(logname));
+                    addViewChart(logUser.equals(selectedUser));
                     chartView.repaint();
                     item.setChecked(true);
                 }
@@ -1119,14 +831,14 @@ public class TabStatDay extends Fragment {
                 if (item.isChecked())
                 {
                     serieCheckedFa = false;
-                    addViewChart(logUser.equals(logname));
+                    addViewChart(logUser.equals(selectedUser));
                     chartView.repaint();
                     item.setChecked(false);
                 }
                 else
                 {
                     serieCheckedFa = true;
-                    addViewChart(logUser.equals(logname));
+                    addViewChart(logUser.equals(selectedUser));
                     chartView.repaint();
                     item.setChecked(true);
                 }
@@ -1136,14 +848,14 @@ public class TabStatDay extends Fragment {
                 if (item.isChecked())
                 {
                     serieCheckedPk = false;
-                    addViewChart(logUser.equals(logname));
+                    addViewChart(logUser.equals(selectedUser));
                     chartView.repaint();
                     item.setChecked(false);
                 }
                 else
                 {
                     serieCheckedPk = true;
-                    addViewChart(logUser.equals(logname));
+                    addViewChart(logUser.equals(selectedUser));
                     chartView.repaint();
                     item.setChecked(true);
                 }
@@ -1153,14 +865,14 @@ public class TabStatDay extends Fragment {
                 if (item.isChecked())
                 {
                     serieCheckedKlient = false;
-                    addViewChart(logUser.equals(logname));
+                    addViewChart(logUser.equals(selectedUser));
                     chartView.repaint();
                     item.setChecked(false);
                 }
                 else
                 {
                     serieCheckedKlient = true;
-                    addViewChart(logUser.equals(logname));
+                    addViewChart(logUser.equals(selectedUser));
                     chartView.repaint();
                     item.setChecked(true);
                 }
@@ -1170,126 +882,18 @@ public class TabStatDay extends Fragment {
         }
     }
 
-    public List<Stats> loadUserStatistics(String type, int steps, int attribute) {
-        List<Stats> gens = null;
-
-        String logname = "";
-        String pin = "";
-
-        Cursor c = db.getAuth();
-
-        if(Integer.valueOf(c.getCount()) > 0) {
-
-            if (c.moveToFirst()) {
-                logname = c.getString(c.getColumnIndex("logname"));
-                pin = c.getString(c.getColumnIndex("pin"));
-            }
-            c.close();
-        }
-        else {
-            return null;
-        }
-
-        //Create request
-        SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
-
-        PropertyInfo usernameProp = new PropertyInfo();
-        usernameProp.setName("userName");
-        usernameProp.setValue(logname);
-        usernameProp.setType(String.class);
-        request.addProperty(usernameProp);
-
-        PropertyInfo typeProp = new PropertyInfo();
-        typeProp.setName("type");
-        typeProp.setValue(type);
-        typeProp.setType(String.class);
-        request.addProperty(typeProp);
-
-        PropertyInfo stepsProp = new PropertyInfo();
-        stepsProp.setName("steps");
-        stepsProp.setValue(steps);
-        stepsProp.setType(int.class);
-        request.addProperty(stepsProp);
-
-        PropertyInfo attributeProp = new PropertyInfo();
-        attributeProp.setName("attribute");
-        attributeProp.setValue(attribute);
-        attributeProp.setType(int.class);
-        request.addProperty(attributeProp);
-
-        //Create envelope
-        SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
-                SoapEnvelope.VER11);
-
-        /*header*/
-        Element h = new Element().createElement(NAMESPACE, "UserCredentials");
-        Element Username = new Element().createElement(NAMESPACE, "userName");
-        Username.addChild(Node.TEXT, logname);
-        h.addChild(Node.ELEMENT, Username);
-        Element wssePassword = new Element().createElement(NAMESPACE, "password");
-        wssePassword.addChild(Node.TEXT, pin);
-        h.addChild(Node.ELEMENT, wssePassword);
-
-        envelope.headerOut = new Element[]{h};
-
-        //Set output SOAP object
-        envelope.setOutputSoapObject(request);
-        //Create HTTP call object
-        HttpTransportSE androidHttpTransport = new HttpTransportSE(URL);
-
-        Log.i("loading stats", "" + envelope.bodyOut.toString());
-
-        try {
-            androidHttpTransport.call(SOAP_ACTION, envelope);
-            SoapObject result = (SoapObject)envelope.getResponse();
-
-            for (int i = 0; i < result.getPropertyCount(); i++)
-            {
-                SoapObject s_deals = (SoapObject) result.getProperty(i);
-
-                String datum = (s_deals.getProperty(0).toString());
-                int cnt = Integer.parseInt(s_deals.getProperty(1).toString());
-
-                gens.add(new Stats(datum, cnt));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return gens;
+    public void setSelectedUser(String selectedUser){
+        this.selectedUser = selectedUser;
+        //Toast.makeText(getActivity(), "Test day: " + selectedUser, Toast.LENGTH_SHORT).show();
     }
 
-    private class AsyncCallWS extends AsyncTask<Integer, Integer, String> {
-        @Override
-        protected String doInBackground(Integer... params) {
-            List<Stats> statistics = loadUserStatistics("D",30,params[0]);
-            SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+    public void setLogUser(String logUser){
+        this.logUser = logUser;
+    }
 
-            for (int i = 0; i < statistics.size(); i++)
-            {
-                try {
-                    seriesAfa.add(sdf.parse(statistics.get(i).getDatum()), statistics.get(i).getCnt());
-                }
-                catch(ParseException pe){
-
-                }
-            }
-
-            //seriesAfa.add(sdf.parse(c.getString(c.getColumnIndex("datum"))), c.getDouble(c.getColumnIndex("cnt")));
-
-            return "Task Completed.";
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-        }
-
-        @Override
-        protected void onPreExecute() {
-        }
-
-        @Override
-        protected void onProgressUpdate(Integer... values) {
-        }
-
+    @Override
+    public void onResume() {
+        super.onResume();
+        addViewChart(logUser.equals(selectedUser));
     }
 }
