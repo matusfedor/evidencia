@@ -57,6 +57,7 @@ public class AddNote extends AppCompatActivity implements View.OnClickListener {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         dateFormatter = new SimpleDateFormat("dd.MM.yyyy");
+        SimpleDateFormat dateFormatterRead = new SimpleDateFormat("yyyy-MM-dd");
         setDateTimeField();
 
         Intent intent = getIntent();
@@ -93,7 +94,13 @@ public class AddNote extends AppCompatActivity implements View.OnClickListener {
             noteText.setText(cursor.getString(cursor.getColumnIndex("notetext")));
 
             EditText meetingDate = ((EditText) findViewById(R.id.edMeetingDate));
-            meetingDate.setText(cursor.getString(cursor.getColumnIndex("datec")));
+            String meetDate = "";
+            try {
+                meetDate = dateFormatter.format(dateFormatterRead.parse(cursor.getString(cursor.getColumnIndex("datec"))));
+            }
+            catch(Exception ex){}
+
+            meetingDate.setText(meetDate);
 
             Spinner attribute = (Spinner) findViewById(R.id.meetingType);
             attribute.setSelection(getIndex(attribute,cursor.getString(cursor.getColumnIndex("attribute"))));
@@ -106,11 +113,18 @@ public class AddNote extends AppCompatActivity implements View.OnClickListener {
                 String noteIdScreen = ((TextView) findViewById(R.id.noteID)).getText().toString();
                 String note = ((EditText) findViewById(R.id.NoteText)).getText().toString();
                 Spinner meetingType = (Spinner) findViewById(R.id.meetingType);
+                String meetingDate = ((TextView) findViewById(R.id.edMeetingDate)).getText().toString();
                 //long meetingTypeString = meetingType.getSelectedItem();
                 int meetingTypeInt = ((Genders) meetingType.getSelectedItem()).getId();
 
+                Date meetingDateValue = new Date();
+                try{
+                    meetingDateValue = dateFormatter.parse(meetingDate);
+                }
+                catch(Exception ex){}
+
                 if(noteIdScreen.isEmpty()) {
-                    long noteId = db.createNote(note, personID, meetingTypeInt);
+                    long noteId = db.createNote(note, personID, meetingTypeInt, meetingDateValue);
                 }
                 else {
                     long noteId = db.updateNote(Integer.parseInt(noteIdScreen), note, meetingTypeInt);

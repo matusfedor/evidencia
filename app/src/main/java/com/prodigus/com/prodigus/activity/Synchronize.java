@@ -62,6 +62,7 @@ import com.prodigus.com.prodigus.Stats;
 import com.prodigus.com.prodigus.Users;
 
 import static com.prodigus.com.prodigus.R.id.progressBar;
+import static com.prodigus.com.prodigus.R.id.progressBarStats;
 
 public class Synchronize extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -80,7 +81,9 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
     private StringReader xmlReader;
 
     private ProgressBar progressBar;
+    private ProgressBar progressBarStat;
     private TextView tvResult;
+    private TextView tvResultStat;
 
     Integer progressBarCount = 1;
 
@@ -105,9 +108,13 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
         navigationView.setNavigationItemSelectedListener(this);
 
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
-        progressBar.setMax(10);
+        progressBar.setMax(17);
+
+        progressBarStat = (ProgressBar) findViewById(R.id.progressBarStats);
+        progressBarStat.setMax(50);
 
         tvResult = (TextView) findViewById(R.id.tvResult);
+        tvResultStat = (TextView) findViewById(R.id.tvResultStat);
 
         db = new MySQLiteHelper(getApplicationContext());
 
@@ -121,6 +128,21 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
                 progressBar.setProgress(0);
 
                 AsyncCallWS task = new AsyncCallWS();
+                task.execute(10);
+
+            }
+        });
+
+        final Button btnAktStat = (Button) findViewById(R.id.btnStats);
+        btnAktStat.setOnClickListener(new View.OnClickListener() {
+
+            public void onClick(View arg0) {
+
+                progressBarCount = 1;
+                progressBarStat.setVisibility(View.VISIBLE);
+                progressBarStat.setProgress(0);
+
+                AsyncCallStatsWS task = new AsyncCallStatsWS();
                 task.execute(10);
 
             }
@@ -202,15 +224,9 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
         try {
             androidHttpTransport.call(SOAP_ACTION, envelope);
 
-            //Get the response
-            //SoapPrimitive response = (SoapPrimitive) envelope.getResponse();
             SoapObject result = (SoapObject)envelope.getResponse();
-            //SoapPrimitive result = (SoapPrimitive)envelope.getResponse();
-
-            //SoapPrimitive result = (SoapPrimitive) envelope.getResponse();
-            Log.i(TAG, String.valueOf(result.getPropertyCount()));
-
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy hh:mm:ss");
+            SimpleDateFormat sdateFormat = new SimpleDateFormat("dd.MM.yyyy");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
             for (int i = 0; i < result.getPropertyCount(); i++)
             {
@@ -221,6 +237,13 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
                 String titul = s_deals.getProperty(0).toString().replace("anyType{}", "");
                 String meno = s_deals.getProperty(1).toString().replace("anyType{}", "");
                 String priezvisko = s_deals.getProperty(2).toString().replace("anyType{}", "");
+                String datum = "";
+                try {
+                    datum = sdateFormat.format(dateFormat.parse(s_deals.getProperty(3).toString()));
+                }
+                catch(Exception ex){Log.i("Err", ex.getMessage());}
+
+                //String datum = dateFormat.format(s_deals.getProperty(3).toString().replace("anyType{}", ""));
                 String mesto = s_deals.getProperty(4).toString().replace("anyType{}", "");
                 String ulica = s_deals.getProperty(5).toString().replace("anyType{}", ""); //getProperty(5).toString();
                 String pc = s_deals.getProperty(6).toString().replace("anyType{}", "");
@@ -230,7 +253,7 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
                 String attribute = s_deals.getProperty(10).toString().replace("anyType{}", "");
                 int clientId = Integer.parseInt(s_deals.getProperty(11).toString().replace("anyType{}", ""));
 
-                long todo1_id = db.createToDo(titul,meno,priezvisko,now, mesto, ulica, pc, email, telefon, "", attribute, clientId);
+                long todo1_id = db.createToDo(titul,meno,priezvisko,datum, mesto, ulica, pc, email, telefon, "", attribute, clientId);
                 Log.i(TAG, Long.toString(todo1_id));
             }
         } catch (Exception e) {
@@ -552,6 +575,7 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
         String gender = "";
         String email = "";
         String phone = "";
+        String bornDate = "";
         int attribute = 0;
         int clientInternalId = 0;
 
@@ -577,6 +601,7 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
             phone = cursor.getString(cursor.getColumnIndexOrThrow("phone"));
             attribute = cursor.getInt(cursor.getColumnIndexOrThrow("attribute"));
             clientInternalId = cursor.getInt(cursor.getColumnIndexOrThrow("clientId"));
+            bornDate = cursor.getString(cursor.getColumnIndexOrThrow("borndate"));
 
             //borndate = cursor.getString(cursor.getColumnIndexOrThrow("borndate")));
             //borndate = "";
@@ -587,7 +612,7 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
                 System.out.println("ERROR: Cannot parse");
             }*/
 
-            sendContacts(clientId, clientInternalId, surname, name, city, street, number, email, phone, "M", null, title, "", attribute);
+            sendContacts(clientId, clientInternalId, surname, name, city, street, number, email, phone, "M", bornDate, title, "", attribute);
         }
         cursor.close();
     }
@@ -1293,23 +1318,28 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
         @Override
         protected String doInBackground(Integer... params) {
             sendAllContacts();
-            publishProgress(1);
-            sendAllContactAttHistory();
-            publishProgress(2);
-            sendAllNotes();
-            publishProgress(3);
-            loadAttributes();
-            publishProgress(4);
-            loadContacts();
             publishProgress(5);
-            loadContactsAttHistory();
-            publishProgress(6);
-            loadNotes();
+            sendAllContactAttHistory();
             publishProgress(7);
+            sendAllNotes();
+            publishProgress(9);
+            loadAttributes();
+            publishProgress(10);
+            loadContacts();
+            publishProgress(12);
+            loadContactsAttHistory();
+            publishProgress(14);
+            loadNotes();
+            publishProgress(16);
             loadUsers();
-            publishProgress(8);
+            publishProgress(17);
+
+            /*
+            int progress = 17;
 
             Cursor cursor = db.getUsers();
+            double step = Math.floor(33/cursor.getCount());
+
             cursor.moveToFirst();
             while (cursor.moveToNext()) {
                 String nick = cursor.getString(cursor.getColumnIndexOrThrow("usr_nick"));
@@ -1333,11 +1363,85 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
                 loadUserStatistics("M", 30, 16, nick );
                 loadUserStatistics("M", 30, 2, nick );
                 loadUserStatistics("M", 30, 1, nick );
+
+                progress += step;
+                publishProgress(progress);
             }
-            cursor.close();
-            publishProgress(10);
+            cursor.close();*/
+            publishProgress(17);
 
             return "Task Completed.";
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            Log.i(TAG, "onPostExecute");
+            tvResult.setText(result);
+            //progressBar.setVisibility(View.GONE);
+            //Button btnAkt = (Button) findViewById(R.id.btnAkt);
+            //btnAkt.setText("AktualizĂˇcia Ăşdajov");
+            //btnAkt.setBackgroundColor(Color.LTGRAY);
+            //tv.setText(fahren + " F");
+        }
+
+        @Override
+        protected void onPreExecute() {
+            Log.i(TAG, "onPreExecute");
+            //Button btnAkt = (Button) findViewById(R.id.btnAkt);
+            //btnAkt.setText("Odosielam dĂˇta...");
+            //btnAkt.setBackgroundColor(Color.RED);
+            //tv.setText("Calculating...");
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            Log.i(TAG, "onProgressUpdate");
+            progressBar.setProgress(values[0]);
+        }
+
+    }
+
+    private class AsyncCallStatsWS extends AsyncTask<Integer, Integer, String> {
+        @Override
+        protected String doInBackground(Integer... params) {
+            int progress = 0;
+
+            db.deleteStats();
+
+            Cursor cursor = db.getUsers();
+            double step = Math.floor(50/cursor.getCount());
+
+            cursor.moveToFirst();
+            while (cursor.moveToNext()) {
+                String nick = cursor.getString(cursor.getColumnIndexOrThrow("usr_nick"));
+                loadUserStatistics("D", 30, 8, nick );
+                loadUserStatistics("D", 30, 6, nick );
+                loadUserStatistics("D", 30, 15, nick );
+                loadUserStatistics("D", 30, 16, nick );
+                loadUserStatistics("D", 30, 2, nick );
+                loadUserStatistics("D", 30, 1, nick );
+
+                loadUserStatistics("W", 30, 8, nick );
+                loadUserStatistics("W", 30, 6, nick );
+                loadUserStatistics("W", 30, 15, nick );
+                loadUserStatistics("W", 30, 16, nick );
+                loadUserStatistics("W", 30, 2, nick );
+                loadUserStatistics("W", 30, 1, nick );
+
+                loadUserStatistics("M", 30, 8, nick );
+                loadUserStatistics("M", 30, 6, nick );
+                loadUserStatistics("M", 30, 15, nick );
+                loadUserStatistics("M", 30, 16, nick );
+                loadUserStatistics("M", 30, 2, nick );
+                loadUserStatistics("M", 30, 1, nick );
+
+                progress += step;
+                publishProgress(progress);
+            }
+            cursor.close();
+            publishProgress(50);
+
+            return "Štatistiky načítané.";
         }
 
         @Override

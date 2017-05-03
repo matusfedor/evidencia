@@ -46,6 +46,7 @@ public class ThirdActivity extends AppCompatActivity implements OnClickListener 
     private DatePickerDialog bornDatePickerDialog;
     private SimpleDateFormat dateFormatter;
     protected List<Genders> gens = null;
+    private Calendar newCalendar;
 
 
     @Override
@@ -129,10 +130,14 @@ public class ThirdActivity extends AppCompatActivity implements OnClickListener 
                 borndate = sdf.parse(cursor.getString((cursor.getColumnIndex("borndate"))));
             } catch (ParseException e) {
                 e.printStackTrace();}
-            Log.i("datum2",borndate.toString());
 
             EditText bdate = ((EditText) findViewById(R.id.edBornDate));
-            bdate.setText(borndate.toString());
+            bdate.setText(sdf.format(borndate));
+            //newCalendar.setTime(borndate);
+            SimpleDateFormat dfYear = new SimpleDateFormat("yyyy");
+            SimpleDateFormat dfMonth = new SimpleDateFormat("MM");
+            SimpleDateFormat dfDay = new SimpleDateFormat("dd");
+            bornDatePickerDialog.updateDate(Integer.parseInt(dfYear.format(borndate)), Integer.parseInt(dfMonth.format(borndate))-1, Integer.parseInt(dfDay.format(borndate)));
         }
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.addFloatButton);
@@ -148,11 +153,11 @@ public class ThirdActivity extends AppCompatActivity implements OnClickListener 
                 String name = ((EditText) findViewById(R.id.edName)).getText().toString();
                 String surname = ((EditText) findViewById(R.id.edSurname)).getText().toString();
                 String bdate = ((EditText) findViewById(R.id.edBornDate)).getText().toString();
-                Date borndate = new Date();
+                /*Date borndate = new Date();
                 try {
                     borndate = sdf.parse(bdate);
                 } catch (ParseException e) {
-                    e.printStackTrace();}
+                    e.printStackTrace();}*/
                 //String gender = ((EditText) findViewById(R.id.edGender)).getText().toString();
                 Spinner gender = (Spinner) findViewById(R.id.Gender_spinner);
                 String genderS = gender.getSelectedItem().toString();
@@ -163,7 +168,7 @@ public class ThirdActivity extends AppCompatActivity implements OnClickListener 
                 String phone = ((EditText) findViewById(R.id.edPhone)).getText().toString();
 
                 if(personId == null || personId == ""){
-                    todo1_id = db.createToDo(title, name, surname, borndate, city, street, number, email, phone, genderS, "1", 0);
+                    todo1_id = db.createToDo(title, name, surname, bdate, city, street, number, email, phone, genderS, "1", 0);
 
                     if(todo1_id > 0){
                         db.createContactHistory(todo1_id, 1, null);
@@ -171,7 +176,7 @@ public class ThirdActivity extends AppCompatActivity implements OnClickListener 
                 }
                 else
                 {
-                    todo1_id = db.updateToDo(Integer.parseInt(personId), title, name, surname, borndate, city, street, number, email, phone, genderS, "1");
+                    todo1_id = db.updateToDo(Integer.parseInt(personId), title, name, surname, bdate, city, street, number, email, phone, genderS, "1");
                 }
                 et = (EditText) findViewById(R.id.edSurname);
 
@@ -214,7 +219,7 @@ public class ThirdActivity extends AppCompatActivity implements OnClickListener 
 
         bornDateEtxt.setOnClickListener(this);
 
-        Calendar newCalendar = Calendar.getInstance();
+        newCalendar = Calendar.getInstance();
         bornDatePickerDialog = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
 
             public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {

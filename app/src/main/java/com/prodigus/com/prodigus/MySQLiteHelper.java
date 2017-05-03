@@ -402,7 +402,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 
     public Cursor getMonthStatistics(int attribute, int step, String user)
     {
-        String selectQuery = "SELECT strftime('%m.%Y',date('now','start of month','" + step * (-1) + " month')) month, count(*) cnt FROM " + TABLE_STATS + " WHERE " + COLUMN_ATTRIBUTE + " = " + attribute + " AND date(" + COLUMN_DATE + ") <  DATE('now', 'start of month','" + step * (-1) + " month', '-1 day') AND date(" + COLUMN_DATE + ")  >  DATE('now', 'start of month', ' " + step * (-1) + " month') AND " + COLUMN_USER + " = '" + user + "'";
+        String selectQuery = "SELECT strftime('%m.%Y',date('now','start of month','" + step * (-1) + " month')) month, count(*) cnt FROM " + TABLE_STATS + " WHERE " + COLUMN_ATTRIBUTE + " = " + attribute + " AND date(" + COLUMN_DATE + ") <  DATE('now', 'start of month','" + step * (-1) + " month', '-1 day') AND date(" + COLUMN_DATE + ")  >  DATE('now', 'start of month', ' \" + step * (-1) + \" month') AND " + COLUMN_USER + " = '" + user + "'";
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
         return cursor;
@@ -470,14 +470,14 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     //endregion
 
     //region Insert SQL
-    public long createToDo(String title, String name, String surname, Date borndate, String city, String street, String number, String email, String phone, String gender, String attribute, int clientId) {
+    public long createToDo(String title, String name, String surname, String borndate, String city, String street, String number, String email, String phone, String gender, String attribute, int clientId) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
         values.put(FeedEntry.COLUMN_TITLE, title);
         values.put(FeedEntry.COLUMN_NAME,name);
         values.put(FeedEntry.COLUMN_SURNAME,surname);
-        values.put(FeedEntry.COLUMN_BORNDATE,borndate.toString());
+        values.put(FeedEntry.COLUMN_BORNDATE,borndate);
         values.put(FeedEntry.COLUMN_CITY,city);
         values.put(FeedEntry.COLUMN_STREET,street);
         values.put(FeedEntry.COLUMN_NUMBER,number);
@@ -569,7 +569,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         return todo_id;
     }
 
-    public long createNote(String text, String person, long attribute)
+    public long createNote(String text, String person, long attribute, Date meetingDate)
     {
         /*
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy hh:mm:ss");
@@ -594,14 +594,14 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         int seconds = calendar.get(Calendar.YEAR);
         String curTime = hours + "." + minutes + "." + seconds;*/
 
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:MM:SS");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         Date now = new Date();
         now.getDate();
 
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(FeedReaderContract.Notes.COLUMN_NOTE_TEXT , text);
-        values.put(FeedReaderContract.Notes.COLUMN_NOTE_DATEC, sdf.format(now));
+        values.put(FeedReaderContract.Notes.COLUMN_NOTE_DATEC, sdf.format(meetingDate));
         values.put(FeedReaderContract.Notes.COLUMN_NOTE_PERSON, person);
         values.put(FeedReaderContract.Notes.COLUMN_NOTE_ATTRIBUTE, attribute);
 
@@ -642,14 +642,14 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     //endregion
 
     //region Update SQL
-    public long updateToDo(int personId, String title, String name, String surname, Date borndate, String city, String street, String number, String email, String phone, String gender, String attribute) {
+    public long updateToDo(int personId, String title, String name, String surname, String borndate, String city, String street, String number, String email, String phone, String gender, String attribute) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
         values.put(FeedEntry.COLUMN_TITLE, title);
         values.put(FeedEntry.COLUMN_NAME,name);
         values.put(FeedEntry.COLUMN_SURNAME,surname);
-        values.put(FeedEntry.COLUMN_BORNDATE,borndate.toString());
+        values.put(FeedEntry.COLUMN_BORNDATE,borndate);
         values.put(FeedEntry.COLUMN_CITY,city);
         values.put(FeedEntry.COLUMN_STREET,street);
         values.put(FeedEntry.COLUMN_NUMBER,number);
@@ -753,6 +753,12 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         db.delete(FeedEntry.TABLE_NAME, null, null);
         db.delete(TABLE_conStateHistory, null, null);
         db.delete(TABLE_USERS, null, null);
+        //db.delete(TABLE_STATS, null, null);
+    }
+
+    public void deleteStats()
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_STATS, null, null);
     }
 

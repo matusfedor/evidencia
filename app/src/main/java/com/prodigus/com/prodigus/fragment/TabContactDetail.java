@@ -17,6 +17,7 @@ package com.prodigus.com.prodigus.fragment;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
@@ -34,6 +35,9 @@ import com.prodigus.com.prodigus.MySQLiteHelper;
 import com.prodigus.com.prodigus.R;
 import com.prodigus.com.prodigus.SecondActivity;
 import com.prodigus.com.prodigus.ThirdActivity;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 
 public class TabContactDetail extends Fragment {
 
@@ -54,6 +58,9 @@ public class TabContactDetail extends Fragment {
 
         View v = (RelativeLayout) inflater.inflate(R.layout.activity_tab_contact_detail, container, false);
 
+        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+        String dad = DatabaseUtils.dumpCursorToString(cursor);
+
         if(personId != null) {
             TextView title = (TextView) v.findViewById(R.id.degree);
             setVisibility(title, cursor.getString(cursor.getColumnIndex("title")), true);
@@ -65,8 +72,10 @@ public class TabContactDetail extends Fragment {
             email.setText(cursor.getString(cursor.getColumnIndex("email")));
             TextView phone = (TextView) v.findViewById(R.id.phone);
             phone.setText(cursor.getString(cursor.getColumnIndex("phone")));
-            //TextView borndate = (TextView) v.findViewById(R.id.dateBirth);
-            //borndate.setText(cursor.getString( cursor.getColumnIndex("borndate")));
+            TextView borndate = (TextView) v.findViewById(R.id.dateBirth);
+
+            borndate.setText(cursor.getString(cursor.getColumnIndex("borndate")));
+
             TextView city = (TextView) v.findViewById(R.id.city);
             setVisibility(city, cursor.getString(cursor.getColumnIndex("city")), false);
             TextView street = (TextView) v.findViewById(R.id.street);
