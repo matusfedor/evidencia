@@ -218,6 +218,7 @@ public class TabContactMeetings extends Fragment {
     private List getNotesList(String attribute)
     {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+        SimpleDateFormat dateFormatterRead = new SimpleDateFormat("yyyy-MM-dd");
 
         List<ChildItems> notes = new ArrayList<ChildItems>();
         Cursor c = db.getNotesByAttribute(attribute, parseInt(personId));
@@ -225,7 +226,7 @@ public class TabContactMeetings extends Fragment {
         {
             try
             {
-                notes.add(new ChildItems(c.getInt(c.getColumnIndex("_id")), c.getString(c.getColumnIndex("datec")) + " " + c.getString(c.getColumnIndex("notetext"))));
+                notes.add(new ChildItems(c.getInt(c.getColumnIndex("_id")), dateFormat.format(dateFormatterRead.parse(c.getString(c.getColumnIndex("datec")))) + " " + c.getString(c.getColumnIndex("notetext"))));
             }
             catch (Exception e) {
                 Log.e("LogMarks", "Error " + e.toString());

@@ -392,9 +392,10 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
                 int att_id = Integer.parseInt(s_deals.getProperty(0).toString());
                 String noteText = s_deals.getProperty(2).toString();
                 Date creation = dateFormat.parse(s_deals.getProperty(3).toString());
+                int serverId = Integer.parseInt(s_deals.getProperty(4).toString());
                 //Date creation = dateFormat2.parse(s_deals.getProperty(3).toString());
 
-                long todo1_id = db.createSyncNote(noteText, con_id, att_id, creation);
+                long todo1_id = db.createSyncNote(noteText, con_id, att_id, creation, serverId);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -1147,8 +1148,10 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
         int attribute = 0;
         Date creation = null;
 
-        String pattern = "dd.MM.yyyy";
+        //String pattern = "dd.MM.yyyy";
+        String pattern = "yyyy-MM-dd";
         SimpleDateFormat format = new SimpleDateFormat(pattern);
+        SimpleDateFormat formatDate = new SimpleDateFormat("dd.MM.yyyy");
 
         Cursor cursor = db.getSyncNotes();
         while (cursor.moveToNext()) {
@@ -1157,6 +1160,7 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
             attribute = cursor.getInt(cursor.getColumnIndexOrThrow("attribute"));
 
             String s = cursor.getString(cursor.getColumnIndexOrThrow("datec"));
+            int cin_id = cursor.getInt(cursor.getColumnIndexOrThrow("cin_id"));
 
             try {
                 creation = format.parse(s);
@@ -1167,7 +1171,7 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
 
             //creation = new Date(cursor.getLong(cursor.getColumnIndexOrThrow("datec")));
 
-            sendNotes(noteText, clientId, attribute, creation);
+            sendNotes(noteText, clientId, attribute, creation, cin_id);
         }
         cursor.close();
     }
@@ -1241,7 +1245,10 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
         }
     }
 
-    public void sendNotes(String noteText, int clientId, int attribute, Date creation) {
+    public void sendNotes(String noteText, int clientId, int attribute, Date creation, int cin_id) {
+        //SimpleDateFormat sdateFormat = new SimpleDateFormat("dd.MM.yyyy");
+        //SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+
         String logname = "";
         String pin = "";
         Cursor c = db.getAuth();
@@ -1279,10 +1286,16 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
         personInfo4.setValue(noteText);
         personInfo4.setType(String.class);
 
+        PropertyInfo personInfo5 = new PropertyInfo();
+        personInfo5.setName("cinId");
+        personInfo5.setValue(cin_id);
+        personInfo5.setType(int.class);
+
         request.addProperty(personInfo);
         request.addProperty(personInfo2);
         request.addProperty(personInfo3);
         request.addProperty(personInfo4);
+        request.addProperty(personInfo5);
 
         //Create envelope
         SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
