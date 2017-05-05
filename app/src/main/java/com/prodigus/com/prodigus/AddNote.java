@@ -139,7 +139,7 @@ public class AddNote extends AppCompatActivity implements View.OnClickListener {
                 int numberOfGreater = 0;
 
                 if(newNoteStatus > statusList) {
-                    db.updateStatus(parseInt(personID), meetingTypeInt);
+                    db.updateStatus(parseInt(personID), meetingTypeInt, meetingDateValue);
                     Toast.makeText(getApplicationContext(), "Status bol zmeneny", Toast.LENGTH_LONG).show();
                 }
                 /*

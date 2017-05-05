@@ -62,7 +62,6 @@ public class SecondActivity extends AppCompatActivity
         setContentView(R.layout.activity_contact);
 
         db = new MySQLiteHelper(getApplicationContext());
-        //getActionBar().setDisplayHomeAsUpEnabled(true);
 
         Intent intent = getIntent();
         String itemText = intent.getStringExtra("item");

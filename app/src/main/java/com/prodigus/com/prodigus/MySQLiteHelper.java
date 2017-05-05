@@ -268,10 +268,10 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         String selectQuery;
         if(searchText != null)
         {
-            selectQuery = "SELECT _id, name, surname, title, city FROM " + TABLE_COMMENTS + " WHERE attribute like '%" + attribute + "%' and (name like '%" + searchText + "%' or surname like '%" + searchText + "%')";
+            selectQuery = "SELECT _id, name, surname, title, city FROM " + TABLE_COMMENTS + " WHERE attribute = '" + attribute + "' and (name like '%" + searchText + "%' or surname like '%" + searchText + "%')";
         }
         else {
-            selectQuery = "SELECT _id, name, surname, title, city FROM " + TABLE_COMMENTS + " WHERE attribute like '%" + attribute + "%'";
+            selectQuery = "SELECT _id, name, surname, title, city FROM " + TABLE_COMMENTS + " WHERE attribute = '" + attribute + "'";
         }
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
@@ -379,7 +379,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     }
 
     public Cursor getWeekStatistics(int attribute, int step) {
-        String selectQuery = "SELECT strftime('%W.%Y',date('now','" + step * (-7) + " days')) week, count(*) cnt FROM contactStateHistory WHERE con_state = " + attribute + " AND date(change_date)  <  DATE('now', 'weekday 1','" + step * (-7) + " days') AND date(change_date)  >  DATE('now', 'weekday 1', ' " + -7 * (step + 1) + " days')";
+        String selectQuery = "SELECT strftime('%W.%Y',date('now','" + step * (-7) + " days')) week, count(*) cnt FROM contactStateHistory WHERE con_state = " + attribute + " AND date(change_date)  <  DATE('now', 'weekday 1','" + step * (-7) + " days') AND date(change_date)  >  DATE('now', 'weekday 1', '" + -7 * (step + 1) + " days')";
 
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
@@ -395,7 +395,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     }
 
     public Cursor getMonthStatistics(int attribute, int step) {
-        String selectQuery = "SELECT strftime('%m.%Y',date('now','start of month','" + step * (-1) + " month')) month, count(*) cnt FROM contactStateHistory WHERE con_state = " + attribute + " AND date(change_date)  <  DATE('now', 'start of month','" + step * (-1) + " month', '-1 day') AND date(change_date)  >  DATE('now', 'start of month', ' " + step * (-1) + " month')";
+        String selectQuery = "SELECT strftime('%m.%Y',date('now','start of month','" + step * (-1) + " month')) month, count(*) cnt FROM contactStateHistory WHERE con_state = " + attribute + " AND date(change_date)  >  DATE('now', 'start of month','" + (step + 1) * (-1) + " month', '-1 day') AND date(change_date)  <  DATE('now', 'start of month', '" + (2 - (step * (-1))) + " month')";
 
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
@@ -404,7 +404,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 
     public Cursor getMonthStatistics(int attribute, int step, String user)
     {
-        String selectQuery = "SELECT strftime('%m.%Y',date('now','start of month','" + step * (-1) + " month')) month, count(*) cnt FROM " + TABLE_STATS + " WHERE " + COLUMN_ATTRIBUTE + " = " + attribute + " AND date(" + COLUMN_DATE + ") <  DATE('now', 'start of month','" + step * (-1) + " month', '-1 day') AND date(" + COLUMN_DATE + ")  >  DATE('now', 'start of month', ' \" + step * (-1) + \" month') AND " + COLUMN_USER + " = '" + user + "'";
+        String selectQuery = "SELECT strftime('%m.%Y',date('now','start of month','" + step * (-1) + " month')) month, count(*) cnt FROM " + TABLE_STATS + " WHERE " + COLUMN_ATTRIBUTE + " = " + attribute + " AND date(" + COLUMN_DATE + ") >  DATE('now', 'start of month','" + (step + 1) * (-1) + " month', '-1 day') AND date(" + COLUMN_DATE + ")  <  DATE('now', 'start of month', '" + (step) * (-1) + " month') AND " + COLUMN_USER + " = '" + user + "'";
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
         return cursor;
@@ -694,14 +694,14 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         return todo_id;
     }
 
-    public long updateStatus(int personId, int attribute) {
+    public long updateStatus(int personId, int attribute, Date meetingDate) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
         values.put(FeedEntry.COLUMN_ATTRIBUTE, attribute);
         long todo_id = db.update(FeedEntry.TABLE_NAME, values, "_id=" + personId, null);
 
-        createContactHistory(personId, attribute, new Date());
+        createContactHistory(personId, attribute, meetingDate);
 
         return todo_id;
     }

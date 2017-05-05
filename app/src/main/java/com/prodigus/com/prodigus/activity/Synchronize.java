@@ -1480,7 +1480,7 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
         @Override
         protected void onProgressUpdate(Integer... values) {
             Log.i(TAG, "onProgressUpdate");
-            progressBar.setProgress(values[0]);
+            progressBarStat.setProgress(values[0]);
         }
 
     }
