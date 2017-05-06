@@ -375,7 +375,7 @@ public class TabStatMonth extends Fragment {
         Cursor authCursor = db.getAuth();
 
         // We start creating the XYSeries to plot the temperature
-        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+        SimpleDateFormat sdf = new SimpleDateFormat("MM.yyyy");
         TimeSeries seriesAfa = new TimeSeries("Denný graf Anketa finančná analýza");
         TimeSeries seriesTelk = new TimeSeries("Denný graf Telefonický hovor s kontaktom");
         TimeSeries seriesTerm = new TimeSeries("Denný graf Termín");
@@ -399,6 +399,9 @@ public class TabStatMonth extends Fragment {
                     } catch (Exception e) {
                         Log.i("", e.getMessage());
                     }
+                    finally {
+                        c.close();
+                    }
                 }
             }
         }
@@ -408,8 +411,7 @@ public class TabStatMonth extends Fragment {
             for(int s = 0; s < 30; s++)
             {
                 Cursor c = db.getMonthStatistics(6,s, selectedUser);
-                while (c.moveToNext())
-                {
+
                     try
                     {
                         seriesTelk.add(sdf.parse(c.getString(c.getColumnIndex("datum"))),c.getDouble(c.getColumnIndex("cnt")));
@@ -422,7 +424,10 @@ public class TabStatMonth extends Fragment {
                     catch (Exception e) {
                         Log.i("",e.getMessage());
                     }
-                }
+                    finally {
+                        c.close();
+                    }
+
             }
         }
 
@@ -431,8 +436,7 @@ public class TabStatMonth extends Fragment {
             for(int s = 0; s < 30; s++)
             {
                 Cursor c = db.getMonthStatistics(15,s, selectedUser);
-                while (c.moveToNext())
-                {
+
                     try
                     {
                         seriesTerm.add(sdf.parse(c.getString(c.getColumnIndex("datum"))),c.getDouble(c.getColumnIndex("cnt")));
@@ -445,7 +449,10 @@ public class TabStatMonth extends Fragment {
                     catch (Exception e) {
                         Log.i("",e.getMessage());
                     }
-                }
+                    finally {
+                        c.close();
+                    }
+
             }
         }
 
@@ -453,7 +460,7 @@ public class TabStatMonth extends Fragment {
         {
             for(int s = 0; s < 30; s++) {
                 Cursor c = db.getMonthStatistics(16,s, selectedUser);
-                while (c.moveToNext()) {
+
                     try {
                         seriesFa.add(sdf.parse(c.getString(c.getColumnIndex("datum"))), c.getDouble(c.getColumnIndex("cnt")));
 
@@ -463,7 +470,10 @@ public class TabStatMonth extends Fragment {
                     } catch (Exception e) {
                         Log.i("", e.getMessage());
                     }
-                }
+                    finally {
+                        c.close();
+                    }
+
             }
         }
 
@@ -472,8 +482,7 @@ public class TabStatMonth extends Fragment {
             for(int s = 0; s < 30; s++)
             {
                 Cursor c = db.getMonthStatistics(2,s, selectedUser);
-                while (c.moveToNext())
-                {
+
                     try
                     {
                         seriesPk.add(sdf.parse(c.getString(c.getColumnIndex("datum"))),c.getDouble(c.getColumnIndex("cnt")));
@@ -486,7 +495,10 @@ public class TabStatMonth extends Fragment {
                     catch (Exception e) {
                         Log.i("",e.getMessage());
                     }
-                }
+                    finally {
+                        c.close();
+                    }
+
             }
         }
 
@@ -495,8 +507,7 @@ public class TabStatMonth extends Fragment {
             for(int s = 0; s < 30; s++)
             {
                 Cursor c = db.getMonthStatistics(1,s, selectedUser);
-                while (c.moveToNext())
-                {
+
                     try
                     {
                         seriesKlient.add(sdf.parse(c.getString(c.getColumnIndex("datum"))),c.getDouble(c.getColumnIndex("cnt")));
@@ -509,7 +520,10 @@ public class TabStatMonth extends Fragment {
                     catch (Exception e) {
                         Log.i("",e.getMessage());
                     }
-                }
+                    finally {
+                        c.close();
+                    }
+
             }
         }
 

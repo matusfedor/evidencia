@@ -1460,7 +1460,7 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
         @Override
         protected void onPostExecute(String result) {
             Log.i(TAG, "onPostExecute");
-            tvResult.setText(result);
+            tvResultStat.setText(result);
             //progressBar.setVisibility(View.GONE);
             //Button btnAkt = (Button) findViewById(R.id.btnAkt);
             //btnAkt.setText("AktualizĂˇcia Ăşdajov");
@@ -1520,9 +1520,9 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
         int id = item.getItemId();
 
         if (id == R.id.nav_contacts) {
-            startActivity(new Intent(Synchronize.this, SecondActivity.class));
+            startActivity(new Intent(Synchronize.this, MainActivity.class));
         } else if (id == R.id.nav_pzp) {
-            startActivity(new Intent(Synchronize.this, TabContactMain.class));
+
         } else if (id == R.id.nav_statistics) {
             startActivity(new Intent(Synchronize.this, TabStatistics.class));
         } else if (id == R.id.nav_sync) {

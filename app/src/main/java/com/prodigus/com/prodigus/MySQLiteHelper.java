@@ -294,10 +294,12 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         String selectQuery;
         if(searchText != null)
         {
-            selectQuery = "SELECT distinct cl_attribute._id, att_sc, att_full FROM " + TABLE_ATTRIBUTE + " INNER JOIN " + TABLE_COMMENTS + " ON cl_attribute._id = clients.attribute WHERE " + COLUMN_SURNAME + " LIKE '%" + searchText + "%' or " + COLUMN_NAME + " LIKE '%" + searchText + "%'";
+            //selectQuery = "SELECT distinct cl_attribute._id, att_sc, att_full FROM " + TABLE_ATTRIBUTE + " INNER JOIN " + TABLE_COMMENTS + " ON cl_attribute._id = clients.attribute WHERE " + COLUMN_SURNAME + " LIKE '%" + searchText + "%' or " + COLUMN_NAME + " LIKE '%" + searchText + "%'";
+            selectQuery = "SELECT cl_attribute._id, att_sc, att_full, count(clients.attribute) cnt FROM cl_attribute INNER JOIN clients ON cl_attribute._id = clients.attribute GROUP BY clients.attribute WHERE " + COLUMN_SURNAME + " LIKE '%" + searchText + "%' or " + COLUMN_NAME + " LIKE '%" + searchText + "%'";
         }
         else {
-            selectQuery = "SELECT distinct cl_attribute._id, att_sc, att_full FROM " + TABLE_ATTRIBUTE + " INNER JOIN " + TABLE_COMMENTS + " ON cl_attribute._id = clients.attribute";
+            //selectQuery = "SELECT distinct cl_attribute._id, att_sc, att_full FROM " + TABLE_ATTRIBUTE + " INNER JOIN " + TABLE_COMMENTS + " ON cl_attribute._id = clients.attribute";
+            selectQuery = "SELECT cl_attribute._id, att_sc, att_full, count(clients.attribute) cnt FROM cl_attribute INNER JOIN clients ON cl_attribute._id = clients.attribute GROUP BY clients.attribute";
         }
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
@@ -395,7 +397,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     }
 
     public Cursor getMonthStatistics(int attribute, int step) {
-        String selectQuery = "SELECT strftime('%m.%Y',date('now','start of month','" + step * (-1) + " month')) month, count(*) cnt FROM contactStateHistory WHERE con_state = " + attribute + " AND date(change_date)  >  DATE('now', 'start of month','" + (step + 1) * (-1) + " month', '-1 day') AND date(change_date)  <  DATE('now', 'start of month', '" + (2 - (step * (-1))) + " month')";
+        String selectQuery = "SELECT strftime('%m.%Y',date('now','start of month','" + step * (-1) + " month')) month, count(*) cnt FROM contactStateHistory WHERE con_state = " + attribute + " AND date(change_date)  >  DATE('now', 'start of month','" + (step) * (-1) + " month', '-1 day') AND date(change_date)  <  DATE('now', 'start of month', '" + (1 - step) + " month')";
 
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
@@ -404,7 +406,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 
     public Cursor getMonthStatistics(int attribute, int step, String user)
     {
-        String selectQuery = "SELECT strftime('%m.%Y',date('now','start of month','" + step * (-1) + " month')) month, count(*) cnt FROM " + TABLE_STATS + " WHERE " + COLUMN_ATTRIBUTE + " = " + attribute + " AND date(" + COLUMN_DATE + ") >  DATE('now', 'start of month','" + (step + 1) * (-1) + " month', '-1 day') AND date(" + COLUMN_DATE + ")  <  DATE('now', 'start of month', '" + (step) * (-1) + " month') AND " + COLUMN_USER + " = '" + user + "'";
+        String selectQuery = "SELECT strftime('%m.%Y',date('now','start of month','" + step * (-1) + " month')) month, count(*) cnt FROM " + TABLE_STATS + " WHERE " + COLUMN_ATTRIBUTE + " = " + attribute + " AND date(" + COLUMN_DATE + ") >  DATE('now', 'start of month','" + (step) * (-1) + " month', '-1 day') AND date(" + COLUMN_DATE + ")  <  DATE('now', 'start of month', '" + (1 - step) + " month') AND " + COLUMN_USER + " = '" + user + "'";
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
         return cursor;
