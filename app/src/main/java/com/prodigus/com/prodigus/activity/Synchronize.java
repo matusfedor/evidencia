@@ -1,5 +1,6 @@
 package com.prodigus.com.prodigus.activity;
 
+import android.content.SharedPreferences;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.NavUtils;
 import android.support.v4.view.GravityCompat;
@@ -393,9 +394,10 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
                 String noteText = s_deals.getProperty(2).toString();
                 Date creation = dateFormat.parse(s_deals.getProperty(3).toString());
                 int serverId = Integer.parseInt(s_deals.getProperty(4).toString());
+
                 //Date creation = dateFormat2.parse(s_deals.getProperty(3).toString());
 
-                long todo1_id = db.createSyncNote(noteText, con_id, att_id, creation, serverId);
+                long todo1_id = db.createSyncNote(noteText, con_id, att_id, creation, serverId,0);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -1161,6 +1163,7 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
 
             String s = cursor.getString(cursor.getColumnIndexOrThrow("datec"));
             int cin_id = cursor.getInt(cursor.getColumnIndexOrThrow("cin_id"));
+            int status = cursor.getInt(cursor.getColumnIndexOrThrow("status"));
 
             try {
                 creation = format.parse(s);
@@ -1171,7 +1174,7 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
 
             //creation = new Date(cursor.getLong(cursor.getColumnIndexOrThrow("datec")));
 
-            sendNotes(noteText, clientId, attribute, creation, cin_id);
+            sendNotes(noteText, clientId, attribute, creation, cin_id, status);
         }
         cursor.close();
     }
@@ -1245,7 +1248,7 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
         }
     }
 
-    public void sendNotes(String noteText, int clientId, int attribute, Date creation, int cin_id) {
+    public void sendNotes(String noteText, int clientId, int attribute, Date creation, int cin_id, int status) {
         //SimpleDateFormat sdateFormat = new SimpleDateFormat("dd.MM.yyyy");
         //SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
@@ -1291,11 +1294,17 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
         personInfo5.setValue(cin_id);
         personInfo5.setType(int.class);
 
+        PropertyInfo personInfo6 = new PropertyInfo();
+        personInfo6.setName("status");
+        personInfo6.setValue(status);
+        personInfo6.setType(int.class);
+
         request.addProperty(personInfo);
         request.addProperty(personInfo2);
         request.addProperty(personInfo3);
         request.addProperty(personInfo4);
         request.addProperty(personInfo5);
+        request.addProperty(personInfo6);
 
         //Create envelope
         SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
@@ -1530,6 +1539,10 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
         } else if (id == R.id.nav_share) {
 
         } else if (id == R.id.nav_logout) {
+            SharedPreferences sharedPref = getApplicationContext().getSharedPreferences("userdetails", MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putInt(getString(R.string.isLogged), 0);
+            editor.commit();
             startActivity(new Intent(Synchronize.this, LoginActivity.class));
         }
 

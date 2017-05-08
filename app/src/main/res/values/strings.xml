@@ -39,6 +39,7 @@
     <string name="title_activity_tab_contact_main">Kontakty</string>
     <string name="section_format">Hello World from section: %1$d</string>
     <string name="title_activity_tab_statistics">Štatistiky</string>
+    <string name="isLogged">isLogged</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment"></string>

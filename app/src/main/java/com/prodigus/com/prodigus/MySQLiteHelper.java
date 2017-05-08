@@ -50,6 +50,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     public static final String COLUMN_NOTE_PERSON = "person";
     public static final String COLUMN_NOTE_ATTRIBUTE = "attribute";
     public static final String COLUMN_NOTE_SERVER_ID = "cin_id";
+    public static final String COLUMN_NOTE_STATUS = "status";
     //endregion
 
     //region Contact State History
@@ -78,7 +79,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     //endregion
 
     private static final String DATABASE_NAME = "contact.db";
-    private static final int DATABASE_VERSION = 18;
+    private static final int DATABASE_VERSION = 19;
 
     public MySQLiteHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -154,7 +155,8 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
             + COLUMN_NOTE_DATEC + " numeric,"
             + COLUMN_NOTE_PERSON + " text not null, "
             + COLUMN_NOTE_ATTRIBUTE + " text not null,"
-            + COLUMN_NOTE_SERVER_ID + " integer) ";
+            + COLUMN_NOTE_SERVER_ID + " integer,"
+            + COLUMN_NOTE_STATUS + " integer)";
 
     private static final String TABLE_STATISTICS =  "create table "
             + TABLE_STATS + "(" + COLUMN_STAT_ID + " integer primary key autoincrement, "
@@ -188,29 +190,26 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         return cursor;
     }
 
-    public int getPersonsStatuses(Integer personID) {
+    public Genders getPersonsStatuses(Integer personID) {
         List<Integer> statusList = new ArrayList<Integer>();
         // Select All Query
-        String selectQuery = "SELECT MAX(con_state) FROM " + TABLE_conStateHistory + " WHERE con_id = " + personID;
+        //String selectQuery = "SELECT MAX(con_state) FROM " + TABLE_conStateHistory + " WHERE con_id = " + personID;
+        String selectQuery = "SELECT max(att_status_order), change_date FROM " + TABLE_conStateHistory + " his INNER JOIN cl_attribute att ON his.con_state = att._id WHERE his.con_id = " + personID;
 
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
         cursor.moveToFirst();
 
-        if(cursor.getCount() != 0)
-        {
-            return cursor.getInt(0);
+        String i = cursor.getString(0);
+        if(i != null) {
+            return new Genders(cursor.getInt(0), cursor.getString(1));
         }
-        return 0;
-
-        // looping through all rows and adding to list
-        /*if (cursor.moveToFirst()) {
-            do {
-                statusList.add(cursor.getInt(0));
-            } while (cursor.moveToNext());
-        }*/
-
-        // return contact list
+        else
+        {
+            Calendar now = Calendar.getInstance();
+            now.add(Calendar.YEAR, -100);
+            return new Genders(0,new Date().toString());
+        }
     }
 
     public int GetAttributeOrder(int statusId) {
@@ -281,8 +280,8 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     public Cursor getNotesByAttribute(String attribute, int personId)
     {
         //String selectQuery = "SELECT _id, datec, notetext FROM " + TABLE_NOTES + " WHERE attribute like '%" + attribute + "%' and person = " + personId;
-        String selectQuery = "SELECT _id, datec, notetext FROM notes WHERE attribute = " + attribute + " and person = " + personId +
-        " UNION SELECT _id, datec, notetext FROM notes WHERE attribute = " + attribute + " and person = (SELECT clientId FROM clients WHERE _id = " + personId + ")";
+        String selectQuery = "SELECT _id, datec, notetext FROM notes WHERE attribute = " + attribute + " and person = " + personId + " and notes.status !=3 " +
+        " UNION SELECT _id, datec, notetext FROM notes WHERE attribute = " + attribute + " and person = (SELECT clientId FROM clients WHERE _id = " + personId + ") and notes.status !=3  ";
 
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
@@ -295,7 +294,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         if(searchText != null)
         {
             //selectQuery = "SELECT distinct cl_attribute._id, att_sc, att_full FROM " + TABLE_ATTRIBUTE + " INNER JOIN " + TABLE_COMMENTS + " ON cl_attribute._id = clients.attribute WHERE " + COLUMN_SURNAME + " LIKE '%" + searchText + "%' or " + COLUMN_NAME + " LIKE '%" + searchText + "%'";
-            selectQuery = "SELECT cl_attribute._id, att_sc, att_full, count(clients.attribute) cnt FROM cl_attribute INNER JOIN clients ON cl_attribute._id = clients.attribute GROUP BY clients.attribute WHERE " + COLUMN_SURNAME + " LIKE '%" + searchText + "%' or " + COLUMN_NAME + " LIKE '%" + searchText + "%'";
+            selectQuery = "SELECT cl_attribute._id, att_sc, att_full, count(clients.attribute) cnt FROM cl_attribute INNER JOIN clients ON cl_attribute._id = clients.attribute WHERE " + COLUMN_SURNAME + " LIKE '%" + searchText + "%' or " + COLUMN_NAME + " LIKE '%" + searchText + "%' GROUP BY clients.attribute";
         }
         else {
             //selectQuery = "SELECT distinct cl_attribute._id, att_sc, att_full FROM " + TABLE_ATTRIBUTE + " INNER JOIN " + TABLE_COMMENTS + " ON cl_attribute._id = clients.attribute";
@@ -308,8 +307,8 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 
     public Cursor getAllNoteMarks(int personID)
     {
-        String selectQuery = "SELECT distinct cl_attribute._id _id, att_sc, att_full FROM " + TABLE_ATTRIBUTE + " INNER JOIN " + TABLE_NOTES + " ON cl_attribute._id = notes.attribute" + " WHERE notes.person = " + personID +
-                " UNION SELECT distinct cl_attribute._id _id, att_sc, att_full FROM cl_attribute INNER JOIN notes ON cl_attribute._id = notes.attribute WHERE notes.person = (SELECT clientId from clients where _id = " + personID + ")";
+        String selectQuery = "SELECT distinct cl_attribute._id _id, att_sc, att_full FROM " + TABLE_ATTRIBUTE + " INNER JOIN " + TABLE_NOTES + " ON cl_attribute._id = notes.attribute" + " WHERE notes.person = " + personID + " and notes.status !=3 " +
+                " UNION SELECT distinct cl_attribute._id _id, att_sc, att_full FROM cl_attribute INNER JOIN notes ON cl_attribute._id = notes.attribute WHERE notes.person = (SELECT clientId from clients where _id = " + personID + ") and notes.status !=3 ";
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
         return cursor;
@@ -414,7 +413,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 
     public Cursor getSyncNotes()
     {
-        String selectQuery = "SELECT _id, notetext, datec, person, attribute, cin_id FROM " + TABLE_NOTES;
+        String selectQuery = "SELECT _id, notetext, datec, person, attribute, cin_id, status FROM " + TABLE_NOTES;
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
         return cursor;
@@ -573,31 +572,8 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         return todo_id;
     }
 
-    public long createNote(String text, String person, long attribute, Date meetingDate)
+    public long createNote(String text, String person, long attribute, Date meetingDate, int status)
     {
-        /*
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy hh:mm:ss");
-
-        Date now = new Date();
-        now.getDate();
-
-        SimpleDateFormat format =
-                new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
-
-        //Date parsed = format.parse(now.toString());*/
-/*
-        Date dt = new Date();
-        int hours = dt.getDay();
-        int minutes = dt.getMonth();
-        int seconds = dt.getYear();
-        String curTime = hours + ":" + minutes + ":" + seconds;*/
-
-        /*Calendar calendar = Calendar.getInstance();
-        int hours = calendar.get(Calendar.DAY_OF_MONTH);
-        int minutes = calendar.get(Calendar.MONTH)+1;
-        int seconds = calendar.get(Calendar.YEAR);
-        String curTime = hours + "." + minutes + "." + seconds;*/
-
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         Date now = new Date();
         now.getDate();
@@ -609,13 +585,14 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         values.put(FeedReaderContract.Notes.COLUMN_NOTE_PERSON, person);
         values.put(FeedReaderContract.Notes.COLUMN_NOTE_ATTRIBUTE, attribute);
         values.put(FeedReaderContract.Notes.COLUMN_NOTE_SERVER_ID, 0);
+        values.put(FeedReaderContract.Notes.COLUMN_NOTE_STATUS, status);
 
         long todo_id = db.insert(FeedReaderContract.Notes.TABLE_NAME, null, values);
 
         return todo_id;
     }
 
-    public long createSyncNote(String text, int person, int attribute, Date dateNote, int serverId)
+    public long createSyncNote(String text, int person, int attribute, Date dateNote, int serverId, int status)
     {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:MM:SS");
 
@@ -627,6 +604,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         values.put(FeedReaderContract.Notes.COLUMN_NOTE_PERSON, person);
         values.put(FeedReaderContract.Notes.COLUMN_NOTE_ATTRIBUTE, attribute);
         values.put(FeedReaderContract.Notes.COLUMN_NOTE_SERVER_ID, serverId);
+        values.put(FeedReaderContract.Notes.COLUMN_NOTE_STATUS, status);
 
         long todo_id = db.insert(FeedReaderContract.Notes.TABLE_NAME, null, values);
 
@@ -708,12 +686,13 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         return todo_id;
     }
 
-    public long updateNote(int nodeId, String text, long attribute) {
+    public long updateNote(int nodeId, String text, long attribute, int status) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
         values.put(FeedReaderContract.Notes.COLUMN_NOTE_TEXT, text);
         values.put(FeedReaderContract.Notes.COLUMN_NOTE_ATTRIBUTE, attribute);
+        values.put(FeedReaderContract.Notes.COLUMN_NOTE_STATUS, status);
         long todo_id = db.update(FeedReaderContract.Notes.TABLE_NAME, values, "_id=" + nodeId, null);
         return todo_id;
     }
@@ -776,9 +755,30 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 
     public void delNote(String noteid)
     {
-        String deleteQuery = "_id = " + noteid;
-        SQLiteDatabase db = this.getWritableDatabase();
-        long todo_id = db.delete(FeedReaderContract.Notes.TABLE_NAME, deleteQuery, null);
+        String selectQuery = "SELECT cin_id FROM " + TABLE_NOTES + " WHERE _id = " + noteid;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        int cin_id = 0;
+
+        if (cursor.moveToFirst()) {
+            do {
+                cin_id = Integer.parseInt(cursor.getString(0));
+            } while (cursor.moveToNext());
+        }
+
+        SQLiteDatabase db2 = this.getWritableDatabase();
+        if(cin_id != 0)
+        {
+            ContentValues values = new ContentValues();
+            values.put(FeedReaderContract.Notes.COLUMN_NOTE_STATUS, 3);
+            db.update(FeedReaderContract.Notes.TABLE_NAME, values, "_id=" + noteid, null);
+        }
+        else
+        {
+            String deleteQuery = "_id = " + noteid;
+            db2.delete(FeedReaderContract.Notes.TABLE_NAME, deleteQuery, null);
+        }
     }
 
     //endregion

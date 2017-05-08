@@ -3,7 +3,9 @@ package com.prodigus.com.prodigus.activity;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
@@ -447,6 +449,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                             db.createAuth(mEmail, mPassword);
                         }
                         c.close();
+
+                        SharedPreferences sharedPref = getApplicationContext().getSharedPreferences("userdetails", MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sharedPref.edit();
+                        editor.putInt(getString(R.string.isLogged), 1);
+                        editor.commit();
+
                         return true;}
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -461,6 +469,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 c.close();
                 if(name != null) {
                     if (name.equals(mEmail) && pin.equals(mPassword)) {
+                        SharedPreferences sharedPref = getApplicationContext().getSharedPreferences("userdetails", MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sharedPref.edit();
+                        editor.putInt(getString(R.string.isLogged), 1);
+                        editor.commit();
                         return true;
                     }
                 }

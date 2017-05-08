@@ -3,6 +3,7 @@ package com.prodigus.com.prodigus.activity;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -107,7 +108,13 @@ public class MainActivity extends AppCompatActivity
 
         handleIntent(getIntent());
 
-        startActivity(new Intent(MainActivity.this, LoginActivity.class));
+        SharedPreferences userDetails = getApplicationContext().getSharedPreferences("userdetails", MODE_PRIVATE);
+        int isLogged = userDetails.getInt(getString(R.string.isLogged), 0);
+
+        if(isLogged == 0)
+        {
+            startActivity(new Intent(MainActivity.this, LoginActivity.class));
+        }
     }
 
     @Override
@@ -165,12 +172,26 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_share) {
 
         } else if (id == R.id.nav_logout) {
+            SharedPreferences sharedPref = getApplicationContext().getSharedPreferences("userdetails", MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putInt(getString(R.string.isLogged), 0);
+            editor.commit();
+
             startActivity(new Intent(MainActivity.this, LoginActivity.class));
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    protected void onStop() {
+        SharedPreferences sharedPref = getApplicationContext().getSharedPreferences("userdetails", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putInt(getString(R.string.isLogged), 0);
+
+        super.onStop();
     }
 
     //from second

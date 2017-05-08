@@ -110,11 +110,12 @@ public class AddNote extends AppCompatActivity implements View.OnClickListener {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                SimpleDateFormat dateFormatterStatus = new SimpleDateFormat("yyyy-MM-dd");
+
                 String noteIdScreen = ((TextView) findViewById(R.id.noteID)).getText().toString();
                 String note = ((EditText) findViewById(R.id.NoteText)).getText().toString();
                 Spinner meetingType = (Spinner) findViewById(R.id.meetingType);
                 String meetingDate = ((TextView) findViewById(R.id.edMeetingDate)).getText().toString();
-                //long meetingTypeString = meetingType.getSelectedItem();
                 int meetingTypeInt = ((Genders) meetingType.getSelectedItem()).getId();
 
                 Date meetingDateValue = new Date();
@@ -124,24 +125,45 @@ public class AddNote extends AppCompatActivity implements View.OnClickListener {
                 catch(Exception ex){}
 
                 if(noteIdScreen.isEmpty()) {
-                    long noteId = db.createNote(note, personID, meetingTypeInt, meetingDateValue);
+                    long noteId = db.createNote(note, personID, meetingTypeInt, meetingDateValue, 2);
                 }
                 else {
-                    long noteId = db.updateNote(Integer.parseInt(noteIdScreen), note, meetingTypeInt);
+                    long noteId = db.updateNote(Integer.parseInt(noteIdScreen), note, meetingTypeInt, 1);
                 }
 
                 ((EditText) findViewById(R.id.NoteText)).setText("");
                 Toast.makeText(getApplicationContext(), "Poznámka bola uložená", Toast.LENGTH_LONG).show();
 
                 //List<Integer> statusList = new ArrayList<Integer>();
-                int statusList = db.getPersonsStatuses(parseInt(personID));
+                Genders statusList = db.getPersonsStatuses(parseInt(personID));
+                //Date statusListDate = new Date();
+                Calendar statusListDate = Calendar.getInstance();
+                statusListDate.add(Calendar.YEAR, -100);
+                Date statusListDate2 = statusListDate.getTime();
+                try
+                {
+                    statusListDate2 = dateFormatterStatus.parse(statusList.getGen());
+                }
+                catch (ParseException pe)
+                    {}
+                catch (Exception ex)
+                {}
                 int newNoteStatus = db.GetAttributeOrder(meetingTypeInt);
                 int numberOfGreater = 0;
 
-                if(newNoteStatus > statusList) {
+                if(newNoteStatus > statusList.getId()) {
                     db.updateStatus(parseInt(personID), meetingTypeInt, meetingDateValue);
                     Toast.makeText(getApplicationContext(), "Status bol zmeneny", Toast.LENGTH_LONG).show();
                 }
+
+                if(statusList.getGen() != null)
+                {
+                    if(newNoteStatus == statusList.getId() && meetingDateValue.before(statusListDate2)) {
+                        db.updateStatus(parseInt(personID), meetingTypeInt, meetingDateValue);
+                        Toast.makeText(getApplicationContext(), "Status bol zmeneny", Toast.LENGTH_LONG).show();
+                    }
+                }
+
                 /*
                 if(todo1_id > 0)
                     Snackbar.make(view, "Záznam uložený", Snackbar.LENGTH_LONG)

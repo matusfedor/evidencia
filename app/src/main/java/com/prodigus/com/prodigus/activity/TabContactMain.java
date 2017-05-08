@@ -69,7 +69,7 @@ public class TabContactMain extends AppCompatActivity {
         int id = item.getItemId();
 
         if (id == android.R.id.home) {
-            Intent nextScreen = new Intent(getApplicationContext(), SecondActivity.class);
+            Intent nextScreen = new Intent(getApplicationContext(), MainActivity.class);
             startActivity(nextScreen);
             return true;
         }
