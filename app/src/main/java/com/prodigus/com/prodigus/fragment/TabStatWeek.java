@@ -198,7 +198,11 @@ public class TabStatWeek extends Fragment {
                     catch (Exception e) {
                         Log.i("",e.getMessage());
                     }
+                    finally {
+                        c.close();
+                    }
                 }
+                c.close();
             }
         }
 
@@ -216,7 +220,11 @@ public class TabStatWeek extends Fragment {
                     } catch (Exception e) {
                         Log.i("", e.getMessage());
                     }
+                    finally {
+                        c.close();
+                    }
                 }
+                c.close();
             }
         }
 
@@ -234,7 +242,11 @@ public class TabStatWeek extends Fragment {
                     } catch (Exception e) {
                         Log.i("", e.getMessage());
                     }
+                    finally {
+                        c.close();
+                    }
                 }
+                c.close();
             }
         }
 
@@ -251,7 +263,11 @@ public class TabStatWeek extends Fragment {
                     } catch (Exception e) {
                         Log.i("", e.getMessage());
                     }
+                    finally {
+                        c.close();
+                    }
                 }
+                c.close();
             }
         }
 
@@ -268,7 +284,11 @@ public class TabStatWeek extends Fragment {
                     } catch (Exception e) {
                         Log.i("", e.getMessage());
                     }
+                    finally {
+                        c.close();
+                    }
                 }
+                c.close();
             }
         }
 
@@ -285,7 +305,11 @@ public class TabStatWeek extends Fragment {
                     } catch (Exception e) {
                         Log.i("", e.getMessage());
                     }
+                    finally {
+                        c.close();
+                    }
                 }
+                c.close();
             }
         }
 

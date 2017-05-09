@@ -164,18 +164,19 @@ public class TabStatistics extends AppCompatActivity implements NavigationView.O
                     case 1:
                         tabStatWeek.setSelectedUser(name);
                         tabStatWeek.setLogUser(logUser);
-                        tabStatWeek.addViewChart(true);
+                        tabStatWeek.addViewChart(logUser.equals(name));
 
                         tabStatDay.setSelectedUser(name);
                         tabStatDay.setLogUser(logUser);
-                        tabStatDay.onResume();
+                        //tabStatDay.onResume();
                         tabStatMonth.setSelectedUser(name);
                         tabStatMonth.setLogUser(logUser);
+                        //tabStatMonth.onResume();
                         break;
                     case 2:
                         tabStatMonth.setSelectedUser(name);
                         tabStatMonth.setLogUser(logUser);
-                        tabStatMonth.addViewChart(true);
+                        tabStatMonth.addViewChart(logUser.equals(name));
 
                         tabStatDay.setSelectedUser(name);
                         tabStatDay.setLogUser(logUser);

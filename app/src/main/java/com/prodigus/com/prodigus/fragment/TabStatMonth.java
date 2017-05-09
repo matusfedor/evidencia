@@ -137,7 +137,11 @@ public class TabStatMonth extends Fragment {
                     catch (Exception e) {
                         Log.i("",e.getMessage());
                     }
+                    finally {
+                        c.close();
+                    }
                 }
+                c.close();
             }
         }
 
@@ -155,7 +159,11 @@ public class TabStatMonth extends Fragment {
                     } catch (Exception e) {
                         Log.i("", e.getMessage());
                     }
+                    finally {
+                        c.close();
+                    }
                 }
+                c.close();
             }
         }
 
@@ -173,7 +181,11 @@ public class TabStatMonth extends Fragment {
                     } catch (Exception e) {
                         Log.i("", e.getMessage());
                     }
+                    finally {
+                        c.close();
+                    }
                 }
+                c.close();
             }
         }
 
@@ -190,7 +202,11 @@ public class TabStatMonth extends Fragment {
                     } catch (Exception e) {
                         Log.i("", e.getMessage());
                     }
+                    finally {
+                        c.close();
+                    }
                 }
+                c.close();
             }
         }
 
@@ -207,7 +223,11 @@ public class TabStatMonth extends Fragment {
                     } catch (Exception e) {
                         Log.i("", e.getMessage());
                     }
+                    finally {
+                        c.close();
+                    }
                 }
+                c.close();
             }
         }
 
@@ -224,7 +244,11 @@ public class TabStatMonth extends Fragment {
                     } catch (Exception e) {
                         Log.i("", e.getMessage());
                     }
+                    finally {
+                        c.close();
+                    }
                 }
+                c.close();
             }
         }
 
@@ -372,8 +396,6 @@ public class TabStatMonth extends Fragment {
 
     private View createTempUserGraph() {
 
-        Cursor authCursor = db.getAuth();
-
         // We start creating the XYSeries to plot the temperature
         SimpleDateFormat sdf = new SimpleDateFormat("MM.yyyy");
         TimeSeries seriesAfa = new TimeSeries("Denný graf Anketa finančná analýza");
@@ -403,6 +425,7 @@ public class TabStatMonth extends Fragment {
                         c.close();
                     }
                 }
+                c.close();
             }
         }
 
@@ -411,23 +434,21 @@ public class TabStatMonth extends Fragment {
             for(int s = 0; s < 30; s++)
             {
                 Cursor c = db.getMonthStatistics(6,s, selectedUser);
+                try
+                {
+                    seriesTelk.add(sdf.parse(c.getString(c.getColumnIndex("datum"))),c.getDouble(c.getColumnIndex("cnt")));
 
-                    try
+                    if(c.getDouble(c.getColumnIndex("cnt")) > maxValue)
                     {
-                        seriesTelk.add(sdf.parse(c.getString(c.getColumnIndex("datum"))),c.getDouble(c.getColumnIndex("cnt")));
-
-                        if(c.getDouble(c.getColumnIndex("cnt")) > maxValue)
-                        {
-                            maxValue = c.getDouble(c.getColumnIndex("cnt"));
-                        }
+                        maxValue = c.getDouble(c.getColumnIndex("cnt"));
                     }
-                    catch (Exception e) {
-                        Log.i("",e.getMessage());
-                    }
-                    finally {
-                        c.close();
-                    }
-
+                }
+                catch (Exception e) {
+                    Log.i("",e.getMessage());
+                }
+                finally {
+                    c.close();
+                }
             }
         }
 
@@ -437,22 +458,21 @@ public class TabStatMonth extends Fragment {
             {
                 Cursor c = db.getMonthStatistics(15,s, selectedUser);
 
-                    try
+                try
+                {
+                    seriesTerm.add(sdf.parse(c.getString(c.getColumnIndex("datum"))),c.getDouble(c.getColumnIndex("cnt")));
+
+                    if(c.getDouble(c.getColumnIndex("cnt")) > maxValue)
                     {
-                        seriesTerm.add(sdf.parse(c.getString(c.getColumnIndex("datum"))),c.getDouble(c.getColumnIndex("cnt")));
-
-                        if(c.getDouble(c.getColumnIndex("cnt")) > maxValue)
-                        {
-                            maxValue = c.getDouble(c.getColumnIndex("cnt"));
-                        }
+                        maxValue = c.getDouble(c.getColumnIndex("cnt"));
                     }
-                    catch (Exception e) {
-                        Log.i("",e.getMessage());
-                    }
-                    finally {
-                        c.close();
-                    }
-
+                }
+                catch (Exception e) {
+                    Log.i("",e.getMessage());
+                }
+                finally {
+                    c.close();
+                }
             }
         }
 
@@ -461,19 +481,18 @@ public class TabStatMonth extends Fragment {
             for(int s = 0; s < 30; s++) {
                 Cursor c = db.getMonthStatistics(16,s, selectedUser);
 
-                    try {
-                        seriesFa.add(sdf.parse(c.getString(c.getColumnIndex("datum"))), c.getDouble(c.getColumnIndex("cnt")));
+                try {
+                    seriesFa.add(sdf.parse(c.getString(c.getColumnIndex("datum"))), c.getDouble(c.getColumnIndex("cnt")));
 
-                        if (c.getDouble(c.getColumnIndex("cnt")) > maxValue) {
-                            maxValue = c.getDouble(c.getColumnIndex("cnt"));
-                        }
-                    } catch (Exception e) {
-                        Log.i("", e.getMessage());
+                    if (c.getDouble(c.getColumnIndex("cnt")) > maxValue) {
+                        maxValue = c.getDouble(c.getColumnIndex("cnt"));
                     }
-                    finally {
-                        c.close();
-                    }
-
+                } catch (Exception e) {
+                    Log.i("", e.getMessage());
+                }
+                finally {
+                    c.close();
+                }
             }
         }
 
@@ -483,22 +502,21 @@ public class TabStatMonth extends Fragment {
             {
                 Cursor c = db.getMonthStatistics(2,s, selectedUser);
 
-                    try
+                try
+                {
+                    seriesPk.add(sdf.parse(c.getString(c.getColumnIndex("datum"))),c.getDouble(c.getColumnIndex("cnt")));
+
+                    if(c.getDouble(c.getColumnIndex("cnt")) > maxValue)
                     {
-                        seriesPk.add(sdf.parse(c.getString(c.getColumnIndex("datum"))),c.getDouble(c.getColumnIndex("cnt")));
-
-                        if(c.getDouble(c.getColumnIndex("cnt")) > maxValue)
-                        {
-                            maxValue = c.getDouble(c.getColumnIndex("cnt"));
-                        }
+                        maxValue = c.getDouble(c.getColumnIndex("cnt"));
                     }
-                    catch (Exception e) {
-                        Log.i("",e.getMessage());
-                    }
-                    finally {
-                        c.close();
-                    }
-
+                }
+                catch (Exception e) {
+                    Log.i("",e.getMessage());
+                }
+                finally {
+                    c.close();
+                }
             }
         }
 
@@ -508,22 +526,21 @@ public class TabStatMonth extends Fragment {
             {
                 Cursor c = db.getMonthStatistics(1,s, selectedUser);
 
-                    try
+                try
+                {
+                    seriesKlient.add(sdf.parse(c.getString(c.getColumnIndex("datum"))),c.getDouble(c.getColumnIndex("cnt")));
+
+                    if(c.getDouble(c.getColumnIndex("cnt")) > maxValue)
                     {
-                        seriesKlient.add(sdf.parse(c.getString(c.getColumnIndex("datum"))),c.getDouble(c.getColumnIndex("cnt")));
-
-                        if(c.getDouble(c.getColumnIndex("cnt")) > maxValue)
-                        {
-                            maxValue = c.getDouble(c.getColumnIndex("cnt"));
-                        }
+                        maxValue = c.getDouble(c.getColumnIndex("cnt"));
                     }
-                    catch (Exception e) {
-                        Log.i("",e.getMessage());
-                    }
-                    finally {
-                        c.close();
-                    }
-
+                }
+                catch (Exception e) {
+                    Log.i("",e.getMessage());
+                }
+                finally {
+                    c.close();
+                }
             }
         }
 
