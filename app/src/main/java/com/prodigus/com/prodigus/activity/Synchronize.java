@@ -73,10 +73,12 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
     private final String SOAP_ACTION_Attribute = "http://microsoft.com/webservices/GetAttributes";
     private final String SOAP_ACTION_USER = "http://microsoft.com/webservices/GetUsers";
     private final String SOAP_ACTION_STATS = "http://microsoft.com/webservices/GetStatistics";
+    private final String SOAP_ACTION_USERCOUNT = "http://microsoft.com/webservices/GetUserCount";
     private final String METHOD_NAME = "GetPerson";
     private final String METHOD_NAME_Attribute = "GetAttributes";
     private final String METHOD_NAME_USER = "GetUsers";
     private final String METHOD_NAME_STAT = "GetStatistics";
+    private final String METHOD_NAME_USERCOUNT = "GetUserCount";
 
     private String TAG = "PGGURU";
     private StringReader xmlReader;
@@ -162,7 +164,7 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
 
     }
 
-    public void loadContacts() {
+    public void loadContacts(int step) {
         //vyber ulozene nastavenie pre autentifikaciu
         String logname = "";
         String pin = "";
@@ -184,22 +186,21 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
 
         Log.i("LIVE","stale zijem");
 
-        //delete all data in db
-        db.deleteAll();
-
         //Create request
         SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
         //Property which holds input parameters
         PropertyInfo celsiusPI = new PropertyInfo();
-        //Set Name
         celsiusPI.setName("username");
-        //Set Value
         celsiusPI.setValue(logname);
-        //Set dataType
-        //celsiusPI.setType(double.class);
         celsiusPI.setType(String.class);
-        //Add the property to request object
         request.addProperty(celsiusPI);
+
+        PropertyInfo stepProp = new PropertyInfo();
+        stepProp.setName("steps");
+        stepProp.setValue(step);
+        stepProp.setType(int.class);
+        request.addProperty(stepProp);
+
         //Create envelope
         SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
                 SoapEnvelope.VER11);
@@ -214,7 +215,7 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
         h.addChild(Node.ELEMENT, wssePassword);
 
         envelope.headerOut = new Element[]{h};
-
+        envelope.dotNet = true;
         //Set output SOAP object
         envelope.setOutputSoapObject(request);
         //Create HTTP call object
@@ -1336,10 +1337,61 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
         }
     }
 
+    public int getUsersCount() {
+        String logname = "";
+        String pin = "";
+        Cursor c = db.getAuth();
+        if(Integer.valueOf(c.getCount()) > 0) {
+
+            if (c.moveToFirst()) {
+                logname = c.getString(c.getColumnIndex("logname"));
+                pin = c.getString(c.getColumnIndex("pin"));
+            }
+            c.close();
+        }
+        else {
+            return 0;
+        }
+
+        SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME_USERCOUNT);
+
+        //Create envelope
+        SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
+                SoapEnvelope.VER11);
+
+        /*header*/
+        Element h = new Element().createElement(NAMESPACE, "UserCredentials");
+        Element Username = new Element().createElement(NAMESPACE, "userName");
+        Username.addChild(Node.TEXT, logname);
+        h.addChild(Node.ELEMENT, Username);
+        Element wssePassword = new Element().createElement(NAMESPACE, "password");
+        wssePassword.addChild(Node.TEXT, pin);
+        h.addChild(Node.ELEMENT, wssePassword);
+
+        envelope.headerOut = new Element[]{h};
+        envelope.dotNet = true;
+        //Set output SOAP object
+        envelope.setOutputSoapObject(request);
+        new MarshalDate().register(envelope);
+        //Create HTTP call object
+        HttpTransportSE androidHttpTransport = new HttpTransportSE(URL);
+
+        try {
+            androidHttpTransport.call(SOAP_ACTION_USERCOUNT, envelope);
+            SoapPrimitive results = (SoapPrimitive)envelope.getResponse();
+            return Integer.parseInt(results.toString());
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return 0;
+    }
+
     private class AsyncCallWS extends AsyncTask<Integer, Integer, String> {
         @Override
         protected String doInBackground(Integer... params) {
-            sendAllContacts();
+            //sendAllContacts();
             publishProgress(5);
             sendAllContactAttHistory();
             publishProgress(7);
@@ -1347,7 +1399,14 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
             publishProgress(9);
             loadAttributes();
             publishProgress(10);
-            loadContacts();
+
+            db.deleteAll();
+            int userCount = Math.round(getUsersCount() / 100);
+
+            for(int k=0; k < userCount; k++)
+            {
+                loadContacts(k);
+            }
             publishProgress(12);
             loadContactsAttHistory();
             publishProgress(14);
