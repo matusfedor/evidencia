@@ -255,7 +255,7 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
                 String attribute = s_deals.getProperty(10).toString().replace("anyType{}", "");
                 int clientId = Integer.parseInt(s_deals.getProperty(11).toString().replace("anyType{}", ""));
 
-                long todo1_id = db.createToDo(titul,meno,priezvisko,datum, mesto, ulica, pc, email, telefon, "", attribute, clientId);
+                long todo1_id = db.createToDo(titul,meno,priezvisko,datum, mesto, ulica, pc, email, telefon, "", attribute, clientId, 0);
                 Log.i(TAG, Long.toString(todo1_id));
             }
         } catch (Exception e) {
@@ -1391,7 +1391,8 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
     private class AsyncCallWS extends AsyncTask<Integer, Integer, String> {
         @Override
         protected String doInBackground(Integer... params) {
-            //sendAllContacts();
+            publishProgress(1);
+            sendAllContacts();
             publishProgress(5);
             sendAllContactAttHistory();
             publishProgress(7);
@@ -1401,54 +1402,26 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
             publishProgress(10);
 
             db.deleteAll();
-            int userCount = Math.round(getUsersCount() / 100);
+            int allUsersCount = getUsersCount();
+            int userCount = Math.round(allUsersCount / 100);
 
             for(int k=0; k < userCount; k++)
             {
                 loadContacts(k);
+                int loadedUser = k*100 > allUsersCount ? allUsersCount : k*100;
+                publishProgress(12,loadedUser,allUsersCount);
             }
+            if(allUsersCount > 0)
+            {
+                loadContacts(0);
+            }
+
             publishProgress(12);
             loadContactsAttHistory();
             publishProgress(14);
             loadNotes();
             publishProgress(16);
             loadUsers();
-            publishProgress(17);
-
-            /*
-            int progress = 17;
-
-            Cursor cursor = db.getUsers();
-            double step = Math.floor(33/cursor.getCount());
-
-            cursor.moveToFirst();
-            while (cursor.moveToNext()) {
-                String nick = cursor.getString(cursor.getColumnIndexOrThrow("usr_nick"));
-                loadUserStatistics("D", 30, 8, nick );
-                loadUserStatistics("D", 30, 6, nick );
-                loadUserStatistics("D", 30, 15, nick );
-                loadUserStatistics("D", 30, 16, nick );
-                loadUserStatistics("D", 30, 2, nick );
-                loadUserStatistics("D", 30, 1, nick );
-
-                loadUserStatistics("W", 30, 8, nick );
-                loadUserStatistics("W", 30, 6, nick );
-                loadUserStatistics("W", 30, 15, nick );
-                loadUserStatistics("W", 30, 16, nick );
-                loadUserStatistics("W", 30, 2, nick );
-                loadUserStatistics("W", 30, 1, nick );
-
-                loadUserStatistics("M", 30, 8, nick );
-                loadUserStatistics("M", 30, 6, nick );
-                loadUserStatistics("M", 30, 15, nick );
-                loadUserStatistics("M", 30, 16, nick );
-                loadUserStatistics("M", 30, 2, nick );
-                loadUserStatistics("M", 30, 1, nick );
-
-                progress += step;
-                publishProgress(progress);
-            }
-            cursor.close();*/
             publishProgress(17);
 
             return "Task Completed.";
@@ -1478,6 +1451,10 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
         protected void onProgressUpdate(Integer... values) {
             Log.i(TAG, "onProgressUpdate");
             progressBar.setProgress(values[0]);
+            if(values.length > 1)
+            {
+                tvResult.setText("Načítaných " + values[1] + " z " + values[2] + " kontaktov");
+            }
         }
 
     }

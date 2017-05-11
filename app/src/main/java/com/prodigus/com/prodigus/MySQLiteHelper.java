@@ -32,6 +32,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     public static final String COLUMN_PHONE = "phone";
     public static final String COLUMN_ATT = "attribute";
     public static final String COLUMN_CLIENT_ID = "clientId";
+    public static final String COLUMN_CLIENT_STATUS = "status";
     //endregion
 
     //region Access
@@ -50,7 +51,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     public static final String COLUMN_NOTE_PERSON = "person";
     public static final String COLUMN_NOTE_ATTRIBUTE = "attribute";
     public static final String COLUMN_NOTE_SERVER_ID = "cin_id";
-    public static final String COLUMN_NOTE_STATUS = "status";
+    public static final String COLUMN_NOTE_STATUS = "status"; //0-not changed 1-changed 2-new 3-deleted
     //endregion
 
     //region Contact State History
@@ -79,7 +80,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     //endregion
 
     private static final String DATABASE_NAME = "contact.db";
-    private static final int DATABASE_VERSION = 19;
+    private static final int DATABASE_VERSION = 20;
 
     public MySQLiteHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -136,7 +137,8 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
             + COLUMN_EMAIL + " text, "
             + COLUMN_PHONE + " text, "
             + COLUMN_ATT + " text,"
-            + COLUMN_CLIENT_ID + " integer)";
+            + COLUMN_CLIENT_ID + " integer,"
+            + COLUMN_NOTE_STATUS + " integer)";
 
     private static final String TABLE_ContactStateHistory = "create table " + TABLE_conStateHistory
             + "(" + COLUMN_HIS_ID + " integer primary key autoincrement, "
@@ -256,7 +258,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 
     public Cursor selectAllContacts()
     {
-        String selectQuery = "SELECT _id, title, name, surname, borndate, city, street, number, gender, email, phone, attribute, clientId FROM " + TABLE_COMMENTS;
+        String selectQuery = "SELECT _id, title, name, surname, borndate, city, street, number, gender, email, phone, attribute, clientId FROM " + TABLE_COMMENTS + " WHERE status !=0";
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
         return cursor;
@@ -473,7 +475,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     //endregion
 
     //region Insert SQL
-    public long createToDo(String title, String name, String surname, String borndate, String city, String street, String number, String email, String phone, String gender, String attribute, int clientId) {
+    public long createToDo(String title, String name, String surname, String borndate, String city, String street, String number, String email, String phone, String gender, String attribute, int clientId, int status) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -489,6 +491,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         values.put(FeedEntry.COLUMN_GENDER,gender);
         values.put(FeedEntry.COLUMN_ATTRIBUTE, attribute);
         values.put(FeedEntry.COLUMN_CLIENT_ID, clientId);
+        values.put(FeedEntry.COLUMN_CLIENT_STATUS, status);
         // insert row
 
         long todo_id = db.insert(FeedEntry.TABLE_NAME, null, values);
@@ -641,6 +644,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         values.put(FeedEntry.COLUMN_PHONE,phone);
         values.put(FeedEntry.COLUMN_GENDER,gender);
         values.put(FeedEntry.COLUMN_ATTRIBUTE, attribute);
+        values.put(FeedEntry.COLUMN_CLIENT_STATUS, 1);
         // insert row
 
         long todo_id = db.update(FeedEntry.TABLE_NAME, values, "_id=" + personId, null);
@@ -679,6 +683,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 
         ContentValues values = new ContentValues();
         values.put(FeedEntry.COLUMN_ATTRIBUTE, attribute);
+        values.put(FeedEntry.COLUMN_CLIENT_STATUS, 1);
         long todo_id = db.update(FeedEntry.TABLE_NAME, values, "_id=" + personId, null);
 
         createContactHistory(personId, attribute, meetingDate);

@@ -35,6 +35,7 @@ import com.prodigus.com.prodigus.MySQLiteHelper;
 import com.prodigus.com.prodigus.R;
 import com.prodigus.com.prodigus.SecondActivity;
 import com.prodigus.com.prodigus.ThirdActivity;
+import com.prodigus.com.prodigus.activity.MainActivity;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -127,7 +128,7 @@ public class TabContactDetail extends Fragment {
             switch (which){
                 case DialogInterface.BUTTON_POSITIVE:
                     db.deleteContact(Integer.parseInt(personId));
-                    startActivity(new Intent(getActivity(), SecondActivity.class));
+                    startActivity(new Intent(getActivity(), MainActivity.class));
                     break;
 
                 case DialogInterface.BUTTON_NEGATIVE:

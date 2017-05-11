@@ -347,7 +347,7 @@ public class TabStatWeek extends Fragment {
 
         XYSeriesRenderer renderer4 = new XYSeriesRenderer();
         renderer4.setLineWidth(2);
-        renderer4.setColor(Color.YELLOW);
+        renderer4.setColor(Color.GRAY);
         // Include low and max value
         renderer4.setDisplayBoundingPoints(true);
         // we add point markers
@@ -643,7 +643,7 @@ public class TabStatWeek extends Fragment {
 
         XYSeriesRenderer renderer4 = new XYSeriesRenderer();
         renderer4.setLineWidth(2);
-        renderer4.setColor(Color.YELLOW);
+        renderer4.setColor(Color.GRAY);
         // Include low and max value
         renderer4.setDisplayBoundingPoints(true);
         // we add point markers
