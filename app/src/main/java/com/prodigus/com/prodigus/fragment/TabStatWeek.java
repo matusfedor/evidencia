@@ -243,13 +243,13 @@ public class TabStatWeek extends Fragment {
         renderer6 = setRenderer(Color.CYAN, renderer6);
 
         if(serieCheckedAfa) {
-            maxValue = getStatistics(seriesAfa, 8, maxValue, null);
+            maxValue = getStatistics(seriesAfa, 10, maxValue, null);
             dataset.addSeries(seriesAfa);
             mRenderer.addSeriesRenderer(renderer);
         }
         if(serieCheckedTelk)
         {
-            maxValue = getStatistics(seriesTelk, 6, maxValue, null);
+            maxValue = getStatistics(seriesTelk, 14, maxValue, null);
             dataset.addSeries(seriesTelk);
             mRenderer.addSeriesRenderer(renderer2);
         }
@@ -342,13 +342,13 @@ public class TabStatWeek extends Fragment {
         renderer6 = setRenderer(Color.CYAN, renderer6);
 
         if(serieCheckedAfa) {
-            maxValue = getStatistics(seriesAfa, 8, maxValue, selectedUser);
+            maxValue = getStatistics(seriesAfa, 10, maxValue, selectedUser);
             dataset.addSeries(seriesAfa);
             mRenderer.addSeriesRenderer(renderer);
         }
         if(serieCheckedTelk)
         {
-            maxValue = getStatistics(seriesTelk, 6, maxValue, selectedUser);
+            maxValue = getStatistics(seriesTelk, 14, maxValue, selectedUser);
             dataset.addSeries(seriesTelk);
             mRenderer.addSeriesRenderer(renderer2);
         }
