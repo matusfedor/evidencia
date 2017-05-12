@@ -316,8 +316,8 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
             {
                 SoapObject s_deals = (SoapObject) result.getProperty(i);
 
-                int con_id = Integer.parseInt(s_deals.getProperty(0).toString());
-                int att_id = Integer.parseInt(s_deals.getProperty(1).toString());
+                int con_id = Integer.parseInt(s_deals.getProperty(1).toString());
+                int att_id = Integer.parseInt(s_deals.getProperty(0).toString());
                 Date creation = dateFormat.parse(s_deals.getProperty(2).toString());
                 long todo1_id = db.createContactHistory(con_id, att_id, creation);
                 Log.i(TAG, Long.toString(todo1_id));
@@ -1121,7 +1121,6 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
         String pattern = "yyyy-MM-dd HH:mm:ss";
         SimpleDateFormat format = new SimpleDateFormat(pattern);
 
-        String myTimestamp="2014/02/17 20:49";
         SimpleDateFormat form = new SimpleDateFormat("MM/dd/yyyy");
 
         Cursor cursor = db.getAllContactAttHistory();

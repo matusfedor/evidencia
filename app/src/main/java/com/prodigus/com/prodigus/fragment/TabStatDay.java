@@ -74,6 +74,7 @@ public class TabStatDay extends Fragment {
     private OnFragmentInteractionListener mListener;
     private String logUser;
     private String selectedUser;
+    private int stepCount = 30;
 
     private LinearLayout chartLyt;
     private Animation fadeAnim;
@@ -132,9 +133,51 @@ public class TabStatDay extends Fragment {
         }
     }
 
-    private View createTempGraph() {
-        // We start creating the XYSeries to plot the temperature
+    private double getStatistics(TimeSeries timeSeries, int attribute, double maxValues, String selectedUser)
+    {
         SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+        double maxValue = maxValues;
+
+        timeSeries.clear();
+
+        for (int s = 0; s < stepCount; s++) {
+            Cursor c = selectedUser == null ? db.getDayStatistics(attribute, s) : db.getDayStatistics(8, s, selectedUser);
+            while (c.moveToNext()) {
+                try {
+                    timeSeries.add(sdf.parse(c.getString(c.getColumnIndex("datum"))), c.getDouble(c.getColumnIndex("cnt")));
+
+                    if (c.getDouble(c.getColumnIndex("cnt")) > maxValue) {
+                        maxValue = c.getDouble(c.getColumnIndex("cnt"));
+                    }
+                } catch (Exception e) {
+                    Log.i("", e.getMessage());
+                }
+                finally {
+                    c.close();
+                    db.close();
+                }
+            }
+            c.close();
+            db.close();
+        }
+
+        return maxValue;
+    }
+
+    private XYSeriesRenderer setRenderer(int color, XYSeriesRenderer xySeriesRenderer)
+    {
+        xySeriesRenderer.setLineWidth(2);
+        xySeriesRenderer.setColor(color);
+        xySeriesRenderer.setDisplayBoundingPoints(true);
+        xySeriesRenderer.setPointStyle(PointStyle.CIRCLE);
+        xySeriesRenderer.setPointStrokeWidth(3);
+        xySeriesRenderer.setShowLegendItem(false);
+
+        return xySeriesRenderer;
+    }
+
+    private View createTempGraph() {
+
         TimeSeries seriesAfa = new TimeSeries("Denný graf Anketa finančná analýza");
         TimeSeries seriesTelk = new TimeSeries("Denný graf Telefonický hovor s kontaktom");
         TimeSeries seriesTerm = new TimeSeries("Denný graf Termín");
@@ -144,266 +187,61 @@ public class TabStatDay extends Fragment {
 
         double maxValue = 0;
 
-        if(serieCheckedAfa)
-        {
-            for (int s = 0; s < 30; s++) {
-                Cursor c = db.getDayStatistics(8, s);
-                while (c.moveToNext()) {
-                    try {
-                        seriesAfa.add(sdf.parse(c.getString(c.getColumnIndex("datum"))), c.getDouble(c.getColumnIndex("cnt")));
-
-                        if (c.getDouble(c.getColumnIndex("cnt")) > maxValue) {
-                            maxValue = c.getDouble(c.getColumnIndex("cnt"));
-                        }
-                    } catch (Exception e) {
-                        Log.i("", e.getMessage());
-                    }
-                    finally {
-                        c.close();
-                    }
-                }
-                c.close();
-            }
-        }
-
-        if(serieCheckedTelk)
-        {
-            for(int s = 0; s < 30; s++)
-            {
-                Cursor c = db.getDayStatistics(6,s);
-                while (c.moveToNext())
-                {
-                    try
-                    {
-                        seriesTelk.add(sdf.parse(c.getString(c.getColumnIndex("datum"))),c.getDouble(c.getColumnIndex("cnt")));
-
-                        if(c.getDouble(c.getColumnIndex("cnt")) > maxValue)
-                        {
-                            maxValue = c.getDouble(c.getColumnIndex("cnt"));
-                        }
-                    }
-                    catch (Exception e) {
-                        Log.i("",e.getMessage());
-                    }
-                    finally {
-                        c.close();
-                    }
-                }
-                c.close();
-            }
-        }
-
-        if(serieCheckedTerm)
-        {
-            for(int s = 0; s < 30; s++)
-            {
-                Cursor c = db.getDayStatistics(15,s);
-                while (c.moveToNext())
-                {
-                    try
-                    {
-                        seriesTerm.add(sdf.parse(c.getString(c.getColumnIndex("datum"))),c.getDouble(c.getColumnIndex("cnt")));
-
-                        if(c.getDouble(c.getColumnIndex("cnt")) > maxValue)
-                        {
-                            maxValue = c.getDouble(c.getColumnIndex("cnt"));
-                        }
-                    }
-                    catch (Exception e) {
-                        Log.i("",e.getMessage());
-                    }
-                    finally {
-                        c.close();
-                    }
-                }
-                c.close();
-            }
-        }
-
-        if(serieCheckedFa)
-        {
-            for(int s = 0; s < 30; s++) {
-                Cursor c = db.getDayStatistics(16,s);
-                while (c.moveToNext()) {
-                    try {
-                        seriesFa.add(sdf.parse(c.getString(c.getColumnIndex("datum"))), c.getDouble(c.getColumnIndex("cnt")));
-
-                        if (c.getDouble(c.getColumnIndex("cnt")) > maxValue) {
-                            maxValue = c.getDouble(c.getColumnIndex("cnt"));
-                        }
-                    } catch (Exception e) {
-                        Log.i("", e.getMessage());
-                    }
-                    finally {
-                        c.close();
-                    }
-                }
-                c.close();
-            }
-        }
-
-        if(serieCheckedPk)
-        {
-            for(int s = 0; s < 30; s++)
-            {
-                Cursor c = db.getDayStatistics(2,s);
-                while (c.moveToNext())
-                {
-                    try
-                    {
-                        seriesPk.add(sdf.parse(c.getString(c.getColumnIndex("datum"))),c.getDouble(c.getColumnIndex("cnt")));
-
-                        if(c.getDouble(c.getColumnIndex("cnt")) > maxValue)
-                        {
-                            maxValue = c.getDouble(c.getColumnIndex("cnt"));
-                        }
-                    }
-                    catch (Exception e) {
-                        Log.i("",e.getMessage());
-                    }
-                    finally {
-                        c.close();
-                    }
-                }
-                c.close();
-            }
-        }
-
-        if(serieCheckedKlient)
-        {
-            for(int s = 0; s < 30; s++)
-            {
-                Cursor c = db.getDayStatistics(1,s);
-                while (c.moveToNext())
-                {
-                    try
-                    {
-                        seriesKlient.add(sdf.parse(c.getString(c.getColumnIndex("datum"))),c.getDouble(c.getColumnIndex("cnt")));
-
-                        if(c.getDouble(c.getColumnIndex("cnt")) > maxValue)
-                        {
-                            maxValue = c.getDouble(c.getColumnIndex("cnt"));
-                        }
-                    }
-                    catch (Exception e) {
-                        Log.i("",e.getMessage());
-                    }
-                    finally {
-                        c.close();
-                    }
-                }
-                c.close();
-            }
-        }
-
         // Now we create the renderer
         XYSeriesRenderer renderer = new XYSeriesRenderer();
-        renderer.setLineWidth(2);
-        renderer.setColor(Color.RED);
-        // Include low and max value
-        renderer.setDisplayBoundingPoints(true);
-        // we add point markers
-        renderer.setPointStyle(PointStyle.CIRCLE);
-        renderer.setPointStrokeWidth(3);
-        renderer.setShowLegendItem(false);
+        renderer = setRenderer(Color.RED, renderer);
 
-        //second serie
         XYSeriesRenderer renderer2 = new XYSeriesRenderer();
-        renderer2.setLineWidth(2);
-        renderer2.setColor(Color.BLUE);
-        // Include low and max value
-        renderer2.setDisplayBoundingPoints(true);
-        // we add point markers
-        renderer2.setPointStyle(PointStyle.CIRCLE);
-        renderer2.setPointStrokeWidth(3);
-        renderer2.setShowLegendItem(false);
+        renderer2 = setRenderer(Color.BLUE, renderer2);
 
         XYSeriesRenderer renderer3 = new XYSeriesRenderer();
-        renderer3.setLineWidth(2);
-        renderer3.setColor(Color.GREEN);
-        // Include low and max value
-        renderer3.setDisplayBoundingPoints(true);
-        // we add point markers
-        renderer3.setPointStyle(PointStyle.CIRCLE);
-        renderer3.setPointStrokeWidth(3);
-        renderer3.setShowLegendItem(false);
+        renderer3 = setRenderer(Color.GREEN, renderer3);
 
         XYSeriesRenderer renderer4 = new XYSeriesRenderer();
-        renderer4.setLineWidth(2);
-        renderer4.setColor(Color.GRAY);
-        // Include low and max value
-        renderer4.setDisplayBoundingPoints(true);
-        // we add point markers
-        renderer4.setPointStyle(PointStyle.CIRCLE);
-        renderer4.setPointStrokeWidth(3);
-        renderer4.setShowLegendItem(false);
+        renderer4 = setRenderer(Color.GRAY, renderer4);
 
         XYSeriesRenderer renderer5 = new XYSeriesRenderer();
-        renderer5.setLineWidth(2);
-        renderer5.setColor(Color.BLACK);
-        renderer5.setDisplayBoundingPoints(true);
-        renderer5.setPointStyle(PointStyle.CIRCLE);
-        renderer5.setPointStrokeWidth(3);
-        renderer5.setShowLegendItem(false);
+        renderer5 = setRenderer(Color.BLACK, renderer5);
 
         XYSeriesRenderer renderer6 = new XYSeriesRenderer();
-        renderer6.setLineWidth(2);
-        renderer6.setColor(Color.CYAN);
-        // Include low and max value
-        renderer6.setDisplayBoundingPoints(true);
-        // we add point markers
-        renderer6.setPointStyle(PointStyle.CIRCLE);
-        renderer6.setPointStrokeWidth(3);
-        renderer6.setShowLegendItem(false);
+        renderer6 = setRenderer(Color.CYAN, renderer6);
 
         // Now we add our series
+        XYMultipleSeriesRenderer mRenderer = new XYMultipleSeriesRenderer();
         XYMultipleSeriesDataset dataset = new XYMultipleSeriesDataset();
         if(serieCheckedAfa) {
+            maxValue = getStatistics(seriesAfa, 8, maxValue, null);
             dataset.addSeries(seriesAfa);
-        }
-        if(serieCheckedTelk)
-        {
-            dataset.addSeries(seriesTelk);
-        }
-        if(serieCheckedTerm)
-        {
-            dataset.addSeries(seriesTerm);
-        }
-        if(serieCheckedFa)
-        {
-            dataset.addSeries(seriesFa);
-        }
-        if(serieCheckedPk)
-        {
-            dataset.addSeries(seriesPk);
-        }
-        if(serieCheckedKlient)
-        {
-            dataset.addSeries(seriesKlient);
-        }
-        // Finaly we create the multiple series renderer to control the graph
-        XYMultipleSeriesRenderer mRenderer = new XYMultipleSeriesRenderer();
-        if(serieCheckedAfa) {
             mRenderer.addSeriesRenderer(renderer);
         }
         if(serieCheckedTelk)
         {
+            maxValue = getStatistics(seriesTelk, 6, maxValue, null);
+            dataset.addSeries(seriesTelk);
             mRenderer.addSeriesRenderer(renderer2);
         }
         if(serieCheckedTerm)
         {
+            maxValue = getStatistics(seriesTerm, 15, maxValue, null);
+            dataset.addSeries(seriesTerm);
             mRenderer.addSeriesRenderer(renderer3);
         }
         if(serieCheckedFa)
         {
+            maxValue = getStatistics(seriesFa, 16, maxValue, null);
+            dataset.addSeries(seriesFa);
             mRenderer.addSeriesRenderer(renderer4);
         }
         if(serieCheckedPk)
         {
+            maxValue = getStatistics(seriesPk, 2, maxValue, null);
+            dataset.addSeries(seriesPk);
             mRenderer.addSeriesRenderer(renderer5);
         }
         if(serieCheckedKlient)
         {
+            maxValue = getStatistics(seriesKlient, 1, maxValue, null);
+            dataset.addSeries(seriesKlient);
             mRenderer.addSeriesRenderer(renderer6);
         }
 
@@ -425,16 +263,7 @@ public class TabStatDay extends Fragment {
         mRenderer.setInScroll(true);
 
         chartView = ChartFactory.getTimeChartView(getActivity(), dataset, mRenderer, "dd.MM");
-        //graphTimeframe
 
-        /*
-        mRenderer.setXLabels(0);
-        String[] date={"25.04.2017","26.04.2017","27.04.2017"};
-        for(int i=0;i<date.length;i++){
-            mRenderer.addXTextLabel(i+1,date[i]);
-        }
-        mRenderer.setShowCustomTextGrid(true);
-*/
         // Enable chart click
         mRenderer.setClickEnabled(true);
         chartView.setOnClickListener(new View.OnClickListener() {
@@ -448,8 +277,6 @@ public class TabStatDay extends Fragment {
     }
 
     private View createTempUserGraph() {
-        // We start creating the XYSeries to plot the temperature
-        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
         TimeSeries seriesAfa = new TimeSeries("Denný graf Anketa finančná analýza");
         TimeSeries seriesTelk = new TimeSeries("Denný graf Telefonický hovor s kontaktom");
         TimeSeries seriesTerm = new TimeSeries("Denný graf Termín");
@@ -459,266 +286,61 @@ public class TabStatDay extends Fragment {
 
         double maxValue = 0;
 
-        if(serieCheckedAfa)
-        {
-            for (int s = 0; s < 30; s++) {
-                Cursor c = db.getDayStatistics(8, s, selectedUser);
-                while (c.moveToNext()) {
-                    try {
-                        seriesAfa.add(sdf.parse(c.getString(c.getColumnIndex("datum"))), c.getDouble(c.getColumnIndex("cnt")));
-
-                        if (c.getDouble(c.getColumnIndex("cnt")) > maxValue) {
-                            maxValue = c.getDouble(c.getColumnIndex("cnt"));
-                        }
-                    } catch (Exception e) {
-                        Log.i("", e.getMessage());
-                    }
-                    finally {
-                        c.close();
-                    }
-                }
-                c.close();
-            }
-        }
-
-        if(serieCheckedTelk)
-        {
-            for(int s = 0; s < 30; s++)
-            {
-                Cursor c = db.getDayStatistics(6,s, selectedUser);
-                while (c.moveToNext())
-                {
-                    try
-                    {
-                        seriesTelk.add(sdf.parse(c.getString(c.getColumnIndex("datum"))),c.getDouble(c.getColumnIndex("cnt")));
-
-                        if(c.getDouble(c.getColumnIndex("cnt")) > maxValue)
-                        {
-                            maxValue = c.getDouble(c.getColumnIndex("cnt"));
-                        }
-                    }
-                    catch (Exception e) {
-                        Log.i("",e.getMessage());
-                    }
-                    finally {
-                        c.close();
-                    }
-                }
-                c.close();
-            }
-        }
-
-        if(serieCheckedTerm)
-        {
-            for(int s = 0; s < 30; s++)
-            {
-                Cursor c = db.getDayStatistics(15,s, selectedUser);
-                while (c.moveToNext())
-                {
-                    try
-                    {
-                        seriesTerm.add(sdf.parse(c.getString(c.getColumnIndex("datum"))),c.getDouble(c.getColumnIndex("cnt")));
-
-                        if(c.getDouble(c.getColumnIndex("cnt")) > maxValue)
-                        {
-                            maxValue = c.getDouble(c.getColumnIndex("cnt"));
-                        }
-                    }
-                    catch (Exception e) {
-                        Log.i("",e.getMessage());
-                    }
-                    finally {
-                        c.close();
-                    }
-                }
-                c.close();
-            }
-        }
-
-        if(serieCheckedFa)
-        {
-            for(int s = 0; s < 30; s++) {
-                Cursor c = db.getDayStatistics(16,s, selectedUser);
-                while (c.moveToNext()) {
-                    try {
-                        seriesFa.add(sdf.parse(c.getString(c.getColumnIndex("datum"))), c.getDouble(c.getColumnIndex("cnt")));
-
-                        if (c.getDouble(c.getColumnIndex("cnt")) > maxValue) {
-                            maxValue = c.getDouble(c.getColumnIndex("cnt"));
-                        }
-                    } catch (Exception e) {
-                        Log.i("", e.getMessage());
-                    }
-                    finally {
-                        c.close();
-                    }
-                }
-                c.close();
-            }
-        }
-
-        if(serieCheckedPk)
-        {
-            for(int s = 0; s < 30; s++)
-            {
-                Cursor c = db.getDayStatistics(2,s, selectedUser);
-                while (c.moveToNext())
-                {
-                    try
-                    {
-                        seriesPk.add(sdf.parse(c.getString(c.getColumnIndex("datum"))),c.getDouble(c.getColumnIndex("cnt")));
-
-                        if(c.getDouble(c.getColumnIndex("cnt")) > maxValue)
-                        {
-                            maxValue = c.getDouble(c.getColumnIndex("cnt"));
-                        }
-                    }
-                    catch (Exception e) {
-                        Log.i("",e.getMessage());
-                    }
-                    finally {
-                        c.close();
-                    }
-                }
-                c.close();
-            }
-        }
-
-        if(serieCheckedKlient)
-        {
-            for(int s = 0; s < 30; s++)
-            {
-                Cursor c = db.getDayStatistics(1,s, selectedUser);
-                while (c.moveToNext())
-                {
-                    try
-                    {
-                        seriesKlient.add(sdf.parse(c.getString(c.getColumnIndex("datum"))),c.getDouble(c.getColumnIndex("cnt")));
-
-                        if(c.getDouble(c.getColumnIndex("cnt")) > maxValue)
-                        {
-                            maxValue = c.getDouble(c.getColumnIndex("cnt"));
-                        }
-                    }
-                    catch (Exception e) {
-                        Log.i("",e.getMessage());
-                    }
-                    finally {
-                        c.close();
-                    }
-                }
-                c.close();
-            }
-        }
-
         // Now we create the renderer
         XYSeriesRenderer renderer = new XYSeriesRenderer();
-        renderer.setLineWidth(2);
-        renderer.setColor(Color.RED);
-        // Include low and max value
-        renderer.setDisplayBoundingPoints(true);
-        // we add point markers
-        renderer.setPointStyle(PointStyle.CIRCLE);
-        renderer.setPointStrokeWidth(3);
-        renderer.setShowLegendItem(false);
+        renderer = setRenderer(Color.RED, renderer);
 
-        //second serie
         XYSeriesRenderer renderer2 = new XYSeriesRenderer();
-        renderer2.setLineWidth(2);
-        renderer2.setColor(Color.BLUE);
-        // Include low and max value
-        renderer2.setDisplayBoundingPoints(true);
-        // we add point markers
-        renderer2.setPointStyle(PointStyle.CIRCLE);
-        renderer2.setPointStrokeWidth(3);
-        renderer2.setShowLegendItem(false);
+        renderer2 = setRenderer(Color.BLUE, renderer2);
 
         XYSeriesRenderer renderer3 = new XYSeriesRenderer();
-        renderer3.setLineWidth(2);
-        renderer3.setColor(Color.GREEN);
-        // Include low and max value
-        renderer3.setDisplayBoundingPoints(true);
-        // we add point markers
-        renderer3.setPointStyle(PointStyle.CIRCLE);
-        renderer3.setPointStrokeWidth(3);
-        renderer3.setShowLegendItem(false);
+        renderer3 = setRenderer(Color.GREEN, renderer3);
 
         XYSeriesRenderer renderer4 = new XYSeriesRenderer();
-        renderer4.setLineWidth(2);
-        renderer4.setColor(Color.GRAY);
-        // Include low and max value
-        renderer4.setDisplayBoundingPoints(true);
-        // we add point markers
-        renderer4.setPointStyle(PointStyle.CIRCLE);
-        renderer4.setPointStrokeWidth(3);
-        renderer4.setShowLegendItem(false);
+        renderer4 = setRenderer(Color.GRAY, renderer4);
 
         XYSeriesRenderer renderer5 = new XYSeriesRenderer();
-        renderer5.setLineWidth(2);
-        renderer5.setColor(Color.BLACK);
-        renderer5.setDisplayBoundingPoints(true);
-        renderer5.setPointStyle(PointStyle.CIRCLE);
-        renderer5.setPointStrokeWidth(3);
-        renderer5.setShowLegendItem(false);
+        renderer5 = setRenderer(Color.BLACK, renderer5);
 
         XYSeriesRenderer renderer6 = new XYSeriesRenderer();
-        renderer6.setLineWidth(2);
-        renderer6.setColor(Color.CYAN);
-        // Include low and max value
-        renderer6.setDisplayBoundingPoints(true);
-        // we add point markers
-        renderer6.setPointStyle(PointStyle.CIRCLE);
-        renderer6.setPointStrokeWidth(3);
-        renderer6.setShowLegendItem(false);
+        renderer6 = setRenderer(Color.CYAN, renderer6);
 
         // Now we add our series
+        XYMultipleSeriesRenderer mRenderer = new XYMultipleSeriesRenderer();
         XYMultipleSeriesDataset dataset = new XYMultipleSeriesDataset();
         if(serieCheckedAfa) {
+            maxValue = getStatistics(seriesAfa, 8, maxValue, selectedUser);
             dataset.addSeries(seriesAfa);
-        }
-        if(serieCheckedTelk)
-        {
-            dataset.addSeries(seriesTelk);
-        }
-        if(serieCheckedTerm)
-        {
-            dataset.addSeries(seriesTerm);
-        }
-        if(serieCheckedFa)
-        {
-            dataset.addSeries(seriesFa);
-        }
-        if(serieCheckedPk)
-        {
-            dataset.addSeries(seriesPk);
-        }
-        if(serieCheckedKlient)
-        {
-            dataset.addSeries(seriesKlient);
-        }
-        // Finaly we create the multiple series renderer to control the graph
-        XYMultipleSeriesRenderer mRenderer = new XYMultipleSeriesRenderer();
-        if(serieCheckedAfa) {
             mRenderer.addSeriesRenderer(renderer);
         }
         if(serieCheckedTelk)
         {
+            maxValue = getStatistics(seriesTelk, 6, maxValue, selectedUser);
+            dataset.addSeries(seriesTelk);
             mRenderer.addSeriesRenderer(renderer2);
         }
         if(serieCheckedTerm)
         {
+            maxValue = getStatistics(seriesTerm, 15, maxValue, selectedUser);
+            dataset.addSeries(seriesTerm);
             mRenderer.addSeriesRenderer(renderer3);
         }
         if(serieCheckedFa)
         {
+            maxValue = getStatistics(seriesFa, 16, maxValue, selectedUser);
+            dataset.addSeries(seriesFa);
             mRenderer.addSeriesRenderer(renderer4);
         }
         if(serieCheckedPk)
         {
+            maxValue = getStatistics(seriesPk, 2, maxValue, selectedUser);
+            dataset.addSeries(seriesPk);
             mRenderer.addSeriesRenderer(renderer5);
         }
         if(serieCheckedKlient)
         {
+            maxValue = getStatistics(seriesKlient, 1, maxValue, selectedUser);
+            dataset.addSeries(seriesKlient);
             mRenderer.addSeriesRenderer(renderer6);
         }
 
@@ -740,16 +362,7 @@ public class TabStatDay extends Fragment {
         mRenderer.setInScroll(true);
 
         chartView = ChartFactory.getTimeChartView(getActivity(), dataset, mRenderer, "dd.MM");
-        //graphTimeframe
 
-        /*
-        mRenderer.setXLabels(0);
-        String[] date={"25.04.2017","26.04.2017","27.04.2017"};
-        for(int i=0;i<date.length;i++){
-            mRenderer.addXTextLabel(i+1,date[i]);
-        }
-        mRenderer.setShowCustomTextGrid(true);
-        */
         // Enable chart click
         mRenderer.setClickEnabled(true);
         chartView.setOnClickListener(new View.OnClickListener() {
