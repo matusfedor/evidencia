@@ -243,7 +243,7 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
                 try {
                     datum = sdateFormat.format(dateFormat.parse(s_deals.getProperty(3).toString()));
                 }
-                catch(Exception ex){Log.i("Err", ex.getMessage());}
+                catch(Exception ex){/*.i("Err", ex.getMessage());*/}
 
                 //String datum = dateFormat.format(s_deals.getProperty(3).toString().replace("anyType{}", ""));
                 String mesto = s_deals.getProperty(4).toString().replace("anyType{}", "");
@@ -1410,7 +1410,7 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
                 int loadedUser = k*100 > allUsersCount ? allUsersCount : k*100;
                 publishProgress(12,loadedUser,allUsersCount);
             }
-            if(allUsersCount > 0)
+            if(allUsersCount < 100)
             {
                 loadContacts(0);
             }

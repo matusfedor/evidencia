@@ -3,6 +3,7 @@ package com.prodigus.com.prodigus.activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -133,6 +134,34 @@ public class TabStatistics extends AppCompatActivity implements NavigationView.O
 
         Spinner spinner = (Spinner) findViewById(R.id.userSpinner);
         ArrayAdapter<Users> adapter = new ArrayAdapter<Users>(this, R.layout.text_spinner, gens);
+        /*{
+            @Override
+            public View getDropDownView(int position, View convertView,ViewGroup parent) {
+                // TODO Auto-generated method stub
+
+                View view = super.getView(position, convertView, parent);
+
+                TextView text = (TextView)view.findViewById(android.R.id.text1);
+                text.setTextColor(Color.BLACK);
+
+                return view;
+
+            }
+
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                // TODO Auto-generated method stub
+
+                View view = super.getView(position, convertView, parent);
+
+                TextView text = (TextView)view.findViewById(android.R.id.text1);
+                text.setTextColor(Color.BLACK);
+
+                return view;
+
+            }
+        };*/
+
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
 

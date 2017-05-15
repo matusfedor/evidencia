@@ -42,7 +42,7 @@
             android:layout_marginTop="21dp"
             android:layout_marginLeft="12dp"
             android:layout_marginRight="12dp"
-            android:popupBackground="#FFFFFF"
+            android:theme="@style/spinnerItemStyle"
             android:id="@+id/userSpinner"/>
 
         <android.support.design.widget.TabLayout

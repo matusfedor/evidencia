@@ -34,6 +34,8 @@ import android.view.View.OnClickListener;
 import android.widget.Spinner;
 import android.widget.ArrayAdapter;
 import com.prodigus.com.prodigus.Genders;
+import com.prodigus.com.prodigus.activity.MainActivity;
+
 import android.support.v7.app.AppCompatActivity;
 
 public class ThirdActivity extends AppCompatActivity implements OnClickListener {
@@ -183,6 +185,8 @@ public class ThirdActivity extends AppCompatActivity implements OnClickListener 
                 if(todo1_id > 0)
                 Snackbar.make(view, "Záznam uložený", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
+
+                startActivity(new Intent(getApplication(), MainActivity.class));
             }
         });
 

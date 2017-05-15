@@ -1,6 +1,7 @@
 package com.prodigus.com.prodigus.fragment;
 
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.net.Uri;
