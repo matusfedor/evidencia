@@ -2,6 +2,7 @@ package com.prodigus.com.prodigus;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
@@ -9,6 +10,7 @@ import com.prodigus.com.prodigus.FeedReaderContract.FeedEntry;
 import com.prodigus.com.prodigus.FeedReaderContract.AccessEntry;
 import android.content.ContentValues;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -77,10 +79,15 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     public static final String COLUMN_USR_ID = "_id";
     public static final String COLUMN_USR_NICK = "usr_nick";
     public static final String COLUMN_USR_NAME = "usr_name";
+
+    //region General
+    public static final String TABLE_GENERAL = "general";
+    public static final String COLUMN_GEN_ID = "_id";
+    public static final String COLUMN_LAST_SYNC = "LastSync";
     //endregion
 
     private static final String DATABASE_NAME = "contact.db";
-    private static final int DATABASE_VERSION = 20;
+    private static final int DATABASE_VERSION = 27;
 
     public MySQLiteHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -96,6 +103,9 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         database.execSQL(TABLE_ContactStateHistory);
         database.execSQL(TABLE_STATISTICS);
         database.execSQL(TABLE_CREATE_USERS);
+        database.execSQL(TABLE_CREATE_GENERAL);
+
+        database.execSQL("Insert into general (_id, LastSync) values (1,datetime('now','-1 year'))");
 
         /*database.execSQL("Insert into cl_attribute values (1,'AFA','Finan. analyza','C',1)");
         database.execSQL("Insert into cl_attribute values (2,'TEL','Telef. kontakt','N',2)");
@@ -118,6 +128,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_conStateHistory);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_STATS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_USERS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_GENERAL);
         onCreate(db);
     }
     //endregion
@@ -173,6 +184,10 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
             + COLUMN_USR_NICK + " text not null,"
             + COLUMN_USR_NAME + " text not null )";
 
+    private static final String TABLE_CREATE_GENERAL =  "create table "
+            + TABLE_GENERAL + "(" + COLUMN_GEN_ID + " integer primary key autoincrement, "
+            + COLUMN_LAST_SYNC + " datetime null)";
+
     ////+ COLUMN_NOTE_DATEC + " text not null,"
 
     private static final String TABLE_ATTRIBUTES =  "create table "
@@ -190,6 +205,36 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
         return cursor;
+    }
+
+    //region Select SQL
+    public String getLastSync()
+    {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:MM:SS");
+        String selectQuery = "SELECT datetime(LastSync,'localtime') LastSyn from general";
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        cursor.moveToFirst();
+
+        String dsd = DatabaseUtils.dumpCursorToString(cursor);
+        String LastSync = cursor.getString(0);
+
+        if(LastSync == null)
+        {
+            Calendar calendar = Calendar.getInstance();
+            calendar.add(Calendar.YEAR , -1 );
+
+            return sdf.format(calendar.getTime());
+        }
+        /*Date syncDate = null;
+        try {
+            syncDate = sdf.parse(sdf.format(dasdad));
+        }
+        catch (ParseException pe)
+        {}*/
+
+        db.close();
+        return LastSync;
     }
 
     public Genders getPersonsStatuses(Integer personID) {
@@ -650,6 +695,20 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         long todo_id = db.update(FeedEntry.TABLE_NAME, values, "_id=" + personId, null);
 
         return todo_id;
+    }
+
+    public void setLastSync()
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("UPDATE general SET LastSync = datetime('now')");
+
+        //String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:MM:SS").format(Calendar.getInstance().get());
+
+        //ContentValues values = new ContentValues();
+        //values.put(COLUMN_LAST_SYNC, timeStamp);
+        //long todo_id = db.update(TABLE_GENERAL, values, null, null);
+
+        db.close();
     }
 
     public long updateContactClientId(int personId, int clientId) {

@@ -43,6 +43,8 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -52,6 +54,7 @@ import java.io.StringReader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -164,10 +167,60 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
 
     }
 
+    public void onRadioButtonClicked(View view) {
+        // Is the button now checked?
+        boolean checked = ((RadioButton) view).isChecked();
+
+        // Check which radio button was clicked
+        switch(view.getId()) {
+            case R.id.fullSynchro:
+                if (checked)
+                    // Pirates are the best
+                    break;
+            case R.id.partialSynchro:
+                if (checked)
+                    // Ninjas rule
+                    break;
+        }
+    }
+
+    public String getLastSyncDate()
+    {
+        String lastSyncDate = null;
+        SimpleDateFormat dateFormatSync = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        try {
+            lastSyncDate = dateFormatSync.format(dateFormatSync.parse(db.getLastSync()));
+        }
+        catch(ParseException ex) {}
+
+        RadioGroup radioButtonSync = (RadioGroup) findViewById(R.id.radioButtonSync);;
+        RadioButton radioButton;
+
+        int selectedId = radioButtonSync.getCheckedRadioButtonId();
+        radioButton = (RadioButton) findViewById(selectedId);
+
+        Calendar calendar = Calendar.getInstance();
+
+        switch (radioButton.getId())
+        {
+            case 0:
+                calendar.add(Calendar.YEAR , -5);
+                return dateFormatSync.format(calendar.getTime());
+            case 1:
+                return lastSyncDate;
+            default:
+                calendar.add(Calendar.YEAR , -5);
+                return dateFormatSync.format(calendar.getTime());
+        }
+    }
+
     public void loadContacts(int step) {
         //vyber ulozene nastavenie pre autentifikaciu
         String logname = "";
         String pin = "";
+
+        String lastSyncDate = getLastSyncDate();
 
         Cursor c = db.getAuth();
 
@@ -200,6 +253,12 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
         stepProp.setValue(step);
         stepProp.setType(int.class);
         request.addProperty(stepProp);
+
+        PropertyInfo lastSyncProp = new PropertyInfo();
+        lastSyncProp.setName("lastSync");
+        lastSyncProp.setValue(lastSyncDate);
+        lastSyncProp.setType(String.class);
+        request.addProperty(lastSyncProp);
 
         //Create envelope
         SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
@@ -556,8 +615,9 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
 
                 String datum = (s_deals.getProperty(0).toString());
                 int cnt = Integer.parseInt(s_deals.getProperty(1).toString());
+                String typeOfStat = (s_deals.getProperty(2).toString());
 
-                long userId = db.createStats(datum, cnt, user, attribute, type);
+                long userId = db.createStats(datum, cnt, user, attribute, typeOfStat);
 
                 //gens.add(new Stats(datum, cnt));
             }
@@ -1339,7 +1399,17 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
     public int getUsersCount() {
         String logname = "";
         String pin = "";
+
+        String lastSyncDate = null;
+        SimpleDateFormat dateFormatSync = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat dateSendFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        try {
+            lastSyncDate = dateSendFormat.format(dateFormatSync.parse(db.getLastSync()));
+        }
+        catch(ParseException ex) {}
+
         Cursor c = db.getAuth();
+
         if(Integer.valueOf(c.getCount()) > 0) {
 
             if (c.moveToFirst()) {
@@ -1353,6 +1423,13 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
         }
 
         SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME_USERCOUNT);
+
+        PropertyInfo personInfo = new PropertyInfo();
+        personInfo.setName("lastSync");
+        personInfo.setValue(lastSyncDate);
+        personInfo.setType(String.class);
+
+        request.addProperty(personInfo);
 
         //Create envelope
         SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
@@ -1415,6 +1492,8 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
                 loadContacts(0);
             }
 
+            db.setLastSync();
+
             publishProgress(12);
             loadContactsAttHistory();
             publishProgress(14);
@@ -1471,7 +1550,9 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
             cursor.moveToFirst();
             while (cursor.moveToNext()) {
                 String nick = cursor.getString(cursor.getColumnIndexOrThrow("usr_nick"));
-                loadUserStatistics("D", 30, 8, nick );
+                loadUserStatistics("X", 30, 0, nick);
+
+                /*loadUserStatistics("D", 30, 8, nick );
                 loadUserStatistics("D", 30, 6, nick );
                 loadUserStatistics("D", 30, 15, nick );
                 loadUserStatistics("D", 30, 16, nick );
@@ -1490,7 +1571,7 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
                 loadUserStatistics("M", 30, 15, nick );
                 loadUserStatistics("M", 30, 16, nick );
                 loadUserStatistics("M", 30, 2, nick );
-                loadUserStatistics("M", 30, 1, nick );
+                loadUserStatistics("M", 30, 1, nick );*/
 
                 progress += step;
                 publishProgress(progress);
