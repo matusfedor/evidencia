@@ -26,13 +26,14 @@
 
     <Button
         android:text="Synchronizácia"
-        android:layout_width="326dp"
+        android:layout_width="fill_parent"
         android:layout_height="50dp"
         android:id="@+id/btnAkt"
         android:elevation="0dp"
         android:layout_alignLeft="@+id/tvResultStat"
         android:layout_alignStart="@+id/tvResultStat"
-        android:layout_below="@id/radioButtonSync"/>
+        android:layout_below="@id/radioButtonSync"
+        android:layout_marginRight="30dp"/>
 
     <ProgressBar
         android:id="@+id/progressBar"
@@ -57,18 +58,20 @@
         android:layout_alignLeft="@+id/progressBar"
         android:layout_alignStart="@+id/progressBar"
         android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_alignParentEnd="true"
+        android:layout_marginRight="30dp"/>
 
     <Button
         android:text="Štatistiky"
-        android:layout_width="326dp"
+        android:layout_width="fill_parent"
         android:layout_height="50dp"
         android:id="@+id/btnStats"
         android:elevation="0dp"
         android:layout_below="@+id/tvResult"
         android:layout_alignLeft="@+id/progressBar"
         android:layout_alignStart="@+id/progressBar"
-        android:layout_marginTop="16dp" />
+        android:layout_marginTop="16dp"
+        android:layout_marginRight="30dp"/>
 
     <ProgressBar
         android:id="@+id/progressBarStats"
@@ -79,20 +82,19 @@
         style="@android:style/Widget.ProgressBar.Horizontal"
         android:layout_below="@+id/btnStats"
         android:layout_alignLeft="@+id/btnStats"
-        android:layout_alignStart="@+id/btnStats"
-        android:layout_alignRight="@+id/btnStats"
-        android:layout_alignEnd="@+id/btnStats"
-        android:layout_marginTop="14dp"/>
+        android:layout_marginTop="14dp"
+        android:layout_marginRight="30dp"/>
 
     <TextView
         android:text="Result: "
-        android:layout_width="326dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/tvResultStat"
         android:layout_below="@+id/btnStats"
         android:layout_alignLeft="@+id/progressBarStats"
         android:layout_alignStart="@+id/progressBarStats"
-        android:layout_marginTop="54dp" />
+        android:layout_marginTop="54dp"
+        android:layout_marginRight="30dp"/>
 
 
 

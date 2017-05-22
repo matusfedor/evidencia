@@ -79,6 +79,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     public static final String COLUMN_USR_ID = "_id";
     public static final String COLUMN_USR_NICK = "usr_nick";
     public static final String COLUMN_USR_NAME = "usr_name";
+    //endregion
 
     //region General
     public static final String TABLE_GENERAL = "general";
@@ -207,7 +208,6 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         return cursor;
     }
 
-    //region Select SQL
     public String getLastSync()
     {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:MM:SS");
@@ -237,10 +237,10 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         return LastSync;
     }
 
-    public Genders getPersonsStatuses(Integer personID) {
+    public Genders getPersonsStatuses(Integer personID)
+    {
         List<Integer> statusList = new ArrayList<Integer>();
-        // Select All Query
-        //String selectQuery = "SELECT MAX(con_state) FROM " + TABLE_conStateHistory + " WHERE con_id = " + personID;
+
         String selectQuery = "SELECT max(att_status_order), change_date FROM " + TABLE_conStateHistory + " his INNER JOIN cl_attribute att ON his.con_state = att._id WHERE his.con_id = " + personID;
 
         SQLiteDatabase db = this.getReadableDatabase();
@@ -259,7 +259,8 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         }
     }
 
-    public int GetAttributeOrder(int statusId) {
+    public int GetAttributeOrder(int statusId)
+    {
         String selectQuery = "SELECT att_status_order FROM " + TABLE_ATTRIBUTE + " WHERE _id = " + statusId;
 
         SQLiteDatabase db = this.getReadableDatabase();
@@ -273,7 +274,8 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         return 0;
     }
 
-    public List<Clients> getAllContacts() {
+    public List<Clients> getAllContacts()
+    {
         List<Clients> contactList = new ArrayList<Clients>();
         // Select All Query
         String selectQuery = "SELECT _id, name, surname FROM " + TABLE_COMMENTS;
@@ -418,7 +420,8 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         return cursor;
     }
 
-    public Cursor getWeekStatistics(int attribute) {
+    public Cursor getWeekStatistics(int attribute)
+    {
         String selectQuery = "SELECT strftime('%W',date('now')) week, count(*) cnt FROM contactStateHistory WHERE con_state = " + attribute + " AND date(change_date)  <  DATE('now', 'weekday 1') AND date(change_date)  >  DATE('now', 'weekday 1', '-7 days')";
 
         SQLiteDatabase db = this.getReadableDatabase();
@@ -426,7 +429,8 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         return cursor;
     }
 
-    public Cursor getWeekStatistics(int attribute, int step) {
+    public Cursor getWeekStatistics(int attribute, int step)
+    {
         String selectQuery = "SELECT strftime('%W.%Y',date('now','" + step * (-7) + " days')) week, count(*) cnt FROM contactStateHistory WHERE con_state = " + attribute + " AND date(change_date)  <  DATE('now', 'weekday 1','" + step * (-7) + " days') AND date(change_date)  >=  DATE('now', 'weekday 1', '" + -7 * (step + 1) + " days')";
 
         SQLiteDatabase db = this.getReadableDatabase();
@@ -442,7 +446,8 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         return cursor;
     }
 
-    public Cursor getMonthStatistics(int attribute, int step) {
+    public Cursor getMonthStatistics(int attribute, int step)
+    {
         String selectQuery = "SELECT strftime('%m.%Y',date('now','start of month','" + step * (-1) + " month')) month, count(*) cnt FROM contactStateHistory WHERE con_state = " + attribute + " AND date(change_date)  >  DATE('now', 'start of month','" + (step) * (-1) + " month', '-1 day') AND date(change_date)  <  DATE('now', 'start of month', '" + (1 - step) + " month')";
 
         SQLiteDatabase db = this.getReadableDatabase();
@@ -482,7 +487,8 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         return cursor;
     }
 
-    public List<Genders> getAllNoteTypes() {
+    public List<Genders> getAllNoteTypes()
+    {
         List<Genders> noteTypesList = new ArrayList<Genders>();
         String selectQuery = "SELECT _id, att_full FROM " + TABLE_ATTRIBUTE + " WHERE att_type = 'N'";
         SQLiteDatabase db = this.getReadableDatabase();
@@ -500,7 +506,8 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         return noteTypesList;
     }
 
-    public Cursor getUsers() {
+    public Cursor getUsers()
+    {
         List<Users> usersList = new ArrayList<Users>();
         String selectQuery = "SELECT usr_nick, usr_name FROM " + TABLE_USERS;
         SQLiteDatabase db = this.getReadableDatabase();
@@ -515,6 +522,21 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 
         // return contact list
         return cursor;
+    }
+
+    public int getClientId(int clientId)
+    {
+        String selectQuery = "SELECT _id FROM " + TABLE_COMMENTS + " WHERE clientId = " + clientId;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        cursor.moveToFirst();
+
+        int _id  = cursor.getCount() > 0 ? cursor.getInt(0) : 0;
+        cursor.close();
+        db.close();
+
+        return _id;
     }
 
     //endregion
@@ -803,6 +825,12 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         db.delete(TABLE_conStateHistory, null, null);
         db.delete(TABLE_USERS, null, null);
         //db.delete(TABLE_STATS, null, null);
+    }
+
+    public void deleteAllContacts()
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(FeedEntry.TABLE_NAME, null, null);
     }
 
     public void deleteStats()
