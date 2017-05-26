@@ -237,6 +237,35 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         return LastSync;
     }
 
+    public String getCurrentDateTime()
+    {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:MM:SS");
+        String selectQuery = "SELECT datetime('now','localtime') LastSyn";
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        cursor.moveToFirst();
+
+        String dsd = DatabaseUtils.dumpCursorToString(cursor);
+        String LastSync = cursor.getString(0);
+
+        if(LastSync == null)
+        {
+            Calendar calendar = Calendar.getInstance();
+            calendar.add(Calendar.YEAR , -1 );
+
+            return sdf.format(calendar.getTime());
+        }
+        /*Date syncDate = null;
+        try {
+            syncDate = sdf.parse(sdf.format(dasdad));
+        }
+        catch (ParseException pe)
+        {}*/
+
+        db.close();
+        return LastSync;
+    }
+
     public Genders getPersonsStatuses(Integer personID)
     {
         List<Integer> statusList = new ArrayList<Integer>();
@@ -821,7 +850,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(FeedReaderContract.Notes.TABLE_NAME, null, null);
-        db.delete(FeedEntry.TABLE_NAME, null, null);
+        //db.delete(FeedEntry.TABLE_NAME, null, null);
         db.delete(TABLE_conStateHistory, null, null);
         db.delete(TABLE_USERS, null, null);
         //db.delete(TABLE_STATS, null, null);

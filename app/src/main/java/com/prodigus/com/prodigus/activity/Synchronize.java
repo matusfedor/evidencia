@@ -35,7 +35,10 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Locale;
+
 import com.prodigus.com.prodigus.MySQLiteHelper;
 import com.prodigus.com.prodigus.R;
 import com.prodigus.com.prodigus.Stats;
@@ -216,6 +219,7 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
         int selectedId = radioButtonSync.getCheckedRadioButtonId();
         radioButton = (RadioButton) findViewById(selectedId);
 
+        Calendar calLocale = new GregorianCalendar(Locale.getDefault());
         Calendar calendar = Calendar.getInstance();
 
         switch (typeOfSynchro)
@@ -971,7 +975,7 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
             int allUsersCount = getUsersCount();
             int userCount = Math.round(allUsersCount / 100);
 
-            for(int k=0; k < userCount; k++)
+            for(int k=0; k <= userCount; k++)
             {
                 loadContacts(k);
                 int loadedUser = k*100 > allUsersCount ? allUsersCount : k*100;
