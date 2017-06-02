@@ -141,7 +141,7 @@ public class TabStatDay extends Fragment {
         timeSeries.clear();
 
         for (int s = 0; s < stepCount; s++) {
-            Cursor c = selectedUser == null ? db.getDayStatistics(attribute, s) : db.getDayStatistics(8, s, selectedUser);
+            Cursor c = selectedUser == null ? db.getDayStatistics(attribute, s) : db.getDayStatistics(attribute, s, selectedUser);
             while (c.moveToNext()) {
                 try {
                     timeSeries.add(sdf.parse(c.getString(c.getColumnIndex("datum"))), c.getDouble(c.getColumnIndex("cnt")));

@@ -185,13 +185,26 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+
     @Override
-    protected void onStop() {
+    protected void onRestart() {
+        SharedPreferences userDetails = getApplicationContext().getSharedPreferences("userdetails", MODE_PRIVATE);
+        int isLogged = userDetails.getInt(getString(R.string.isLogged), 0);
+
+        if(isLogged == 0)
+        {
+            startActivity(new Intent(MainActivity.this, LoginActivity.class));
+        }
+        super.onRestart();
+    }
+
+    @Override
+    protected void onDestroy() {
         SharedPreferences sharedPref = getApplicationContext().getSharedPreferences("userdetails", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putInt(getString(R.string.isLogged), 0);
-
-        super.onStop();
+        editor.commit();
+        super.onDestroy();
     }
 
     //from second

@@ -387,6 +387,12 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
         //Create request
         SoapObject request = new SoapObject(NAMESPACE, "GetAttHistory");
 
+        PropertyInfo lastSyncProp = new PropertyInfo();
+        lastSyncProp.setName("lastSync");
+        lastSyncProp.setValue(getLastSyncDate());
+        lastSyncProp.setType(String.class);
+        request.addProperty(lastSyncProp);
+
         //Set output SOAP object
         envelope.setOutputSoapObject(request);
         //Create HTTP call object
@@ -406,7 +412,7 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
                 int con_id = Integer.parseInt(s_deals.getProperty(1).toString());
                 int att_id = Integer.parseInt(s_deals.getProperty(0).toString());
                 Date creation = dateFormat.parse(s_deals.getProperty(2).toString());
-                long todo1_id = db.createContactHistory(con_id, att_id, creation);
+                long todo1_id = db.createContactHistory(con_id, att_id, creation, 0);
                 Log.i(TAG, Long.toString(todo1_id));
             }
         } catch (Exception e) {
@@ -555,8 +561,8 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
                 String datum = (s_deals.getProperty(0).toString());
                 int cnt = Integer.parseInt(s_deals.getProperty(1).toString());
                 String typeOfStat = (s_deals.getProperty(2).toString());
-
-                long userId = db.createStats(datum, cnt, user, attribute, typeOfStat);
+                int att = Integer.parseInt(s_deals.getProperty(3).toString());
+                long userId = db.createStats(datum, cnt, user, att, typeOfStat);
 
                 //gens.add(new Stats(datum, cnt));
             }
@@ -1042,34 +1048,22 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
             double step = Math.floor(50/cursor.getCount());
 
             cursor.moveToFirst();
-            while (cursor.moveToNext()) {
+            do{
                 String nick = cursor.getString(cursor.getColumnIndexOrThrow("usr_nick"));
                 loadUserStatistics("X", 30, 0, nick);
-
-                /*loadUserStatistics("D", 30, 8, nick );
-                loadUserStatistics("D", 30, 6, nick );
-                loadUserStatistics("D", 30, 15, nick );
-                loadUserStatistics("D", 30, 16, nick );
-                loadUserStatistics("D", 30, 2, nick );
-                loadUserStatistics("D", 30, 1, nick );
-
-                loadUserStatistics("W", 30, 8, nick );
-                loadUserStatistics("W", 30, 6, nick );
-                loadUserStatistics("W", 30, 15, nick );
-                loadUserStatistics("W", 30, 16, nick );
-                loadUserStatistics("W", 30, 2, nick );
-                loadUserStatistics("W", 30, 1, nick );
-
-                loadUserStatistics("M", 30, 8, nick );
-                loadUserStatistics("M", 30, 6, nick );
-                loadUserStatistics("M", 30, 15, nick );
-                loadUserStatistics("M", 30, 16, nick );
-                loadUserStatistics("M", 30, 2, nick );
-                loadUserStatistics("M", 30, 1, nick );*/
 
                 progress += step;
                 publishProgress(progress);
             }
+            while(cursor.moveToNext());
+
+            /*while (cursor.moveToNext()) {
+                String nick = cursor.getString(cursor.getColumnIndexOrThrow("usr_nick"));
+                loadUserStatistics("X", 30, 0, nick);
+
+                progress += step;
+                publishProgress(progress);
+            }*/
             cursor.close();
             publishProgress(50);
 

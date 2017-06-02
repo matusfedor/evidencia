@@ -173,7 +173,7 @@ public class ThirdActivity extends AppCompatActivity implements OnClickListener 
                     todo1_id = db.createToDo(title, name, surname, bdate, city, street, number, email, phone, genderS, "24", 0, 2);
 
                     if(todo1_id > 0){
-                        db.createContactHistory(todo1_id, 1, null);
+                        db.createContactHistory(todo1_id, 1, null, 2);
                     }
                 }
                 else

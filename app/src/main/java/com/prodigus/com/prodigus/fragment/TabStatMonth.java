@@ -115,7 +115,7 @@ public class TabStatMonth extends Fragment {
         timeSeries.clear();
 
         for (int s = 0; s < stepCount; s++) {
-            Cursor c = userSelectedDdl == null ? db.getMonthStatistics(attribute, s) : db.getMonthStatistics(8, s, userSelectedDdl);
+            Cursor c = userSelectedDdl == null ? db.getMonthStatistics(attribute, s) : db.getMonthStatistics(attribute, s, userSelectedDdl);
             while (c.moveToNext()) {
                 try {
                     timeSeries.add(sdf.parse(c.getString(c.getColumnIndex("month"))), c.getDouble(c.getColumnIndex("cnt")));

@@ -34,7 +34,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     public static final String COLUMN_PHONE = "phone";
     public static final String COLUMN_ATT = "attribute";
     public static final String COLUMN_CLIENT_ID = "clientId";
-    public static final String COLUMN_CLIENT_STATUS = "status";
+    public static final String COLUMN_CLIENT_STATUS = "status"; //0-not changed 1-changed 2-new 3-deleted
     //endregion
 
     //region Access
@@ -62,6 +62,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     public static final String COLUMN_CON_ID = "con_id";
     public static final String COLUMN_CON_STATE = "con_state";
     public static final String COLUMN_CHANGE_DATE = "change_date";
+    public static final String COLUMN_HIS_STATUS = "status"; //0-not changed 1-changed 2-new 3-deleted
     //endregion
 
     //region Statistics
@@ -88,7 +89,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     //endregion
 
     private static final String DATABASE_NAME = "contact.db";
-    private static final int DATABASE_VERSION = 27;
+    private static final int DATABASE_VERSION = 28;
 
     public MySQLiteHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -156,7 +157,8 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
             + "(" + COLUMN_HIS_ID + " integer primary key autoincrement, "
             + COLUMN_CON_ID + " integer, "
             + COLUMN_CON_STATE + " integer, "
-            + COLUMN_CHANGE_DATE +  " numeric)";
+            + COLUMN_CHANGE_DATE + " numeric, "
+            + COLUMN_HIS_STATUS + " integer)";
 
     private static final String TABLE_SETACCESS =  "create table "
             + TABLE_ACCESS + "(" + COLUMN_LOG_ID + " integer primary key autoincrement, "
@@ -402,7 +404,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 
     public Cursor getAllContactAttHistory()
     {
-        String selectQuery = "SELECT con_id, con_state, change_date FROM contactStateHistory";
+        String selectQuery = "SELECT con_id, con_state, change_date FROM contactStateHistory WHERE status != 0";
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
         return cursor;
@@ -443,7 +445,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 
     public Cursor getDayStatistics(int attribute, int step, String user)
     {
-        String selectQuery = "SELECT strftime('%d.%m.%Y',date('now','" + step * (-1) + " day')) datum , count(*) cnt FROM " + TABLE_STATS + " WHERE " + COLUMN_ATTRIBUTE + " = " + attribute + " AND date(" + COLUMN_DATE + ") = date('now','" + step * (-1) + " day') AND " + COLUMN_USER + " = '" + user + "'";
+        String selectQuery = "SELECT strftime('%d.%m.%Y',date('now','" + step * (-1) + " day')) datum , stat_count cnt FROM " + TABLE_STATS + " WHERE " + COLUMN_ATTRIBUTE + " = " + attribute + " AND " + COLUMN_DATE + " = strftime('%d.%m.%Y',date('now','" + step * (-1) + " day')) AND " + COLUMN_USER + " = '" + user + "' AND stat_type = 'D'";
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
         return cursor;
@@ -469,7 +471,8 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 
     public Cursor getWeekStatistics(int attribute, int step, String user)
     {
-        String selectQuery = "SELECT strftime('%W.%Y',date('now','" + step * (-7) + " days')) week , count(*) cnt FROM " + TABLE_STATS + " WHERE " + COLUMN_ATTRIBUTE + " = " + attribute + " AND date(" + COLUMN_DATE + ") <  DATE('now', 'weekday 1','" + step * (-7) + " days') AND date(" + COLUMN_DATE + ")  >=  DATE('now', 'weekday 1', ' " + -7 * (step + 1) + " days') AND " + COLUMN_USER + " = '" + user + "'";
+        //String selectQuery = "SELECT strftime('%W.%Y',date('now','" + step * (-7) + " days')) week , count(*) cnt FROM " + TABLE_STATS + " WHERE " + COLUMN_ATTRIBUTE + " = " + attribute + " AND date(" + COLUMN_DATE + ") <  DATE('now', 'weekday 1','" + step * (-7) + " days') AND date(" + COLUMN_DATE + ")  >=  DATE('now', 'weekday 1', ' " + -7 * (step + 1) + " days') AND " + COLUMN_USER + " = '" + user + "'";
+        String selectQuery = "SELECT strftime('%W.%Y',date('now','" + step * (-7) + " days')) week , stat_count cnt FROM " + TABLE_STATS + " WHERE " + COLUMN_ATTRIBUTE + " = " + attribute + " AND " + COLUMN_DATE + " = trim(strftime('%W.%Y',date('now','" + step * (-7) + " days'))) AND " + COLUMN_USER + " = '" + user + "'";
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
         return cursor;
@@ -486,7 +489,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 
     public Cursor getMonthStatistics(int attribute, int step, String user)
     {
-        String selectQuery = "SELECT strftime('%m.%Y',date('now','start of month','" + step * (-1) + " month')) month, count(*) cnt FROM " + TABLE_STATS + " WHERE " + COLUMN_ATTRIBUTE + " = " + attribute + " AND date(" + COLUMN_DATE + ") >  DATE('now', 'start of month','" + (step) * (-1) + " month', '-1 day') AND date(" + COLUMN_DATE + ")  <  DATE('now', 'start of month', '" + (1 - step) + " month') AND " + COLUMN_USER + " = '" + user + "'";
+        String selectQuery = "SELECT strftime('%m.%Y',date('now','start of month','" + step * (-1) + " month')) month, stat_count cnt FROM " + TABLE_STATS + " WHERE " + COLUMN_ATTRIBUTE + " = " + attribute + " AND " + COLUMN_DATE + " = trim(strftime('%m.%Y',date('now','" + (step) * (-1) + " month')),'0') AND " + COLUMN_USER + " = '" + user + "' AND stat_type = 'M'";
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
         return cursor;
@@ -494,7 +497,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 
     public Cursor getSyncNotes()
     {
-        String selectQuery = "SELECT _id, notetext, datec, person, attribute, cin_id, status FROM " + TABLE_NOTES;
+        String selectQuery = "SELECT _id, notetext, datec, person, attribute, cin_id, status FROM " + TABLE_NOTES + " WHERE status !=0 ";
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
         return cursor;
@@ -595,7 +598,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         return todo_id;
     }
 
-    public long createContactHistory(long conID, int state, Date creation) {
+    public long createContactHistory(long conID, int state, Date creation, int status) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:MM:SS");
@@ -609,7 +612,8 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         }
         else
         {values.put(COLUMN_CHANGE_DATE, cDate);}
-        // insert row
+
+        values.put(COLUMN_HIS_STATUS, status);
 
         long todo_id = db.insert(TABLE_conStateHistory, null, values);
 
@@ -796,7 +800,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         values.put(FeedEntry.COLUMN_CLIENT_STATUS, 1);
         long todo_id = db.update(FeedEntry.TABLE_NAME, values, "_id=" + personId, null);
 
-        createContactHistory(personId, attribute, meetingDate);
+        createContactHistory(personId, attribute, meetingDate, 2);
 
         return todo_id;
     }

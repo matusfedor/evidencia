@@ -174,7 +174,7 @@ public class TabStatWeek extends Fragment {
         timeSeries.clear();
 
         for (int s = 0; s < stepCount; s++) {
-            Cursor c = selectedUserDdl == null ? db.getWeekStatistics(attribute, s) : db.getWeekStatistics(8, s, selectedUserDdl);
+            Cursor c = selectedUserDdl == null ? db.getWeekStatistics(attribute, s) : db.getWeekStatistics(attribute, s, selectedUserDdl);
             while (c.moveToNext()) {
                 try {
                     timeSeries.add(sdf.parse(c.getString(c.getColumnIndex("week"))), c.getDouble(c.getColumnIndex("cnt")));
