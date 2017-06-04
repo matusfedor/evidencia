@@ -553,7 +553,7 @@ public class TabStatWeek extends Fragment {
             case R.id.refresh:
                 Toast.makeText(getContext(), "Refresh statistics for user: " + selectedUser, Toast.LENGTH_SHORT).show();
                 showProgress(true);
-                db.deleteStatsByUser(selectedUser);
+                db.deleteStatsByUser(selectedUser, "W");
                 AsyncCallStatsWS task = new AsyncCallStatsWS();
                 task.execute(10);
 
@@ -586,7 +586,7 @@ public class TabStatWeek extends Fragment {
         protected String doInBackground(Integer... params) {
             int progress = 0;
             // db = new MySQLiteHelper(getActivity());
-            loadUserStatistics("X", 30, 0, selectedUser);
+            loadUserStatistics("W", 30, 0, selectedUser);
 
             return "Štatistiky načítané.";
         }

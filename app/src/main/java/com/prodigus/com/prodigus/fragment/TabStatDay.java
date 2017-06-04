@@ -43,6 +43,7 @@ import com.github.mikephil.charting.data.LineDataSet;
 import com.prodigus.com.prodigus.Genders;
 import com.prodigus.com.prodigus.MySQLiteHelper;
 import com.prodigus.com.prodigus.R;
+import com.prodigus.com.prodigus.StatisticInsert;
 import com.prodigus.com.prodigus.Stats;
 import com.prodigus.com.prodigus.Users;
 import com.prodigus.com.prodigus.activity.LoginActivity;
@@ -556,7 +557,7 @@ public class TabStatDay extends Fragment {
             case R.id.refresh:
                 Toast.makeText(getContext(), "Refresh statistics for user: " + selectedUser, Toast.LENGTH_SHORT).show();
                 showProgress(true);
-                db.deleteStatsByUser(selectedUser);
+                db.deleteStatsByUser(selectedUser, "D");
                 AsyncCallStatsWS task = new AsyncCallStatsWS();
                 task.execute(10);
 
@@ -589,7 +590,7 @@ public class TabStatDay extends Fragment {
         protected String doInBackground(Integer... params) {
             int progress = 0;
            // db = new MySQLiteHelper(getActivity());
-            loadUserStatistics("X", 30, 0, selectedUser);
+            loadUserStatistics("D", 30, 0, selectedUser);
 
             return "Štatistiky načítané.";
         }
@@ -662,7 +663,23 @@ public class TabStatDay extends Fragment {
             androidHttpTransport.call(SOAP_ACTION_STATS, envelope);
             SoapObject result = (SoapObject)envelope.getResponse();
 
+            ArrayList<StatisticInsert> listOfStat = new ArrayList<StatisticInsert>();
+
             for (int i = 0; i < result.getPropertyCount(); i++)
+            {
+                SoapObject s_deals = (SoapObject) result.getProperty(i);
+
+                String datum = (s_deals.getProperty(0).toString());
+                int cnt = Integer.parseInt(s_deals.getProperty(1).toString());
+                String typeOfStat = (s_deals.getProperty(2).toString());
+                int att = Integer.parseInt(s_deals.getProperty(3).toString());
+
+                listOfStat.add(new StatisticInsert(datum, cnt, user,  att, typeOfStat));
+            }
+
+            db.createStats(listOfStat);
+
+            /*for (int i = 0; i < result.getPropertyCount(); i++)
             {
                 SoapObject s_deals = (SoapObject) result.getProperty(i);
 
@@ -673,7 +690,7 @@ public class TabStatDay extends Fragment {
                 long userId = db.createStats(datum, cnt, user, att, typeOfStat);
 
                 //gens.add(new Stats(datum, cnt));
-            }
+            }*/
         } catch (Exception e) {
             e.printStackTrace();
         }

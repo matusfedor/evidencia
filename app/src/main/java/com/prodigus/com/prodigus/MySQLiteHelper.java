@@ -660,6 +660,28 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         return todo_id;
     }
 
+    public void createStats(ArrayList<StatisticInsert> statInsert) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        db.beginTransaction();
+        try {
+            for(int i=0; i < statInsert.size(); i++)
+            {
+                ContentValues values = new ContentValues();
+                values.put("stat_date",statInsert.get(i).getDate());
+                values.put("stat_count", statInsert.get(i).getCountOf());
+                values.put("stat_user",statInsert.get(i).getUser());
+                values.put("stat_attribute",statInsert.get(i).getAttribute());
+                values.put("stat_type",statInsert.get(i).getType());
+
+                long todo_id = db.insert(TABLE_STATS, null, values);
+            }
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
+    }
+
     public long createStats(String stat_date, int cnt, String user, int attribute, String type) {
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -670,8 +692,15 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         values.put("stat_attribute",attribute);
         values.put("stat_type",type);
 
-
         long todo_id = db.insert(TABLE_STATS, null, values);
+
+        /*db.beginTransaction();
+        try {
+            todo_id = db.insert(TABLE_STATS, null, values);
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }*/
 
         return todo_id;
     }
@@ -885,10 +914,10 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         db.delete(TABLE_STATS, null, null);
     }
 
-    public void deleteStatsByUser(String user)
+    public void deleteStatsByUser(String user, String stat_type)
     {
         SQLiteDatabase db = this.getWritableDatabase();
-        db.delete(TABLE_STATS, "stat_user = '" + user + "'", null);
+        db.delete(TABLE_STATS, "stat_user = '" + user + "' AND stat_type = '" + stat_type + "'", null);
     }
 
     public void deleteAllAttributes()

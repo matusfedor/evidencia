@@ -33,6 +33,7 @@ import android.widget.TextView;
 import java.io.StringReader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -41,6 +42,7 @@ import java.util.Locale;
 
 import com.prodigus.com.prodigus.MySQLiteHelper;
 import com.prodigus.com.prodigus.R;
+import com.prodigus.com.prodigus.StatisticInsert;
 import com.prodigus.com.prodigus.Stats;
 
 public class Synchronize extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -128,7 +130,23 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
                 progressBarStat.setProgress(0);
 
                 AsyncCallStatsWS task = new AsyncCallStatsWS();
-                task.execute(10);
+                task.execute("");
+
+                /*db.deleteStats();
+
+                Cursor cursor = db.getUsers();
+                double step = Math.floor(50/cursor.getCount());
+
+                cursor.moveToFirst();
+                do{
+                    String nick = cursor.getString(cursor.getColumnIndexOrThrow("usr_nick"));
+
+                    AsyncCallStatsWS task = new AsyncCallStatsWS();
+                    task.execute(nick);
+                }
+                while(cursor.moveToNext());
+
+                cursor.close();*/
 
             }
         });
@@ -554,6 +572,8 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
             androidHttpTransport.call(SOAP_ACTION_STATS, envelope);
             SoapObject result = (SoapObject)envelope.getResponse();
 
+            ArrayList<StatisticInsert> listOfStat = new ArrayList<StatisticInsert>();
+
             for (int i = 0; i < result.getPropertyCount(); i++)
             {
                 SoapObject s_deals = (SoapObject) result.getProperty(i);
@@ -562,10 +582,16 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
                 int cnt = Integer.parseInt(s_deals.getProperty(1).toString());
                 String typeOfStat = (s_deals.getProperty(2).toString());
                 int att = Integer.parseInt(s_deals.getProperty(3).toString());
-                long userId = db.createStats(datum, cnt, user, att, typeOfStat);
+
+                listOfStat.add(new StatisticInsert(datum, cnt, user,  att, typeOfStat));
+
+                //long userId = db.createStats(datum, cnt, user, att, typeOfStat);
 
                 //gens.add(new Stats(datum, cnt));
             }
+
+            db.createStats(listOfStat);
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -1037,10 +1063,11 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
 
     }
 
-    private class AsyncCallStatsWS extends AsyncTask<Integer, Integer, String> {
+    private class AsyncCallStatsWS extends AsyncTask<String, Integer, String> {
         @Override
-        protected String doInBackground(Integer... params) {
+        protected String doInBackground(String... params) {
             int progress = 0;
+            //String nameOfUser = params[0];
 
             db.deleteStats();
 
@@ -1048,7 +1075,7 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
             double step = Math.floor(50/cursor.getCount());
 
             cursor.moveToFirst();
-            do{
+            do {
                 String nick = cursor.getString(cursor.getColumnIndexOrThrow("usr_nick"));
                 loadUserStatistics("X", 30, 0, nick);
 
@@ -1057,13 +1084,6 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
             }
             while(cursor.moveToNext());
 
-            /*while (cursor.moveToNext()) {
-                String nick = cursor.getString(cursor.getColumnIndexOrThrow("usr_nick"));
-                loadUserStatistics("X", 30, 0, nick);
-
-                progress += step;
-                publishProgress(progress);
-            }*/
             cursor.close();
             publishProgress(50);
 
@@ -1074,20 +1094,11 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
         protected void onPostExecute(String result) {
             Log.i(TAG, "onPostExecute");
             tvResultStat.setText(result);
-            //progressBar.setVisibility(View.GONE);
-            //Button btnAkt = (Button) findViewById(R.id.btnAkt);
-            //btnAkt.setText("AktualizĂˇcia Ăşdajov");
-            //btnAkt.setBackgroundColor(Color.LTGRAY);
-            //tv.setText(fahren + " F");
         }
 
         @Override
         protected void onPreExecute() {
             Log.i(TAG, "onPreExecute");
-            //Button btnAkt = (Button) findViewById(R.id.btnAkt);
-            //btnAkt.setText("Odosielam dĂˇta...");
-            //btnAkt.setBackgroundColor(Color.RED);
-            //tv.setText("Calculating...");
         }
 
         @Override
