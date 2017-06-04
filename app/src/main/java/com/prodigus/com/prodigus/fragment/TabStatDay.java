@@ -1,12 +1,20 @@
 package com.prodigus.com.prodigus.fragment;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.annotation.TargetApi;
+import android.app.LoaderManager;
 import android.content.Context;
+import android.content.CursorLoader;
+import android.content.Loader;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -21,6 +29,7 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -36,6 +45,7 @@ import com.prodigus.com.prodigus.MySQLiteHelper;
 import com.prodigus.com.prodigus.R;
 import com.prodigus.com.prodigus.Stats;
 import com.prodigus.com.prodigus.Users;
+import com.prodigus.com.prodigus.activity.LoginActivity;
 import com.prodigus.com.prodigus.activity.Synchronize;
 import com.prodigus.com.prodigus.activity.TabStatistics;
 
@@ -62,6 +72,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import static android.content.ContentValues.TAG;
 
 public class TabStatDay extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
@@ -115,6 +127,8 @@ public class TabStatDay extends Fragment {
                              Bundle savedInstanceState) {
 
         myFragmentView = inflater.inflate(R.layout.fragment_tab_stat_day, container, false);
+        mProgressView = myFragmentView.findViewById(R.id.statDay_progress);
+
         chartLyt = (LinearLayout) myFragmentView.findViewById(R.id.chart);
         db = new MySQLiteHelper(getActivity());
 
@@ -538,6 +552,18 @@ public class TabStatDay extends Fragment {
                     item.setChecked(true);
                 }
                 return true;
+
+            case R.id.refresh:
+                Toast.makeText(getContext(), "Refresh statistics for user: " + selectedUser, Toast.LENGTH_SHORT).show();
+                showProgress(true);
+                db.deleteStatsByUser(selectedUser);
+                AsyncCallStatsWS task = new AsyncCallStatsWS();
+                task.execute(10);
+
+                // User chose the "Favorite" action, mark the current item
+                // as a favorite...
+                return true;
+
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -556,5 +582,173 @@ public class TabStatDay extends Fragment {
     public void onResume() {
         super.onResume();
         addViewChart(logUser.equals(selectedUser));
+    }
+
+    private class AsyncCallStatsWS extends AsyncTask<Integer, Integer, String> {
+        @Override
+        protected String doInBackground(Integer... params) {
+            int progress = 0;
+           // db = new MySQLiteHelper(getActivity());
+            loadUserStatistics("X", 30, 0, selectedUser);
+
+            return "Štatistiky načítané.";
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            Log.i(TAG, "onPostExecute");
+            addViewChart(logUser.equals(selectedUser));
+            chartView.repaint();
+            showProgress(false);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            Log.i(TAG, "onPreExecute");
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            Log.i(TAG, "onProgressUpdate");
+        }
+
+    }
+
+    private final String NAMESPACE = "http://microsoft.com/webservices/";
+    private final String URL = "http://evidencia.prodigus.sk/EvidenceService.asmx";
+    private final String SOAP_ACTION_STATS = "http://microsoft.com/webservices/GetStatistics";
+    private final String METHOD_NAME_STAT = "GetStatistics";
+
+    public void loadUserStatistics(String type, int steps, int attribute, String user) {
+        List<Stats> gens = null;
+
+        SoapSerializationEnvelope envelope = setEnvelope();
+
+        //Create request
+        SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME_STAT);
+
+        PropertyInfo usernameProp = new PropertyInfo();
+        usernameProp.setName("username");
+        usernameProp.setValue(user);
+        usernameProp.setType(String.class);
+        request.addProperty(usernameProp);
+
+        PropertyInfo typeProp = new PropertyInfo();
+        typeProp.setName("userType");
+        typeProp.setValue(type);
+        typeProp.setType(String.class);
+        request.addProperty(typeProp);
+
+        PropertyInfo stepsProp = new PropertyInfo();
+        stepsProp.setName("steps");
+        stepsProp.setValue(steps);
+        stepsProp.setType(int.class);
+        request.addProperty(stepsProp);
+
+        PropertyInfo attributeProp = new PropertyInfo();
+        attributeProp.setName("attribute");
+        attributeProp.setValue(attribute);
+        attributeProp.setType(int.class);
+        request.addProperty(attributeProp);
+
+        //Set output SOAP object
+        envelope.setOutputSoapObject(request);
+        //Create HTTP call object
+        HttpTransportSE androidHttpTransport = new HttpTransportSE(URL);
+
+        Log.i("loading stats", "" + envelope.bodyOut.toString());
+
+        try {
+            androidHttpTransport.call(SOAP_ACTION_STATS, envelope);
+            SoapObject result = (SoapObject)envelope.getResponse();
+
+            for (int i = 0; i < result.getPropertyCount(); i++)
+            {
+                SoapObject s_deals = (SoapObject) result.getProperty(i);
+
+                String datum = (s_deals.getProperty(0).toString());
+                int cnt = Integer.parseInt(s_deals.getProperty(1).toString());
+                String typeOfStat = (s_deals.getProperty(2).toString());
+                int att = Integer.parseInt(s_deals.getProperty(3).toString());
+                long userId = db.createStats(datum, cnt, user, att, typeOfStat);
+
+                //gens.add(new Stats(datum, cnt));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public SoapSerializationEnvelope setEnvelope()
+    {
+        String logname = "";
+        String pin = "";
+        Cursor c = db.getAuth();
+
+        if(Integer.valueOf(c.getCount()) > 0) {
+
+            if (c.moveToFirst()) {
+                logname = c.getString(c.getColumnIndex("logname"));
+                pin = c.getString(c.getColumnIndex("pin"));
+            }
+            c.close();
+        }
+        else {
+            return null;
+        }
+
+        //Create envelope
+        SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
+                SoapEnvelope.VER11);
+
+        /*header*/
+        Element h = new Element().createElement(NAMESPACE, "UserCredentials");
+        Element Username = new Element().createElement(NAMESPACE, "userName");
+        Username.addChild(Node.TEXT, logname);
+        h.addChild(Node.ELEMENT, Username);
+        Element wssePassword = new Element().createElement(NAMESPACE, "password");
+        wssePassword.addChild(Node.TEXT, pin);
+        h.addChild(Node.ELEMENT, wssePassword);
+
+        envelope.headerOut = new Element[]{h};
+        envelope.dotNet = true;
+
+        return envelope;
+    }
+
+
+    private View mProgressView;
+
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
+    private void showProgress(final boolean show) {
+        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
+        // for very easy animations. If available, use these APIs to fade-in
+        // the progress spinner.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
+
+            chartLyt.setVisibility(show ? View.GONE : View.VISIBLE);
+            chartLyt.animate().setDuration(shortAnimTime).alpha(
+                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    chartLyt.setVisibility(show ? View.GONE : View.VISIBLE);
+                }
+            });
+
+            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+            mProgressView.animate().setDuration(shortAnimTime).alpha(
+                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+                }
+            });
+        } else {
+            // The ViewPropertyAnimator APIs are not available, so simply show
+            // and hide the relevant UI components.
+            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+            chartLyt.setVisibility(show ? View.GONE : View.VISIBLE);
+        }
     }
 }

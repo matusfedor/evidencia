@@ -91,6 +91,19 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "contact.db";
     private static final int DATABASE_VERSION = 28;
 
+    private static MySQLiteHelper mInstance = null;
+
+    public static MySQLiteHelper getInstance(Context ctx) {
+
+        // Use the application context, which will ensure that you
+        // don't accidentally leak an Activity's context.
+        // See this article for more information: http://bit.ly/6LRzfx
+        if (mInstance == null) {
+            mInstance = new MySQLiteHelper(ctx.getApplicationContext());
+        }
+        return mInstance;
+    }
+
     public MySQLiteHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
@@ -870,6 +883,12 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_STATS, null, null);
+    }
+
+    public void deleteStatsByUser(String user)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_STATS, "stat_user = '" + user + "'", null);
     }
 
     public void deleteAllAttributes()
