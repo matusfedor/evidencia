@@ -430,8 +430,16 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
                 int con_id = Integer.parseInt(s_deals.getProperty(1).toString());
                 int att_id = Integer.parseInt(s_deals.getProperty(0).toString());
                 Date creation = dateFormat.parse(s_deals.getProperty(2).toString());
-                long todo1_id = db.createContactHistory(con_id, att_id, creation, 0);
-                Log.i(TAG, Long.toString(todo1_id));
+                int historyId = Integer.parseInt(s_deals.getProperty(3).toString());
+
+                int currClientId = db.getClientHistoryId(historyId);
+
+                if(currClientId == 0) {
+                    db.createContactHistory(con_id, att_id, creation, 0, historyId);
+                }
+                else {
+                    db.updateStatusContactHistory(currClientId);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -816,6 +824,7 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
 
     public void sendAllContactAttHistory()
     {
+        int id = 0;
         int clientId = 0;
         int attribute = 0;
         Date creation = null;
@@ -827,6 +836,7 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
 
         Cursor cursor = db.getAllContactAttHistory();
         while (cursor.moveToNext()) {
+            id = cursor.getInt(cursor.getColumnIndexOrThrow("_id"));
             clientId = cursor.getInt(cursor.getColumnIndexOrThrow("con_id"));
             attribute = cursor.getInt(cursor.getColumnIndexOrThrow("con_state"));
             String s = cursor.getString(cursor.getColumnIndexOrThrow("change_date"));
@@ -839,7 +849,7 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
             }
             //creation = new Date(cursor.getLong(cursor.getColumnIndexOrThrow("change_date")));
 
-            sendContactAttHistory(clientId, attribute, creation);
+            sendContactAttHistory(id, clientId, attribute, creation);
         }
         cursor.close();
     }
@@ -881,7 +891,7 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
         cursor.close();
     }
 
-    public void sendContactAttHistory(int clientId, int attribute, Date creation) {
+    public void sendContactAttHistory(int id, int clientId, int attribute, Date creation) {
 
         SoapSerializationEnvelope envelope = setEnvelope();
 
@@ -917,6 +927,15 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
         try {
             androidHttpTransport.call("http://microsoft.com/webservices/InsertAttHistory", envelope);
             SoapPrimitive results = (SoapPrimitive)envelope.getResponse();
+
+            Integer returnValue = Integer.parseInt(results.toString());
+
+            if(returnValue != null && returnValue > 0)
+            {
+                //aplikovane v send contacts
+                //db.updateContactClientId(id, returnValue);
+                db.updateContactHistoryInternalId(id, returnValue);
+            }
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -1000,6 +1019,7 @@ public class Synchronize extends AppCompatActivity implements NavigationView.OnN
             if(typeOfSynchro.equals("F"))
             {
                 db.deleteAllContacts();
+                db.deleteAllContactsHistory();
             }
 
             db.deleteAll();

@@ -63,6 +63,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     public static final String COLUMN_CON_STATE = "con_state";
     public static final String COLUMN_CHANGE_DATE = "change_date";
     public static final String COLUMN_HIS_STATUS = "status"; //0-not changed 1-changed 2-new 3-deleted
+    public static final String COLUMN_HIS_SERVER_ID = "history_id";
     //endregion
 
     //region Statistics
@@ -89,7 +90,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     //endregion
 
     private static final String DATABASE_NAME = "contact.db";
-    private static final int DATABASE_VERSION = 28;
+    private static final int DATABASE_VERSION = 29;
 
     private static MySQLiteHelper mInstance = null;
 
@@ -171,6 +172,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
             + COLUMN_CON_ID + " integer, "
             + COLUMN_CON_STATE + " integer, "
             + COLUMN_CHANGE_DATE + " numeric, "
+            + COLUMN_HIS_SERVER_ID + " integer, "
             + COLUMN_HIS_STATUS + " integer)";
 
     private static final String TABLE_SETACCESS =  "create table "
@@ -417,7 +419,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 
     public Cursor getAllContactAttHistory()
     {
-        String selectQuery = "SELECT con_id, con_state, change_date FROM contactStateHistory WHERE status != 0";
+        String selectQuery = "SELECT _id, con_id, con_state, change_date FROM contactStateHistory WHERE status != 0";
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
         return cursor;
@@ -584,6 +586,21 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         return _id;
     }
 
+    public int getClientHistoryId(int historyId)
+    {
+        String selectQuery = "SELECT _id FROM " + TABLE_conStateHistory + " WHERE " + COLUMN_HIS_SERVER_ID + " = " + historyId;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        cursor.moveToFirst();
+
+        int _id  = cursor.getCount() > 0 ? cursor.getInt(0) : 0;
+        cursor.close();
+        db.close();
+
+        return _id;
+    }
+
     //endregion
 
     //region Insert SQL
@@ -611,7 +628,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         return todo_id;
     }
 
-    public long createContactHistory(long conID, int state, Date creation, int status) {
+    public long createContactHistory(long conID, int state, Date creation, int status, int historyId) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:MM:SS");
@@ -627,6 +644,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         {values.put(COLUMN_CHANGE_DATE, cDate);}
 
         values.put(COLUMN_HIS_STATUS, status);
+        values.put(COLUMN_HIS_SERVER_ID, historyId);
 
         long todo_id = db.insert(TABLE_conStateHistory, null, values);
 
@@ -794,6 +812,18 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         return todo_id;
     }
 
+    public long updateStatusContactHistory(int historyId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_HIS_SERVER_ID, 0);
+
+        long todo_id = db.update(TABLE_conStateHistory, values, COLUMN_HIS_SERVER_ID + " = " + historyId, null);
+
+        return todo_id;
+    }
+
+
     public void setLastSync()
     {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -834,6 +864,21 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         return todo_id;
     }
 
+    public long updateContactHistoryInternalId(int id, int historyId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        if(String.valueOf(historyId).isEmpty() && historyId > 0)
+        { return 0;}
+
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_HIS_SERVER_ID, historyId);
+        values.put(COLUMN_HIS_STATUS, 0);
+
+        long todo_id = db.update(TABLE_conStateHistory, values, " _id = " + id, null);
+
+        return todo_id;
+    }
+
     public long updateStatus(int personId, int attribute, Date meetingDate) {
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -842,7 +887,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         values.put(FeedEntry.COLUMN_CLIENT_STATUS, 1);
         long todo_id = db.update(FeedEntry.TABLE_NAME, values, "_id=" + personId, null);
 
-        createContactHistory(personId, attribute, meetingDate, 2);
+        createContactHistory(personId, attribute, meetingDate, 2, 0);
 
         return todo_id;
     }
@@ -897,7 +942,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(FeedReaderContract.Notes.TABLE_NAME, null, null);
         //db.delete(FeedEntry.TABLE_NAME, null, null);
-        db.delete(TABLE_conStateHistory, null, null);
+        //db.delete(TABLE_conStateHistory, null, null);
         db.delete(TABLE_USERS, null, null);
         //db.delete(TABLE_STATS, null, null);
     }
@@ -906,6 +951,12 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(FeedEntry.TABLE_NAME, null, null);
+    }
+
+    public void deleteAllContactsHistory()
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_conStateHistory, null, null);
     }
 
     public void deleteStats()
