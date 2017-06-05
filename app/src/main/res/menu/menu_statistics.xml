@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <group android:checkableBehavior="all">
         <item android:id="@+id/red" android:checked="true"
-            android:title="AFA" />
+            android:title="AFA/APP" />
         <item android:id="@+id/blue" android:checked="true"
             android:title="TELK" />
         <item android:id="@+id/green"

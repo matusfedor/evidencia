@@ -124,7 +124,7 @@ public class TabStatMonth extends Fragment {
         }
     }
 
-    private double getStatistics(TimeSeries timeSeries, int attribute, double maxValues, String userSelectedDdl)
+    private double getStatistics(TimeSeries timeSeries, int[] attribute, double maxValues, String userSelectedDdl)
     {
         SimpleDateFormat sdf = new SimpleDateFormat("MM.yyyy");
         double maxValue = maxValues;
@@ -201,37 +201,37 @@ public class TabStatMonth extends Fragment {
         XYMultipleSeriesRenderer mRenderer = new XYMultipleSeriesRenderer();
         XYMultipleSeriesDataset dataset = new XYMultipleSeriesDataset();
         if(serieCheckedAfa) {
-            maxValue = getStatistics(seriesAfa, 10, maxValue, null);
+            maxValue = getStatistics(seriesAfa, new int[]{10,24}, maxValue, null);
             dataset.addSeries(seriesAfa);
             mRenderer.addSeriesRenderer(renderer);
         }
         if(serieCheckedTelk)
         {
-            maxValue = getStatistics(seriesTelk, 14, maxValue, null);
+            maxValue = getStatistics(seriesTelk, new int[]{14}, maxValue, null);
             dataset.addSeries(seriesTelk);
             mRenderer.addSeriesRenderer(renderer2);
         }
         if(serieCheckedTerm)
         {
-            maxValue = getStatistics(seriesTerm, 15, maxValue, null);
+            maxValue = getStatistics(seriesTerm, new int[]{15}, maxValue, null);
             dataset.addSeries(seriesTerm);
             mRenderer.addSeriesRenderer(renderer3);
         }
         if(serieCheckedFa)
         {
-            maxValue = getStatistics(seriesFa, 16, maxValue, null);
+            maxValue = getStatistics(seriesFa, new int[]{16}, maxValue, null);
             dataset.addSeries(seriesFa);
             mRenderer.addSeriesRenderer(renderer4);
         }
         if(serieCheckedPk)
         {
-            maxValue = getStatistics(seriesPk, 2, maxValue, null);
+            maxValue = getStatistics(seriesPk, new int[]{2}, maxValue, null);
             dataset.addSeries(seriesPk);
             mRenderer.addSeriesRenderer(renderer5);
         }
         if(serieCheckedKlient)
         {
-            maxValue = getStatistics(seriesKlient, 1, maxValue, null);
+            maxValue = getStatistics(seriesKlient, new int[]{1}, maxValue, null);
             dataset.addSeries(seriesKlient);
             mRenderer.addSeriesRenderer(renderer6);
         }
@@ -301,37 +301,37 @@ public class TabStatMonth extends Fragment {
         XYMultipleSeriesRenderer mRenderer = new XYMultipleSeriesRenderer();
         XYMultipleSeriesDataset dataset = new XYMultipleSeriesDataset();
         if(serieCheckedAfa) {
-            maxValue = getStatistics(seriesAfa, 10, maxValue, selectedUser);
+            maxValue = getStatistics(seriesAfa, new int[]{10,24}, maxValue, selectedUser);
             dataset.addSeries(seriesAfa);
             mRenderer.addSeriesRenderer(renderer);
         }
         if(serieCheckedTelk)
         {
-            maxValue = getStatistics(seriesTelk, 14, maxValue, selectedUser);
+            maxValue = getStatistics(seriesTelk, new int[]{14}, maxValue, selectedUser);
             dataset.addSeries(seriesTelk);
             mRenderer.addSeriesRenderer(renderer2);
         }
         if(serieCheckedTerm)
         {
-            maxValue = getStatistics(seriesTerm, 15, maxValue, selectedUser);
+            maxValue = getStatistics(seriesTerm, new int[]{15}, maxValue, selectedUser);
             dataset.addSeries(seriesTerm);
             mRenderer.addSeriesRenderer(renderer3);
         }
         if(serieCheckedFa)
         {
-            maxValue = getStatistics(seriesFa, 16, maxValue, selectedUser);
+            maxValue = getStatistics(seriesFa, new int[]{16}, maxValue, selectedUser);
             dataset.addSeries(seriesFa);
             mRenderer.addSeriesRenderer(renderer4);
         }
         if(serieCheckedPk)
         {
-            maxValue = getStatistics(seriesPk, 2, maxValue, selectedUser);
+            maxValue = getStatistics(seriesPk, new int[]{2}, maxValue, selectedUser);
             dataset.addSeries(seriesPk);
             mRenderer.addSeriesRenderer(renderer5);
         }
         if(serieCheckedKlient)
         {
-            maxValue = getStatistics(seriesKlient, 1, maxValue, selectedUser);
+            maxValue = getStatistics(seriesKlient, new int[]{1}, maxValue, selectedUser);
             dataset.addSeries(seriesKlient);
             mRenderer.addSeriesRenderer(renderer6);
         }

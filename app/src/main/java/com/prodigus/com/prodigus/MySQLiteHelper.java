@@ -13,6 +13,7 @@ import android.content.ContentValues;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -450,17 +451,17 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         return cursor;
     }
 
-    public Cursor getDayStatistics(int attribute, int step)
+    public Cursor getDayStatistics(int[] attribute, int step)
     {
-        String selectQuery = "SELECT strftime('%d.%m.%Y',date('now','" + step * (-1) + " day')) datum , count(*) cnt FROM contactStateHistory WHERE con_state = " + attribute + " AND date(change_date) = date('now','" + step * (-1) + " day')";
+        String selectQuery = "SELECT strftime('%d.%m.%Y',date('now','" + step * (-1) + " day')) datum , count(*) cnt FROM contactStateHistory WHERE con_state IN " + Arrays.toString(attribute).replace('[','(').replace(']',')') + " AND date(change_date) = date('now','" + step * (-1) + " day')";
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
         return cursor;
     }
 
-    public Cursor getDayStatistics(int attribute, int step, String user)
+    public Cursor getDayStatistics(int[] attribute, int step, String user)
     {
-        String selectQuery = "SELECT strftime('%d.%m.%Y',date('now','" + step * (-1) + " day')) datum , stat_count cnt FROM " + TABLE_STATS + " WHERE " + COLUMN_ATTRIBUTE + " = " + attribute + " AND " + COLUMN_DATE + " = strftime('%d.%m.%Y',date('now','" + step * (-1) + " day')) AND " + COLUMN_USER + " = '" + user + "' AND stat_type = 'D'";
+        String selectQuery = "SELECT strftime('%d.%m.%Y',date('now','" + step * (-1) + " day')) datum , stat_count cnt FROM " + TABLE_STATS + " WHERE " + COLUMN_ATTRIBUTE + " IN " + Arrays.toString(attribute).replace('[','(').replace(']',')') + " AND " + COLUMN_DATE + " = strftime('%d.%m.%Y',date('now','" + step * (-1) + " day')) AND " + COLUMN_USER + " = '" + user + "' AND stat_type = 'D'";
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
         return cursor;
@@ -484,6 +485,24 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         return cursor;
     }
 
+    public Cursor getWeekStatistics(int[] attribute, int step)
+    {
+        String selectQuery = "SELECT strftime('%W.%Y',date('now','" + step * (-7) + " days')) week, count(*) cnt FROM contactStateHistory WHERE con_state IN " + Arrays.toString(attribute).replace('[','(').replace(']',')') + " AND date(change_date)  <  DATE('now', 'weekday 1','" + step * (-7) + " days') AND date(change_date)  >=  DATE('now', 'weekday 1', '" + -7 * (step + 1) + " days')";
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        return cursor;
+    }
+
+    public Cursor getWeekStatistics(int[] attribute, int step, String user)
+    {
+        //String selectQuery = "SELECT strftime('%W.%Y',date('now','" + step * (-7) + " days')) week , count(*) cnt FROM " + TABLE_STATS + " WHERE " + COLUMN_ATTRIBUTE + " = " + attribute + " AND date(" + COLUMN_DATE + ") <  DATE('now', 'weekday 1','" + step * (-7) + " days') AND date(" + COLUMN_DATE + ")  >=  DATE('now', 'weekday 1', ' " + -7 * (step + 1) + " days') AND " + COLUMN_USER + " = '" + user + "'";
+        String selectQuery = "SELECT strftime('%W.%Y',date('now','" + step * (-7) + " days')) week , stat_count cnt FROM " + TABLE_STATS + " WHERE " + COLUMN_ATTRIBUTE + " IN " + Arrays.toString(attribute).replace('[','(').replace(']',')') + " AND " + COLUMN_DATE + " = trim(strftime('%W.%Y',date('now','" + step * (-7) + " days'))) AND " + COLUMN_USER + " = '" + user + "'";
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        return cursor;
+    }
+
     public Cursor getWeekStatistics(int attribute, int step, String user)
     {
         //String selectQuery = "SELECT strftime('%W.%Y',date('now','" + step * (-7) + " days')) week , count(*) cnt FROM " + TABLE_STATS + " WHERE " + COLUMN_ATTRIBUTE + " = " + attribute + " AND date(" + COLUMN_DATE + ") <  DATE('now', 'weekday 1','" + step * (-7) + " days') AND date(" + COLUMN_DATE + ")  >=  DATE('now', 'weekday 1', ' " + -7 * (step + 1) + " days') AND " + COLUMN_USER + " = '" + user + "'";
@@ -493,18 +512,18 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         return cursor;
     }
 
-    public Cursor getMonthStatistics(int attribute, int step)
+    public Cursor getMonthStatistics(int[] attribute, int step)
     {
-        String selectQuery = "SELECT strftime('%m.%Y',date('now','start of month','" + step * (-1) + " month')) month, count(*) cnt FROM contactStateHistory WHERE con_state = " + attribute + " AND date(change_date)  >  DATE('now', 'start of month','" + (step) * (-1) + " month', '-1 day') AND date(change_date)  <  DATE('now', 'start of month', '" + (1 - step) + " month')";
+        String selectQuery = "SELECT strftime('%m.%Y',date('now','start of month','" + step * (-1) + " month')) month, count(*) cnt FROM contactStateHistory WHERE con_state IN " + Arrays.toString(attribute).replace('[','(').replace(']',')') + " AND date(change_date)  >  DATE('now', 'start of month','" + (step) * (-1) + " month', '-1 day') AND date(change_date)  <  DATE('now', 'start of month', '" + (1 - step) + " month')";
 
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
         return cursor;
     }
 
-    public Cursor getMonthStatistics(int attribute, int step, String user)
+    public Cursor getMonthStatistics(int[] attribute, int step, String user)
     {
-        String selectQuery = "SELECT strftime('%m.%Y',date('now','start of month','" + step * (-1) + " month')) month, stat_count cnt FROM " + TABLE_STATS + " WHERE " + COLUMN_ATTRIBUTE + " = " + attribute + " AND " + COLUMN_DATE + " = trim(strftime('%m.%Y',date('now','" + (step) * (-1) + " month')),'0') AND " + COLUMN_USER + " = '" + user + "' AND stat_type = 'M'";
+        String selectQuery = "SELECT strftime('%m.%Y',date('now','start of month','" + step * (-1) + " month')) month, stat_count cnt FROM " + TABLE_STATS + " WHERE " + COLUMN_ATTRIBUTE + " IN "+ Arrays.toString(attribute).replace('[','(').replace(']',')') + " AND " + COLUMN_DATE + " = trim(strftime('%m.%Y',date('now','" + (step) * (-1) + " month')),'0') AND " + COLUMN_USER + " = '" + user + "' AND stat_type = 'M'";
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
         return cursor;
